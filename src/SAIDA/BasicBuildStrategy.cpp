@@ -9,18 +9,18 @@ BasicBuildStrategy &BasicBuildStrategy::Instance()
 	static BasicBuildStrategy instance;
 	return instance;
 }
-
+//构造函数=========================================================================
 BasicBuildStrategy::BasicBuildStrategy()
 {
 	setFrameCountFlag(24 * 420);
 	canceledBunker = false;
 	notCancel = false;
 }
-
+//析解函数=========================================================================
 BasicBuildStrategy::~BasicBuildStrategy()
 {
 }
-
+//获取第二个基地的位置=========================================================================
 TilePosition MyBot::BasicBuildStrategy::getSecondCommandPosition(bool force)
 {
 
@@ -30,7 +30,7 @@ TilePosition MyBot::BasicBuildStrategy::getSecondCommandPosition(bool force)
 			return secondCommandPosition;
 
 		TilePosition tp = ConstructionPlaceFinder::Instance().getBuildLocationBySpiralSearch(Terran_Command_Center, (TilePosition)secondCommandPosition, false, MYBASE);
-
+		//test
 		if (tp != TilePositions::None) {
 			return tp;
 		}
@@ -38,7 +38,7 @@ TilePosition MyBot::BasicBuildStrategy::getSecondCommandPosition(bool force)
 	}
 
 	secondCommandPosition = TilePositions::None;
-
+	//如果没有第一次扩张的位置，返回none
 	if (!INFO.getFirstExpansionLocation(S))
 		return secondCommandPosition;
 
@@ -64,9 +64,9 @@ TilePosition MyBot::BasicBuildStrategy::getSecondCommandPosition(bool force)
 			tempPosition = ConstructionPlaceFinder::Instance().getBuildLocationBySpiralSearch(Terran_Command_Center, (TilePosition)p, false, MYBASE);
 
 			if (tempPosition != TilePositions::None
-					&& getGroundDistance(INFO.getWaitingPositionAtFirstChoke(3, 6), (Position)p) > 5 * TILE_SIZE
-					&& INFO.getBuildingsInRadius(S, p, 5 * TILE_SIZE, true).empty()
-					&& getGroundDistance(INFO.getFirstChokePosition(S), (Position)p) > 10 * TILE_SIZE) {
+				&& getGroundDistance(INFO.getWaitingPositionAtFirstChoke(3, 6), (Position)p) > 5 * TILE_SIZE
+				&& INFO.getBuildingsInRadius(S, p, 5 * TILE_SIZE, true).empty()
+				&& getGroundDistance(INFO.getFirstChokePosition(S), (Position)p) > 10 * TILE_SIZE) {
 				secondCommandPosition = tempPosition;
 				dist = tempDist;
 			}
@@ -80,7 +80,7 @@ TilePosition MyBot::BasicBuildStrategy::getSecondCommandPosition(bool force)
 
 	return secondCommandPosition;
 }
-
+//获取山上的防空塔位置=========================================================================
 TilePosition MyBot::BasicBuildStrategy::getTurretPositionOnTheHill()
 {
 	if (turretposOnTheHill != TilePositions::None)
@@ -120,10 +120,11 @@ TilePosition MyBot::BasicBuildStrategy::getTurretPositionOnTheHill()
 		// 못짓는 위치라면 spiral 하게 다시 찾는다.
 		if (!bw->canBuildHere((TilePosition)p, Terran_Missile_Turret)) {
 			tempPosition = ConstructionPlaceFinder::Instance().getBuildLocationBySpiralSearch
-						   (Terran_Missile_Turret, (TilePosition)p, false, MYBASE);
+				(Terran_Missile_Turret, (TilePosition)p, false, MYBASE);
 
 			tempDist = (int)firstChoke.getDistance((Position)tempPosition);
-		} else {
+		}
+		else {
 			tempPosition = (TilePosition)p;
 		}
 
@@ -140,7 +141,7 @@ TilePosition MyBot::BasicBuildStrategy::getTurretPositionOnTheHill()
 	// 안드로메다 때문에 넣는 코드.
 	if (dist > 6 * TILE_SIZE) {
 		turretposOnTheHill = ConstructionPlaceFinder::Instance().getBuildLocationBySpiralSearch(
-								 Terran_Missile_Turret, (TilePosition)INFO.getFirstChokePoint(S)->Center(), false, MYBASE);
+			Terran_Missile_Turret, (TilePosition)INFO.getFirstChokePoint(S)->Center(), false, MYBASE);
 	}
 
 	if (turretposOnTheHill == TilePositions::None) {
@@ -150,25 +151,27 @@ TilePosition MyBot::BasicBuildStrategy::getTurretPositionOnTheHill()
 	return turretposOnTheHill;
 }
 
-
+//获取游戏帧数标志
 int BasicBuildStrategy::getFrameCountFlag()
 {
 	return frameCountFlag;
 }
-
+//设置游戏帧数标志
 void BasicBuildStrategy::setFrameCountFlag(int frameCountFlag_)
 {
 	frameCountFlag = frameCountFlag_;
 }
 
-
+//能建造第一个兵营===================================================================================
 bool BasicBuildStrategy::canBuildFirstBarrack(int supplyUsed)
 {
-	// 현재 존재하거나 짓는 중인가?
-	if (isExistOrUnderConstruction(Terran_Barracks)) {
+	// 兵营已经造完或者正在建造的情况下，不造
+	if (isExistOrUnderConstruction(Terran_Barracks))
+	{
 		return false;
 	}
 	else {
+		// 没有足够资源的时候，不造
 		if (checkSupplyUsedForInitialBuild(supplyUsed, getFrameCountFlag())) {
 			if (!hasEnoughResourcesToBuild(Terran_Barracks))
 				return false;
@@ -182,7 +185,7 @@ bool BasicBuildStrategy::canBuildFirstBarrack(int supplyUsed)
 
 	return false;
 }
-
+//能建造精炼厂===================================================================================
 bool BasicBuildStrategy::canBuildRefinery(int supplyUsed, BuildOrderItem::SeedPositionStrategy seedPositionStrategy) {
 	if (CM.existConstructionQueueItem(Terran_Refinery) || BM.buildQueue.existItem(Terran_Refinery))
 		return false;
@@ -212,7 +215,7 @@ bool BasicBuildStrategy::canBuildRefinery(int supplyUsed, BuildOrderItem::SeedPo
 
 					// 미네랄 숫자보다 일꾼수가 많아지면 가스 건설
 					if (ScvManager::Instance().getDepotMineralSize(center->unit())
-							<= ScvManager::Instance().getAssignedScvCount(center->unit()))
+						<= ScvManager::Instance().getAssignedScvCount(center->unit()))
 					{
 						return true;
 					}
@@ -266,26 +269,27 @@ bool BasicBuildStrategy::canBuildRefinery(int supplyUsed, BuildOrderItem::SeedPo
 
 	return false;
 }
+//能建造精炼厂===================================================================================
 bool BasicBuildStrategy::canBuildRefinery(int supplyUsed, Base *base)
 {
 	if (CM.existConstructionQueueItem(Terran_Refinery) || BM.buildQueue.existItem(Terran_Refinery)) {
 		return false;
 	}
-	else {
+	else {//没有足够资源就不建造
 		if (!hasEnoughResourcesToBuild(Terran_Refinery)) {
 			return false;
 		}
 
 		if (checkSupplyUsedForInitialBuild(supplyUsed, getFrameCountFlag()))
-		{	// 해당 위치에 Refinery가 있는가?
+		{	// 您的位置是否有Refinery？如果有，就不建造
 			if (hasRefinery(base))
 				return false;
 
-			// 현재 가스 여유가 있으면 건설하지 않음
+			// 目前，如果有气体充足，就不建设
 			if (S->gas() > 1000)
 				return false;
 
-			// 미네랄 개수만큼 SCV가 있는지 체크,
+			// 检查是否有矿物
 			uList commandList = INFO.getBuildings(Terran_Command_Center, S);
 
 			for (auto center : commandList)
@@ -296,9 +300,9 @@ bool BasicBuildStrategy::canBuildRefinery(int supplyUsed, Base *base)
 				if (!isSameArea(center->pos(), base->Center()))
 					continue;
 
-				// 미네랄 숫자보다 일꾼수가 많아지면 가스 건설
+				// 如果工人人数多于矿物数量，refinery将被建造
 				if (ScvManager::Instance().getDepotMineralSize(center->unit())
-						<= ScvManager::Instance().getAssignedScvCount(center->unit()))
+					<= ScvManager::Instance().getAssignedScvCount(center->unit()))
 				{
 					return true;
 				}
@@ -308,6 +312,7 @@ bool BasicBuildStrategy::canBuildRefinery(int supplyUsed, Base *base)
 
 	return false;
 }
+//能建造第二个堵路地堡==================================================================================
 bool BasicBuildStrategy::canBuildSecondChokePointBunker(int supplyUsed)
 {
 	if (!INFO.getTypeBuildingsInRadius(Terran_Bunker, S, INFO.getSecondChokePosition(S), 6 * TILE_SIZE).empty())
@@ -315,13 +320,14 @@ bool BasicBuildStrategy::canBuildSecondChokePointBunker(int supplyUsed)
 		return false;
 	}
 
-	for (auto b : INFO.getBuildings(Terran_Bunker, S)) {
+	for (auto b : INFO.getBuildings(Terran_Bunker, S))
+	{
 		if (isSameArea(b->unit()->getTilePosition(), INFO.getFirstExpansionLocation(S)->getTilePosition()))
 			return false;
 	}
 
 	if (isUnderConstruction(Terran_Bunker)
-			|| INFO.getCompletedCount(Terran_Barracks, S) == 0) {
+		|| INFO.getCompletedCount(Terran_Barracks, S) == 0) {
 		return false;
 	}
 	else {
@@ -339,7 +345,45 @@ bool BasicBuildStrategy::canBuildSecondChokePointBunker(int supplyUsed)
 
 	return false;
 }
+//能建造基地防守地堡==================================================================================
+bool BasicBuildStrategy::canBuildMainBaseDefenceBunker(int supplyUsed)
+{
+	if (BM.buildQueue.existItem(Terran_Bunker))
+		return false;
 
+	for (auto b : INFO.getBuildings(Terran_Bunker, S))
+	{
+		if (!b->isComplete())
+			return false;
+
+		if (isSameArea(b->pos(), INFO.getMainBaseLocation(S)->Center()))
+			return false;
+
+	}
+
+
+
+
+
+
+	if (!hasEnoughResourcesToBuild(Terran_Bunker))
+	{
+		return false;
+	}
+
+	if (checkSupplyUsedForInitialBuild(supplyUsed, getFrameCountFlag()))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+
+
+	return false;
+}
+//存在精炼厂===================================================================================
 bool BasicBuildStrategy::hasRefinery(BuildOrderItem::SeedPositionStrategy seedPositionStrategy)
 {
 	vector<Geyser *> geysers;
@@ -367,14 +411,14 @@ bool BasicBuildStrategy::hasRefinery(BuildOrderItem::SeedPositionStrategy seedPo
 
 	// 해당 위치에 가스가 지어져있지 않으면 없는 것으로 간주. 가스가 지어졌다가 부서지면 갱신이 안돼서 아래와 같이 코딩함.
 	for (auto geyser : geysers)
-		for (auto unit : bw->getUnitsOnTile(geyser->Unit()->getInitialTilePosition())) {
-			if (unit->getType() == Resource_Vespene_Geyser)
-				return false;
-		}
+	for (auto unit : bw->getUnitsOnTile(geyser->Unit()->getInitialTilePosition())) {
+		if (unit->getType() == Resource_Vespene_Geyser)
+			return false;
+	}
 
 	return true;
 }
-
+//存在精炼厂===================================================================================
 bool BasicBuildStrategy::hasRefinery(Base *base)
 {
 	if (base == nullptr)
@@ -386,17 +430,17 @@ bool BasicBuildStrategy::hasRefinery(Base *base)
 
 	// 해당 위치에 가스가 지어져있지 않으면 없는 것으로 간주. 가스가 지어졌다가 부서지면 갱신이 안돼서 아래와 같이 코딩함.
 	for (auto geyser : geysers)
-		for (auto unit : bw->getUnitsOnTile(geyser->Unit()->getTilePosition()))
-			if (unit->getType() == Resource_Vespene_Geyser)
-				return false;
+	for (auto unit : bw->getUnitsOnTile(geyser->Unit()->getTilePosition()))
+	if (unit->getType() == Resource_Vespene_Geyser)
+		return false;
 
 	return false;
 }
-
+//能制造第一个工厂===================================================================================
 bool BasicBuildStrategy::canBuildFirstFactory(int supplyUsed)
 {
-	if (isExistOrUnderConstruction(Terran_Factory)
-			|| INFO.getCompletedCount(Terran_Barracks, S) == 0)
+	if (isExistOrUnderConstruction(Terran_Factory)//如果有建成的工厂或者正在被建造的工厂
+		|| INFO.getCompletedCount(Terran_Barracks, S) == 0)
 	{
 		return false;
 	}
@@ -416,7 +460,59 @@ bool BasicBuildStrategy::canBuildFirstFactory(int supplyUsed)
 
 	return false;
 }
+//能建造第二个工厂================================================================================
+bool BasicBuildStrategy::canBuildSecondFactory(int supplyUsed)
+{
+	
+	if (isUnderConstruction(Terran_Armory) || INFO.getAllCount(Terran_Factory, S) != 1)
+		{
+			return false;
+		}
+		
+	if (checkSupplyUsedForInitialBuild(supplyUsed, getFrameCountFlag())) 
+		{
 
+				if (!hasEnoughResourcesToBuild(Terran_Factory)) 
+				{
+					return false;
+				}
+
+				return true;
+		}
+
+	else 
+		return false;
+		
+		
+	
+}
+//能建造第二个兵营================================================================================
+bool BasicBuildStrategy::canBuildSecondBarrack(int supplyUsed)
+{
+	
+	if ((INFO.getAllCount(Terran_Barracks, S) != 1) || isUnderConstruction(Terran_Barracks))
+		{
+			return false;
+		}
+		else
+		{
+
+			if (checkSupplyUsedForInitialBuild(supplyUsed, getFrameCountFlag())) {
+				if (!hasEnoughResourcesToBuild(Terran_Factory)) {
+					return false;
+				}
+
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
+		return false;
+	
+}
+//能建造额外工厂==================================================================================
 bool BasicBuildStrategy::canBuildadditionalFactory()
 {
 	bool machineShopFirstFlag = true;
@@ -430,12 +526,90 @@ bool BasicBuildStrategy::canBuildadditionalFactory()
 
 	if (INFO.enemyRace == Races::Zerg)
 		maxCount = 5;
-	else if (INFO.enemyRace == Races::Protoss) {
-		// 앞마당에 커맨드 없으면 2로!!
-		if (!isMyCommandAtFirstExpansion())
-			maxCount = 2;
-		else
-			maxCount = 6;
+	else if (INFO.enemyRace == Races::Protoss)
+	{
+		if (SM.getMyBuild() == MyBuildTypes::Protoss_DragoonKiller)
+		{
+			if (!isMyCommandAtFirstExpansion())
+				maxCount = 1;
+			else if (INFO.getCompletedCount(Terran_Academy, S) < 1)
+				maxCount = 2;
+
+			else if (INFO.getAllCount(Terran_Armory, S) < 2)
+				maxCount = 3;
+
+			else if (INFO.getAllCount(Terran_Science_Facility, S) < 1)
+				maxCount = 4;
+
+
+			else if (S->getUpgradeLevel(UpgradeTypes::Terran_Vehicle_Weapons) < 1)
+				maxCount = 5;
+
+			else maxCount = 6;
+		}
+		else if (SM.getMyBuild() == MyBuildTypes::Protoss_CannonKiller)
+		{
+			if (!isMyCommandAtFirstExpansion())
+				maxCount = 1;
+			else if (INFO.getCompletedCount(Terran_Academy, S) < 1)
+				maxCount = 2;
+
+			else if (INFO.getAllCount(Terran_Science_Facility, S) < 1)
+				maxCount = 3;
+
+			else if (S->getUpgradeLevel(UpgradeTypes::Terran_Vehicle_Weapons) < 1)
+				maxCount = 5;
+
+			else maxCount = 6;
+		}
+		else if (SM.getMyBuild() == MyBuildTypes::Protoss_CannonKiller)
+		{
+			if (INFO.getAllCount(Terran_Armory, S) < 1)
+				maxCount = 2;
+			else if (INFO.getCompletedCount(Terran_Armory, S) < 2)
+				maxCount = 4;
+			else if (INFO.getAllCount(Terran_Science_Facility, S) < 1)
+				maxCount = 5;
+			else
+				maxCount = 6;
+
+		}
+		else if	(SM.getMyBuild() == MyBuildTypes::Protoss_ZealotKiller)
+		{
+			if (INFO.getAllCount(Terran_Armory, S) < 1)
+				maxCount = 2;
+			else if (INFO.getCompletedCount(Terran_Armory, S) < 2)
+				maxCount = 4;
+			else if (INFO.getAllCount(Terran_Science_Facility, S) < 1)
+				maxCount = 5;
+			else 
+				maxCount = 6;
+
+		}
+		else if (SM.getMyBuild() == MyBuildTypes::Protoss_MineKiller)
+		{
+			if (INFO.getAllCount(Terran_Barracks, S) < 2)
+				maxCount = 1;
+			
+			else if (INFO.getAllCount(Terran_Barracks, S)>=2 &&INFO.getDestroyedCount(Protoss_Nexus,E)<1)
+				maxCount = 2;
+
+			else maxCount = 3;
+		}
+		else if (SM.getMyBuild() == MyBuildTypes::Protoss_TemplarKiller)
+		{
+			if (TIME<8*24*60)
+				maxCount = 2;
+			else if (TIME>=8 * 24 * 60 && TIME<9 * 24 * 60)
+				maxCount = 3;
+
+			else if (TIME>9 * 24 * 60 && TIME<11 * 24 * 60)
+				maxCount = 5;
+
+			else maxCount = 7;
+		}
+		else maxCount = 6;
+		
 	}
 	else if (INFO.enemyRace == Races::Terran)
 	{
@@ -449,60 +623,64 @@ bool BasicBuildStrategy::canBuildadditionalFactory()
 	{
 		if (INFO.getActivationGasBaseCount() >= 3)
 		{
-			maxCount += 3;
+			maxCount += 1;
 
 			// 테란전 후반에 자원 많이 남을 경우 팩토리 추가로 건설해놓자
 			if (INFO.enemyRace == Races::Terran && S->minerals() >= 4000 && S->gas() >= 1500)
 				maxCount += 2;
 		}
 
-		if (S->minerals() >= 1200)
-			maxCount += 2;
+
 	}
 
 	if ((machineShopFirstFlag && INFO.getCompletedCount(Terran_Machine_Shop, S) == 0)
-			|| (INFO.getAllCount(Terran_Factory, S) + CM.getConstructionQueueItemCount(Terran_Factory) + BM.buildQueue.getItemCount(Terran_Factory)) >= maxCount
-			|| BM.buildQueue.existItem(Terran_Factory))
+		|| (INFO.getAllCount(Terran_Factory, S) + CM.getConstructionQueueItemCount(Terran_Factory) + BM.buildQueue.getItemCount(Terran_Factory)) >= maxCount
+		|| BM.buildQueue.existItem(Terran_Factory))
 	{
 		return false;
 	}
 
 	if (INFO.enemyRace == Races::Terran) {
 		if (SM.getMyBuild() == MyBuildTypes::Terran_TankGoliath
-				&& INFO.getAllCount(Terran_Factory, S) == 2
-				&& (!(S->hasResearched(TechTypes::Tank_Siege_Mode) || S->isResearching(TechTypes::Tank_Siege_Mode))
-					|| !(INFO.getAllCount(Terran_Academy, S) > 0 && INFO.getAllCount(Terran_Armory, S) > 0)
-					|| INFO.getCompletedCount(Terran_Machine_Shop, S) < 2))
+			&& INFO.getAllCount(Terran_Factory, S) == 2
+			&& (!(S->hasResearched(TechTypes::Tank_Siege_Mode) || S->isResearching(TechTypes::Tank_Siege_Mode))
+			|| !(INFO.getAllCount(Terran_Academy, S) > 0 && INFO.getAllCount(Terran_Armory, S) > 0)
+			|| INFO.getCompletedCount(Terran_Machine_Shop, S) < 2))
 		{
 			return false;
 		}
 	}
-	else if (INFO.enemyRace == Races::Protoss) {
+	else if (INFO.enemyRace == Races::Protoss)
+	{
+		if (SM.getMyBuild() != MyBuildTypes::Protoss_MineKiller && SM.getMyBuild() != MyBuildTypes::Protoss_TemplarKiller)
+		{
 
-		if (!(EIB == Toss_2g_zealot || EIB == Toss_1g_forward || EIB == Toss_2g_forward || EMB == Toss_1base_fast_zealot)
+
+			if (!(EIB == Toss_2g_zealot || EIB == Toss_1g_forward || EIB == Toss_2g_forward || EMB == Toss_1base_fast_zealot)
 				&& !(S->hasResearched(TechTypes::Tank_Siege_Mode) || S->isResearching(TechTypes::Tank_Siege_Mode)))
-			return false;
+				return false;
 
-		// 다크인 경우
-		if (EMB == Toss_dark && INFO.getAllCount(Terran_Missile_Turret, S) == 0) {
-			return false;
-		}
-		else if (EMB == Toss_range_up_dra_push && !HasEnemyFirstExpansion()) {
-			if (INFO.getBuildings(Terran_Engineering_Bay, S).empty()) {
+
+			if (EMB == Toss_dark && INFO.getAllCount(Terran_Missile_Turret, S) == 0)
+			{
+				return false;
+			}
+
+
+			else if (EMB == Toss_range_up_dra_push && !HasEnemyFirstExpansion())
+			{
+				if (INFO.getBuildings(Terran_Engineering_Bay, S).empty()) {
+					return false;
+				}
+			}
+			else if (INFO.getAllCount(Terran_Factory, S) > 1 && INFO.getBuildings(Terran_Engineering_Bay, S).empty()) {
 				return false;
 			}
 		}
-		else if (INFO.getAllCount(Terran_Factory, S) > 1 && INFO.getBuildings(Terran_Engineering_Bay, S).empty()) {
-			return false;
-		}
-
-		// 2팩에서 아카 아머리 건설 후 추가 팩토리 건설
-		if (INFO.getAllCount(Terran_Factory, S) == 2
-				&& !(INFO.getCompletedCount(Terran_Academy, S) > 0 && INFO.getCompletedCount(Terran_Armory, S) > 0))
-			return false;
 	}
 
-	if (!hasEnoughResourcesToBuild(Terran_Factory)) {
+	if (!hasEnoughResourcesToBuild(Terran_Factory))
+	{
 		return false;
 	}
 
@@ -510,7 +688,8 @@ bool BasicBuildStrategy::canBuildadditionalFactory()
 	int canTrainTankCnt = 0;
 	int canTrainGoliathCnt = 0;
 
-	for (auto f : INFO.getBuildings(Terran_Factory, S)) {
+	for (auto f : INFO.getBuildings(Terran_Factory, S))
+	{
 		if (!f->isComplete())
 			continue;
 
@@ -555,7 +734,34 @@ bool BasicBuildStrategy::canBuildadditionalFactory()
 
 	return true;
 }
+bool BasicBuildStrategy::canBuildadditionalBarrack(int supplyUsed)
+{
+	
+	
+	
+	
+	
+	if (isUnderConstruction(Terran_Barracks))
+	{
+		return false;
+	}
+	else 
+	{
+		// 没有足够资源的时候，不造
+		if (checkSupplyUsedForInitialBuild(supplyUsed, getFrameCountFlag())) {
+			if (!hasEnoughResourcesToBuild(Terran_Barracks))
+				return false;
 
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	return false;
+}
+//能建造防空塔===================================================================================
 bool BasicBuildStrategy::canBuildMissileTurret(TilePosition p, int buildCnt)
 {
 	if (INFO.getCompletedCount(Terran_Engineering_Bay, S) == 0)
@@ -573,12 +779,12 @@ bool BasicBuildStrategy::canBuildMissileTurret(TilePosition p, int buildCnt)
 
 	return true;
 }
-
+//能建造第一个分基地===================================================================================
 bool BasicBuildStrategy::canBuildFirstExpansion(int supplyUsed)
 {
 	if (CM.existConstructionQueueItem(Terran_Command_Center)
-			|| INFO.getAllCount(Terran_Command_Center, S) >= 2
-			|| BM.buildQueue.existItem(Terran_Command_Center)) {
+		|| INFO.getAllCount(Terran_Command_Center, S) >= 2
+		|| BM.buildQueue.existItem(Terran_Command_Center)) {
 		return false;
 	}
 	else {
@@ -601,12 +807,12 @@ bool BasicBuildStrategy::canBuildFirstExpansion(int supplyUsed)
 
 	return false;
 }
-
+//能建造第二个分基地===================================================================================
 bool BasicBuildStrategy::canBuildSecondExpansion(int supplyUsed)
 {
 	if (CM.existConstructionQueueItem(Terran_Command_Center)
-			|| INFO.getAllCount(Terran_Command_Center, S) >= 3
-			|| BM.buildQueue.existItem(Terran_Command_Center)) {
+		|| INFO.getAllCount(Terran_Command_Center, S) >= 3
+		|| BM.buildQueue.existItem(Terran_Command_Center)) {
 		return false;
 	}
 	else {
@@ -624,12 +830,12 @@ bool BasicBuildStrategy::canBuildSecondExpansion(int supplyUsed)
 
 	return false;
 }
-
+//能建造第三个分基地===================================================================================
 bool BasicBuildStrategy::canBuildThirdExpansion(int supplyUsed)
 {
 	if (CM.existConstructionQueueItem(Terran_Command_Center)
-			|| INFO.getAllCount(Terran_Command_Center, S) >= 4
-			|| BM.buildQueue.existItem(Terran_Command_Center)) {
+		|| INFO.getAllCount(Terran_Command_Center, S) >= 4
+		|| BM.buildQueue.existItem(Terran_Command_Center)) {
 		return false;
 	}
 	else {
@@ -647,11 +853,11 @@ bool BasicBuildStrategy::canBuildThirdExpansion(int supplyUsed)
 
 	return false;
 }
-
+//能建造分基地===================================================================================
 bool BasicBuildStrategy::canBuildAdditionalExpansion(int supplyUsed)
 {
 	if (CM.existConstructionQueueItem(Terran_Command_Center)
-			|| BM.buildQueue.existItem(Terran_Command_Center)) {
+		|| BM.buildQueue.existItem(Terran_Command_Center)) {
 		return false;
 	}
 	else {
@@ -669,11 +875,11 @@ bool BasicBuildStrategy::canBuildAdditionalExpansion(int supplyUsed)
 
 	return false;
 }
-
+//能建造第一个飞机场===================================================================================
 bool BasicBuildStrategy::canBuildFirstStarport(int supplyUsed)
 {
 	if (isExistOrUnderConstruction(Terran_Starport)
-			|| INFO.getCompletedCount(Terran_Factory, S) == 0) {
+		|| INFO.getCompletedCount(Terran_Factory, S) == 0) {
 		return false;
 	}
 	else {
@@ -692,11 +898,11 @@ bool BasicBuildStrategy::canBuildFirstStarport(int supplyUsed)
 
 	return false;
 }
-
+//能建造第一个防空塔===================================================================================
 bool BasicBuildStrategy::canBuildFirstTurret(int supplyUsed)
 {
 	if (isExistOrUnderConstruction(Terran_Missile_Turret)
-			|| INFO.getCompletedCount(Terran_Engineering_Bay, S) == 0) {
+		|| INFO.getCompletedCount(Terran_Engineering_Bay, S) == 0) {
 		return false;
 	}
 	else {
@@ -714,11 +920,11 @@ bool BasicBuildStrategy::canBuildFirstTurret(int supplyUsed)
 
 	return false;
 }
-
+//能建造第一个机械研究院===================================================================================
 bool BasicBuildStrategy::canBuildFirstArmory(int supplyUsed)
 {
 	if (isExistOrUnderConstruction(Terran_Armory)
-			|| INFO.getCompletedCount(Terran_Factory, S) == 0) {
+		|| INFO.getCompletedCount(Terran_Factory, S) == 0) {
 		return false;
 	}
 	else {
@@ -736,42 +942,48 @@ bool BasicBuildStrategy::canBuildFirstArmory(int supplyUsed)
 
 	return false;
 }
-
+//能建造第二个机械研究院===================================================================================
 bool BasicBuildStrategy::canBuildSecondArmory(int supplyUsed) {
-	if (isUnderConstruction(Terran_Armory)
-			|| INFO.getCompletedCount(Terran_Factory, S) == 0 || INFO.getAllCount(Terran_Armory, S) != 1) {
+	if (isUnderConstruction(Terran_Armory)||INFO.getAllCount(Terran_Armory, S) != 1) {
 		return false;
 	}
 
-	if (!hasEnoughResourcesToBuild(Terran_Armory)) {
-		return false;
-	}
-
-	if (!checkSupplyUsedForInitialBuild(supplyUsed, getFrameCountFlag())) {
-		return false;
-	}
-
-	// Terran_Science_Facility 가 늦게 올라가기 때문에 아머리 하나로 업그레이드를 찍다가 올리도록 수정.
-	if (!isExistOrUnderConstruction(Terran_Science_Facility))
-		return false;
-
-	// 업그레이드가 됐으면 짓는다.
-	if (S->getUpgradeLevel(UpgradeTypes::Terran_Vehicle_Weapons) >= 2 || S->getUpgradeLevel(UpgradeTypes::Terran_Vehicle_Plating) >= 1)
-		return true;
-
-	// 업그레이드가 아머리 지을 시간 + 5초 남으면 짓는다.
-	for (auto a : INFO.getBuildings(Terran_Armory, S)) {
-		if (a->isComplete() && a->unit()->isUpgrading() && a->unit()->getRemainingUpgradeTime() < Terran_Armory.buildTime() + 5 * 24)
+	
+	if (checkSupplyUsedForInitialBuild(supplyUsed, getFrameCountFlag())) 
+	{
+		if (hasEnoughResourcesToBuild(Terran_Armory)) 
+		{
 			return true;
+		}
+		else 
+			return false;
+	}
+	return false;
+	
+}
+//能建造第三个机械研究院===================================================================================
+bool BasicBuildStrategy::canBuildThirdArmory(int supplyUsed) {
+	if (isUnderConstruction(Terran_Armory) || INFO.getAllCount(Terran_Armory, S) != 2) {
+		return false;
 	}
 
-	return false;
-}
 
+	if (checkSupplyUsedForInitialBuild(supplyUsed, getFrameCountFlag()))
+	{
+		if (hasEnoughResourcesToBuild(Terran_Armory))
+		{
+			return true;
+		}
+		else
+			return false;
+	}
+	return false;
+
+}
+//能建造第一个地堡===================================================================================
 bool BasicBuildStrategy::canBuildFirstBunker(int supplyUsed)
 {
-	if (isExistOrUnderConstruction(Terran_Bunker)
-			|| INFO.getCompletedCount(Terran_Barracks, S) == 0) {
+	if (isExistOrUnderConstruction(Terran_Bunker)) {
 		return false;
 	}
 	else {
@@ -789,7 +1001,29 @@ bool BasicBuildStrategy::canBuildFirstBunker(int supplyUsed)
 
 	return false;
 }
+//能建造第二个地堡===================================================================================
+bool BasicBuildStrategy::canBuildSecondBunker(int supplyUsed)
+{
+	if (isUnderConstruction(Terran_Bunker)||INFO.getCompletedCount(Terran_Bunker,S)!=1)
+	{
+		return false;
+	}
+	else {
+		if (!hasEnoughResourcesToBuild(Terran_Bunker)) {
+			return false;
+		}
 
+		if (checkSupplyUsedForInitialBuild(supplyUsed, getFrameCountFlag())) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	return false;
+}
+//能建造第一个步兵升级所===================================================================================
 bool BasicBuildStrategy::canBuildFirstEngineeringBay(int supplyUsed)
 {
 	if (isExistOrUnderConstruction(Terran_Engineering_Bay)) {
@@ -810,11 +1044,11 @@ bool BasicBuildStrategy::canBuildFirstEngineeringBay(int supplyUsed)
 
 	return false;
 }
-
+//能建造第一个步兵学院===================================================================================
 bool BasicBuildStrategy::canBuildFirstAcademy(int supplyUsed)
 {
 	if (isExistOrUnderConstruction(Terran_Academy)
-			|| INFO.getCompletedCount(Terran_Barracks, S) == 0) {
+		|| INFO.getCompletedCount(Terran_Barracks, S) == 0) {
 		return false;
 	}
 	else {
@@ -832,11 +1066,11 @@ bool BasicBuildStrategy::canBuildFirstAcademy(int supplyUsed)
 
 	return false;
 }
-
+//能建造第一个科学院===================================================================================
 bool BasicBuildStrategy::canBuildFirstScienceFacility(int supplyUsed)
 {
 	if (isExistOrUnderConstruction(Terran_Science_Facility)
-			|| INFO.getCompletedCount(Terran_Starport, S) == 0) {
+		|| INFO.getCompletedCount(Terran_Starport, S) == 0) {
 		return false;
 	}
 	else {
@@ -854,17 +1088,17 @@ bool BasicBuildStrategy::canBuildFirstScienceFacility(int supplyUsed)
 
 	return false;
 }
-
+//有足够的资源可以建造===================================================================================
 bool BasicBuildStrategy::hasEnoughResourcesToBuild(UnitType unitType)
 {
 	return BM.hasEnoughResources(unitType);
 }
-
+//有第二个基地===================================================================================
 bool BasicBuildStrategy::hasSecondCommand()
 {
 	return INFO.getBuildings(Terran_Command_Center, S).size() > 1;
 }
-
+//是时候建造工厂附属建筑==================================================================================
 bool BasicBuildStrategy::isTimeToMachineShopUpgrade(TechType techType, UpgradeType upType)
 {
 	if (INFO.getCompletedCount(Terran_Machine_Shop, S) == 0) {
@@ -873,16 +1107,16 @@ bool BasicBuildStrategy::isTimeToMachineShopUpgrade(TechType techType, UpgradeTy
 
 	if (techType != TechTypes::None) {
 		if (S->isResearching(techType)
-				|| BM.buildQueue.existItem(techType)
-				|| S->hasResearched(techType))
+			|| BM.buildQueue.existItem(techType)
+			|| S->hasResearched(techType))
 		{
 			return false;
 		}
 	}
 	else {
 		if (S->isUpgrading(upType)
-				|| BM.buildQueue.existItem(upType)
-				|| S->getUpgradeLevel(upType) == 1)
+			|| BM.buildQueue.existItem(upType)
+			|| S->getUpgradeLevel(upType) == 1)
 		{
 			return false;
 		}
@@ -890,7 +1124,7 @@ bool BasicBuildStrategy::isTimeToMachineShopUpgrade(TechType techType, UpgradeTy
 
 	return true;
 }
-
+//是时候建造飞机场附属建筑==================================================================================
 bool BasicBuildStrategy::isTimeToControlTowerUpgrade(TechType techType)
 {
 	// 컨트롤타워가 없으면 return false;
@@ -899,15 +1133,15 @@ bool BasicBuildStrategy::isTimeToControlTowerUpgrade(TechType techType)
 	}
 
 	if (S->isResearching(techType) == true
-			|| BM.buildQueue.getItemCount(techType) != 0
-			|| S->hasResearched(techType))
+		|| BM.buildQueue.getItemCount(techType) != 0
+		|| S->hasResearched(techType))
 	{
 		return false;
 	}
 
 	return true;
 }
-
+//是时候进行科学院的研究==================================================================================
 bool BasicBuildStrategy::isTimeToScienceFacilityUpgrade(TechType techType)
 {
 	// 사이언스 퍼실러티가 없으면 return false;
@@ -916,15 +1150,41 @@ bool BasicBuildStrategy::isTimeToScienceFacilityUpgrade(TechType techType)
 	}
 
 	if (S->isResearching(techType) == true
-			|| BM.buildQueue.getItemCount(techType) != 0
-			|| S->hasResearched(techType))
+		|| BM.buildQueue.getItemCount(techType) != 0
+		|| S->hasResearched(techType))
 	{
 		return false;
 	}
 
 	return true;
 }
+//是时候进行学院的研究了=================================================================================
+bool BasicBuildStrategy::isTimeToAcademyUpgrade(TechType techType, UpgradeType upType)
+{
+	if (INFO.getCompletedCount(Terran_Academy, S) == 0) {
+		return false;
+	}
 
+	if (techType != TechTypes::None) {
+		if (S->isResearching(techType)
+			|| BM.buildQueue.existItem(techType)
+			|| S->hasResearched(techType))
+		{
+			return false;
+		}
+	}
+	else {
+		if (S->isUpgrading(upType)
+			|| BM.buildQueue.existItem(upType)
+			|| S->getUpgradeLevel(upType) == 1)
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+//是时候进行机械研究院的研究==================================================================================
 bool BasicBuildStrategy::isTimeToArmoryUpgrade(UpgradeType upgradeType, int level)
 {
 	// 아머리가 없으면 return false;
@@ -937,25 +1197,53 @@ bool BasicBuildStrategy::isTimeToArmoryUpgrade(UpgradeType upgradeType, int leve
 		return false;
 
 	if (S->isUpgrading(upgradeType) == true
-			|| BM.buildQueue.getItemCount(upgradeType) != 0
-			|| S->getUpgradeLevel(upgradeType) >= level)
+		|| BM.buildQueue.getItemCount(upgradeType) != 0
+		|| S->getUpgradeLevel(upgradeType) >= level)
 	{
 		return false;
 	}
 
 	// canUpgrade 로 체크하면 자원까지 포함해서 체크하기 때문에 미리 큐에 넣기 위해 아래와 같이 체크함.
 	for (auto a : INFO.getBuildings(Terran_Armory, S))
-		if (a->unit()->isCompleted() && !a->unit()->isUpgrading())
-			return true;
+	if (a->unit()->isCompleted() && !a->unit()->isUpgrading())
+		return true;
 
 	return false;
 }
+//是时候进行工程湾的研究==================================================================================
+bool BasicBuildStrategy::isTimeToEngineeringBayUpgrade(UpgradeType upgradeType, int level)
+{
+	// 아머리가 없으면 return false;
+	if (INFO.getCompletedCount(Terran_Engineering_Bay, S) == 0)
+	{
+		return false;
+	}
 
+	if (level == 1 && (S->getUpgradeLevel(UpgradeTypes::Terran_Vehicle_Weapons) <1))
+		// 2렙 이상 업그레이드는 Terran_Science_Facility 필요
+	if ((level > 1 && INFO.getCompletedCount(Terran_Science_Facility, S) == 0) || (S->minerals()<500 || S->gas()<400))
+		return false;
+
+	if (S->isUpgrading(upgradeType) == true
+		|| BM.buildQueue.getItemCount(upgradeType) != 0
+		|| S->getUpgradeLevel(upgradeType) >= level)
+	{
+		return false;
+	}
+
+	// canUpgrade 로 체크하면 자원까지 포함해서 체크하기 때문에 미리 큐에 넣기 위해 아래와 같이 체크함.
+	for (auto a : INFO.getBuildings(Terran_Engineering_Bay, S))
+	if (a->unit()->isCompleted() && !a->unit()->isUpgrading())
+		return true;
+
+	return false;
+}
+//存在或者正在被建造==================================================================================
 bool BasicBuildStrategy::isExistOrUnderConstruction(UnitType unitType)
 {
 	if (CM.existConstructionQueueItem(unitType)
-			|| BM.buildQueue.existItem(unitType)
-			|| INFO.getAllCount(unitType, S) >= 1) {
+		|| BM.buildQueue.existItem(unitType)
+		|| INFO.getAllCount(unitType, S) >= 1) {
 		return true;
 	}
 
@@ -964,7 +1252,7 @@ bool BasicBuildStrategy::isExistOrUnderConstruction(UnitType unitType)
 		{
 			if (unit.first->getType() == unitType.whatBuilds().first) {
 				if (unit.first->getLastCommand().getType() == UnitCommandTypes::Build_Addon
-						&& (TIME - unit.first->getLastCommandFrame() < 10))
+					&& (TIME - unit.first->getLastCommandFrame() < 10))
 				{
 					return true;
 				}
@@ -974,24 +1262,24 @@ bool BasicBuildStrategy::isExistOrUnderConstruction(UnitType unitType)
 
 	return false;
 }
-
+//正在被建造==================================================================================
 bool BasicBuildStrategy::isUnderConstruction(UnitType unitType)
 {
 	if (CM.existConstructionQueueItem(unitType)
-			|| BM.buildQueue.existItem(unitType)) {
+		|| BM.buildQueue.existItem(unitType)) {
 		return true;
 	}
 
 	return false;
 }
-
+//核实初始建造的supply==================================================================================
 bool BasicBuildStrategy::checkSupplyUsedForInitialBuild(int supplyUsed, int until_frameCount)
 {
 	if (until_frameCount == 0) {
 		return true;
 	}
 
-	// until_frameCount 까지는 SupplyUsed를 Flag로 해서 특정 로직 수행에 대한 타이밍을 판단한다.
+	// 到until_frameCount为止， SupplyUsed用Flag来判断执行特定逻辑的时机。
 	if (TIME < until_frameCount) {
 		if (S->supplyUsed() >= supplyUsed) {
 			return true;
@@ -1001,15 +1289,16 @@ bool BasicBuildStrategy::checkSupplyUsedForInitialBuild(int supplyUsed, int unti
 		}
 	}
 	else {
-		// 추가 로직 필요
+		// 需要其他逻辑 
 		return true;
 	}
 }
 
-
+//建造地堡防御==================================================================================
 void BasicBuildStrategy::buildBunkerDefence()
 {
-	if (isExistOrUnderConstruction(Terran_Bunker)) {
+	if (isExistOrUnderConstruction(Terran_Bunker))
+	{
 
 		// 이미 취소되었었다면, 위치가 변경된 채로 큐에 다시 들어가 있을테니,
 		// 한번더 취소하지 않는다.
@@ -1021,20 +1310,25 @@ void BasicBuildStrategy::buildBunkerDefence()
 		for (auto b : INFO.getBuildings(Terran_Bunker, S))
 		{
 			// 본진에 이미 지어진 벙커가 있으면 리턴
-			if (b->isComplete() && theMap.GetArea((WalkPosition)b->pos()) == theMap.GetArea(INFO.getMainBaseLocation(S)->Location())) {
+			if (b->isComplete() && theMap.GetArea((WalkPosition)b->pos()) == theMap.GetArea(INFO.getMainBaseLocation(S)->Location()))
+			{
 				return;
 			}
 		}
 
-		if (CM.existConstructionQueueItem(Terran_Bunker)) {
+		if (CM.existConstructionQueueItem(Terran_Bunker))
+		{
 			const vector<ConstructionTask> *constructionQueue = CM.getConstructionQueue();
 
-			for (const auto &b : *constructionQueue) {
+			for (const auto &b : *constructionQueue)
+			{
 
-				if (b.type == Terran_Bunker) {
+				if (b.type == Terran_Bunker)
+				{
 					if (b.desiredPosition != TilePositions::None &&
-							(theMap.GetArea(b.desiredPosition) != theMap.GetArea(INFO.getMainBaseLocation(S)->Location())
-							 || theMap.GetArea(b.finalPosition) != theMap.GetArea(INFO.getMainBaseLocation(S)->Location()))) {
+						(theMap.GetArea(b.desiredPosition) != theMap.GetArea(INFO.getMainBaseLocation(S)->Location())
+						|| theMap.GetArea(b.finalPosition) != theMap.GetArea(INFO.getMainBaseLocation(S)->Location())))
+					{
 						CM.cancelConstructionTask(b);
 						cancelFlag = true;
 					}
@@ -1042,20 +1336,23 @@ void BasicBuildStrategy::buildBunkerDefence()
 			}
 		}
 
-		cancelFlag = cancelFlag || BM.buildQueue.removeQueue(Terran_Bunker, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, false);
 
-		if (cancelFlag) {
+
+		if (cancelFlag)
+		{
 			canceledBunker = true;
 
 			BM.buildQueue.queueAsHighestPriority(Terran_Bunker, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, false);
 		}
 	}
-	else {
+	else
+	{
 
-		if (!hasEnoughResourcesToBuild(Terran_Bunker) && INFO.getUnitsInRadius(E, INFO.getMainBaseLocation(S)->Center(), 10 * TILE_SIZE, true, true, false).size() != 0) {
-			// 돈이 없으면서 적 유닛이 가까이에 있으면 서플을 취소한다.
+		if (!hasEnoughResourcesToBuild(Terran_Bunker)/* && INFO.getUnitsInRadius(E, INFO.getMainBaseLocation(S)->Center(), 10 * TILE_SIZE, true, true, false).size() != 0*/)
+		{
+			// 没有足够钱造地堡就把在建中的BS爆掉
 
-			// 서플 취소
+
 			for (auto s : INFO.getBuildings(Terran_Supply_Depot, S))
 			{
 				if (!s->isComplete())
@@ -1070,19 +1367,21 @@ void BasicBuildStrategy::buildBunkerDefence()
 		BM.buildQueue.queueAsHighestPriority(Terran_Bunker, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, false);
 	}
 }
+//分基地建造地堡防御
 
+//已经研究或正在被研究==================================================================================
 bool BasicBuildStrategy::isResearchingOrResearched(TechType techType, UpgradeType upType)
 {
 	if (techType != TechTypes::None) {
 		if (S->isResearching(techType) == true
-				|| S->hasResearched(techType))
+			|| S->hasResearched(techType))
 		{
 			return true;
 		}
 	}
 	else if (upType != UpgradeTypes::None) {
 		if (S->isUpgrading(upType) == true
-				|| S->getUpgradeLevel(upType) == 1)
+			|| S->getUpgradeLevel(upType) == 1)
 		{
 			return true;
 		}
@@ -1090,15 +1389,15 @@ bool BasicBuildStrategy::isResearchingOrResearched(TechType techType, UpgradeTyp
 
 	return false;
 }
-
+//获取正在建造的计数==================================================================================
 int BasicBuildStrategy::getUnderConstructionCount(UnitType u, TilePosition p) {
 	return BM.buildQueue.getItemCount(u, p) + CM.getConstructionQueueItemCount(u, p);
 }
-
+//获取存在或正在建造的计数==================================================================================
 int BasicBuildStrategy::getExistOrUnderConstructionCount(UnitType unitType, Position position) {
 	return INFO.getTypeBuildingsInRadius(unitType, S, position, 6 * TILE_SIZE).size() + getUnderConstructionCount(unitType, (TilePosition)position);
 }
-
+//建造防空塔==================================================================================
 void BasicBuildStrategy::buildMissileTurrets(int count)
 {
 	if (INFO.enemyRace == Races::Terran && S->minerals() > 2000)
@@ -1162,481 +1461,66 @@ void BasicBuildStrategy::buildMissileTurrets(int count)
 		}
 	}
 }
-
-void BasicBuildStrategy::executeBasicBuildStrategy()
+void BasicBuildStrategy::setmyBasicBuildStrategy()
 {
-	if (TIME % 12 != 0)
-		return;
-
-	// 본진 커맨드 뿌개지면 다시 짓는 로직
-	if (INFO.getTypeBuildingsInRadius(Terran_Command_Center, S, MYBASE, 5 * TILE_SIZE, true).empty()
-			&& INFO.getUnitsInArea(E, MYBASE, true, true, false).empty()
-			&& !CM.existConstructionQueueItem(Terran_Command_Center)
-			&& !BM.buildQueue.existItem(Terran_Command_Center)
-	   ) {
-		int remainingM = 0;
-
-		for (auto m : INFO.getMainBaseLocation(S)->Minerals())
-			remainingM += m->Amount();
-
-		if (remainingM >= 2000)
-			BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, BuildOrderItem::SeedPositionStrategy::MainBaseLocation);
-	}
-
-	if (INFO.enemyRace == Races::Terran) {
+	if (INFO.enemyRace == Races::Terran)
+	{
 		if (SM.getMyBuild() == MyBuildTypes::Terran_VultureTankWraith)
 			TerranVulutreTankWraithBuild();
 		else if (SM.getMyBuild() == MyBuildTypes::Terran_TankGoliath)
 			TerranTankGoliathBuild();
 	}
-	else if (INFO.enemyRace == Races::Protoss) {
-		// 1배럭 + 1팩 + 앞마당 + 5 팩토리(골리앗) + 방1업 진출
-		// 1배럭 + 1팩 + 앞마당 스타포트
-		if (canBuildFirstBarrack(20)) {
-			BM.buildQueue.queueAsHighestPriority(Terran_Barracks, false);
-		}
-
-		if (canBuildRefinery(24, BuildOrderItem::SeedPositionStrategy::MainBaseLocation)) {
-			TilePosition refineryPos = ConstructionPlaceFinder::Instance().getRefineryPositionNear(BuildOrderItem::SeedPositionStrategy::MainBaseLocation);
-
-			if (refineryPos.isValid())
-				BM.buildQueue.queueAsHighestPriority(Terran_Refinery, refineryPos, false);
-		}
-
-		if (canBuildFirstFactory(32)) {
-			BM.buildQueue.queueAsHighestPriority(Terran_Factory, false);
-		}
-
-		int baseVultureCount = 0;
-		int baseZealotCount = 0;
-
-		if (EIB == Toss_1g_forward)
-		{
-			baseVultureCount = 2;
-			baseZealotCount = 3;
-		}
-		else if (EIB == Toss_2g_zealot || EIB == Toss_2g_forward || EMB == Toss_1base_fast_zealot)
-		{
-			baseVultureCount = 4;
-			baseZealotCount = 5;
-		}
-
-		if (EIB == Toss_2g_zealot || EIB == Toss_1g_forward || EIB == Toss_2g_forward
-				|| EMB == Toss_1base_fast_zealot)
-		{
-			// Factory 있으면 Vulture로 막는다.
-			if (INFO.getCompletedCount(Terran_Factory, S) == 0)
-				buildBunkerDefence();
-
-			if ((INFO.getCompletedCount(Terran_Vulture, S) >= baseVultureCount || INFO.getDestroyedCount(Protoss_Zealot, E) >= baseZealotCount)
-					&& canBuildFirstExpansion(42))
-				BM.buildQueue.queueAsLowestPriority(Terran_Command_Center, getSecondCommandPosition(), false);
-			else if (S->minerals() >= 500 && canBuildFirstExpansion(42))
-				BM.buildQueue.queueAsLowestPriority(Terran_Command_Center, getSecondCommandPosition(true), false);
-
-			// 벌쳐 속업 먼저
-			/*if (INFO.getCompletedCount(Terran_Factory, S) >= 2 && isTimeToMachineShopUpgrade(TechTypes::None, UpgradeTypes::Ion_Thrusters))
-				BM.buildQueue.queueAsLowestPriority(UpgradeTypes::Ion_Thrusters);
-			*/
-			// 벌쳐 마인 업
-			if (INFO.getCompletedCount(Terran_Vulture, S) >= 1 && isTimeToMachineShopUpgrade(TechTypes::Spider_Mines))
-				BM.buildQueue.queueAsHighestPriority(TechTypes::Spider_Mines);
-
-		}
-		else if (EIB == Toss_pure_double || EIB == Toss_forge)
-		{
-			if (canBuildFirstExpansion(42)) {
-				BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation, false);
-			}
-
-			// 역언덕 맵에서, 앞마당 짓고 벙커 짓기
-			if (INFO.getAltitudeDifference() <= 0 && hasSecondCommand() && canBuildFirstBunker(42)) {
-				BM.buildQueue.queueAsHighestPriority(Terran_Bunker, BuildOrderItem::SeedPositionStrategy::SecondChokePoint, false);
-			}
-
-		}
-		else if (EIB == Toss_cannon_rush) {
-			uList cannons = INFO.getBuildings(Protoss_Photon_Cannon, E);
-			bool isDestroyComplete = true;
-
-			for (auto c : cannons) {
-				// 본진이나 앞마당이나 앞마당 근처에 있는 경우.
-				if (isSameArea(c->pos(), INFO.getMainBaseLocation(S)->Center())
-						|| (INFO.getFirstExpansionLocation(S) &&
-							(isSameArea(c->pos(), INFO.getFirstExpansionLocation(S)->Center())
-							 || getAttackDistance(c->type(), c->pos(), Terran_Command_Center, INFO.getFirstExpansionLocation(S)->Center()) <= Protoss_Photon_Cannon.groundWeapon().maxRange() + 2 * TILE_SIZE))) {
-					isDestroyComplete = false;
-					break;
-				}
-			}
-
-			// 우리 본진 + 초크포인트 + 포토 사거리 에 적 포토가 있는 경우 시즈모드 업 먼저 하고.
-			if (!isDestroyComplete && isExistOrUnderConstruction(Terran_Siege_Tank_Tank_Mode) && isTimeToMachineShopUpgrade(TechTypes::Tank_Siege_Mode)) {
-				BM.buildQueue.queueAsHighestPriority(TechTypes::Tank_Siege_Mode, true);
-			}
-
-			if (canBuildFirstExpansion(42)) {
-				// 커멘드는 포토캐논 다 부순 경우 멀티 위치에 짓는다.
-				if (isDestroyComplete)
-					BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation, false);
-				// 포토가 있으면 탱크 있고 시즈업 시작했으면 짓는다.
-				else if (S->isResearching(TechTypes::Tank_Siege_Mode) || BM.buildQueue.existItem(TechTypes::Tank_Siege_Mode)
-						 || S->hasResearched(TechTypes::Tank_Siege_Mode))
-					BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, getSecondCommandPosition(true), false);
-			}
-		}
-		else
-		{
-			if (canBuildFirstBunker(38)) {
-				BM.buildQueue.queueAsHighestPriority(Terran_Bunker, BuildOrderItem::SeedPositionStrategy::SecondChokePoint, false);
-			}
-
-			if (canBuildFirstExpansion(42)) {
-				BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation, false);
-			}
-
-			//if (canBuildFirstExpansion(42)) {
-			//	BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, getSecondCommandPosition(), false);
-			//}
-
-			//// 앞마당에 건설 시에는 Bunker짓는다.
-			//if (INFO.getFirstExpansionLocation(S) && getSecondCommandPosition() == INFO.getFirstExpansionLocation(S)->getTilePosition())
-			//{
-			//	if (canBuildFirstBunker(42)) {
-			//		BM.buildQueue.queueAsHighestPriority(Terran_Bunker, (TilePosition)(INFO.getSecondAverageChokePosition(S) - ((Position)Terran_Bunker.tileSize() / 2)), false);
-			//	}
-			//}
-		}
-
-		//만약 적이 앞마당을.. 점령했으면
-
-		// 이후의 로직은 앞마당을 짓고나서 수행되도록
-		if (!hasSecondCommand()) {
-			return;
-		}
-
-		// 적 앞마당 있든 없든 벙커 짓자..
-		if (canBuildSecondChokePointBunker(62)/* && !HasEnemyFirstExpansion()*/
-				&& isMyCommandAtFirstExpansion()) {
-			BM.buildQueue.queueAsHighestPriority(Terran_Bunker, BuildOrderItem::SeedPositionStrategy::SecondChokePoint, false);
-		}
-
-		// 엔지니어링 베이
-		if (EMB == Toss_Scout || EMB == Toss_dark || EMB == Toss_dark_drop || EMB == Toss_drop || EMB == Toss_reaver_drop) {
-			// 다크가 확실한 경우
-			if (canBuildFirstEngineeringBay(0) && INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) > 0) {
-				int completeTime = INT_MAX;
-
-				if (INFO.getAllCount(Protoss_Templar_Archives, E) + INFO.getAllCount(Protoss_Dark_Templar, E) + INFO.getAllCount(Protoss_Shuttle, E) + INFO.getAllCount(Protoss_Scout, E) == 0) {
-					uList aduns = INFO.getBuildings(Protoss_Citadel_of_Adun, E);
-					uList robotics = INFO.getBuildings(Protoss_Robotics_Facility, E);
-					uList roboticsSupportBay = INFO.getBuildings(Protoss_Robotics_Support_Bay, E);
-
-					// 아둔이 있는 경우(다크템플러)
-					if (!aduns.empty()) {
-						for (auto a : aduns) {
-							if (completeTime > a->getCompleteTime())
-								completeTime = a->getCompleteTime();
-						}
-					}
-					// 로보틱스 서포트베이가 있는 경우 (리버드랍)
-					else if (!roboticsSupportBay.empty()) {
-						for (auto r : roboticsSupportBay) {
-							if (completeTime > r->getCompleteTime())
-								completeTime = r->getCompleteTime();
-						}
-					}
-					// 로보틱스만 있는 경우
-					else if (!robotics.empty()) {
-						for (auto r : robotics) {
-							if (completeTime > r->getCompleteTime() + 450) {
-								completeTime = r->getCompleteTime() + 450;
-							}
-						}
-					}
-				}
-				else {
-					completeTime = TIME;
-				}
-
-				if (completeTime <= TIME)
-					BM.buildQueue.queueAsHighestPriority(Terran_Engineering_Bay, true);
-			}
-		}
-		// 적 빌드를 모른 상태에서 적 앞마당이 없이 4분이 지난 경우
-		else if (EIB != Toss_cannon_rush && EMB == UnknownMainBuild && !HasEnemyFirstExpansion()) {
-			// 원탱 찍고 엔베
-			if (TIME > 24 * 240 && canBuildFirstEngineeringBay(0) && INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) > 0)
-				BM.buildQueue.queueAsHighestPriority(Terran_Engineering_Bay, true);
-		}
-		// 사업드라군 푸쉬 후 다크 공격 대비
-		else if (EMB == Toss_range_up_dra_push && !HasEnemyFirstExpansion()) {
-			if (canBuildFirstEngineeringBay(0) && INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) > 0) {
-				int completeTime = INT_MAX;
-
-				uList cyberneticsCores = INFO.getBuildings(Protoss_Cybernetics_Core, E);
-
-				if (cyberneticsCores.empty()) {
-					uList gateways = INFO.getBuildings(Protoss_Gateway, E);
-
-					for (auto g : gateways)
-						if (g->getCompleteTime() < completeTime)
-							completeTime = g->getCompleteTime();
-
-					completeTime += Protoss_Cybernetics_Core.buildTime();
-				}
-				else {
-					for (auto c : cyberneticsCores)
-						if (c->getCompleteTime() < completeTime)
-							completeTime = c->getCompleteTime();
-				}
-
-				completeTime += Protoss_Citadel_of_Adun.buildTime();
-
-				// 사업한 경우는 가스 캐는데 시간이 더 필요함. (720)
-				if (EMB == Toss_range_up_dra_push) {
-					// 사업 한 경우 드라군 최소 한기 뽑았다고 가정 (360)
-					completeTime += 1080;
-				}
-
-				if (completeTime <= TIME)
-					BM.buildQueue.queueAsHighestPriority(Terran_Engineering_Bay, true);
-			}
-		}
-		else
-		{
-			// 시즈 생산, 시즈 모드 업 먼저
-			if (INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) >= 2 && isResearchingOrResearched(TechTypes::Tank_Siege_Mode)
-					&& canBuildFirstEngineeringBay(0))
-				BM.buildQueue.queueAsHighestPriority(Terran_Engineering_Bay, false);
-		}
-
-
-		// [터렛]
-		// 다크이거나 상대 앞마당이 없고 상대 전략을 파악하지 못했을 때.
-		if (EMB == Toss_dark || (EIB != Toss_cannon_rush && EMB == UnknownMainBuild && !HasEnemyFirstExpansion() && TIME > 24 * 240))
-		{
-			// 앞마당이 있으면 앞마당 앞에
-			// 이미 다크가 와버리면 그냥 언덕에서부터 차례로 지어서 내려가자..
-			// 시간적으로 여유가 있는 경우 (템플러아카이브 건설 시간 + 다크 생산 + 오는 시간 + 터렛 지으러 가는 시간)
-			if (INFO.getFirstExpansionLocation(S) && INFO.getSecondChokePoint(S)
-					&& (isMyCommandAtFirstExpansion() || INFO.getCompletedCount(Terran_Bunker, S) != 0)
-					&& INFO.getTypeUnitsInRadius(Protoss_Dark_Templar, E, (Position)INFO.getSecondChokePoint(S)->Center(), 8 * TILE_SIZE).empty()
-					&& TIME < (24 * 270 + Protoss_Dark_Templar.buildTime() + 24 * 60)) {
-
-
-				if (canBuildMissileTurret(getSecondChokePointTurretPosition())) {
-					BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, getSecondChokePointTurretPosition(), true);
-				}
-
-			}
-			else {
-				if (INFO.getSecondChokePoint(S) && INFO.getTypeBuildingsInRadius(Terran_Missile_Turret, S, (Position)INFO.getSecondChokePoint(S)->Center(), 8 * TILE_SIZE, true).empty())
-				{
-					if (canBuildMissileTurret(getTurretPositionOnTheHill()))
-						BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, (TilePosition)getTurretPositionOnTheHill(), true);
-
-					if (canBuildMissileTurret(getSecondChokePointTurretPosition()))
-						BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, (TilePosition)getSecondChokePointTurretPosition(), true);
-				}
-			}
-
-			if (canBuildMissileTurret((TilePosition)MYBASE) && S->supplyUsed() >= 80) {
-				BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, true);
-			}
-		}
-		else if (EMB == Toss_dark_drop)
-		{
-			if (canBuildMissileTurret((TilePosition)MYBASE, 2)) {
-				BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, true);
-			}
-
-			if (canBuildMissileTurret(getSecondChokePointTurretPosition())) {
-				BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, getSecondChokePointTurretPosition(), true);
-			}
-		}
-		else if (EMB == Toss_Scout || INFO.getCompletedCount(Protoss_Scout, E) > 0) {
-			// 본진 하나 앞마당 하나
-			if (INFO.getCompletedCount(Terran_Goliath, S) <= INFO.getCompletedCount(Protoss_Scout, E)) {
-				if (canBuildMissileTurret((TilePosition)MYBASE)) {
-					BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, true);
-				}
-
-				if (canBuildMissileTurret((TilePosition)INFO.getFirstExpansionLocation(S)->Center())) {
-					BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation, true);
-				}
-			}
-		}
-		else if (EMB == Toss_fast_carrier) {
-			// 아무 전략이 없을때도 그냥 본진에 터렛 하나는 짓자
-			if (canBuildMissileTurret(getSecondChokePointTurretPosition())
-					&& INFO.getCompletedCount(Terran_Factory, S) > 5 && S->supplyUsed() >= 100)
-				BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, getSecondChokePointTurretPosition(), true);
-
-
-			if (canBuildMissileTurret((TilePosition)MYBASE)
-					&& INFO.getCompletedCount(Terran_Factory, S) > 5 && S->supplyUsed() >= 100)
-				BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, true);
-
-			// 후반에 터렛 무작위로 짓기 로직
-			if (TrainManager::Instance().getAvailableMinerals() > 800) {
-				if (CM.getConstructionQueueItemCount(Terran_Missile_Turret)
-						+ BM.buildQueue.getItemCount(Terran_Missile_Turret)
-						+ INFO.getTypeBuildingsInArea(Terran_Missile_Turret, S, MYBASE).size() < 6) {
-
-					BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, false);
-
-				}
-			}
-		}
-		else if (EMB == Toss_arbiter || EMB == Toss_arbiter_carrier) {
-			buildMissileTurrets(INFO.getCompletedCount(Terran_Command_Center, S) >= 3 ? 2 : 1);
-		}
-		else {
-
-			// 아무 전략이 없을때도 그냥 본진에 터렛 하나는 짓자
-			if (canBuildMissileTurret(getSecondChokePointTurretPosition())
-					&& INFO.getCompletedCount(Terran_Factory, S) > 1 && (S->supplyUsed() >= 60 || INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) >= 3))
-				BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, getSecondChokePointTurretPosition(), true);
-
-
-			if (canBuildMissileTurret((TilePosition)MYBASE)
-					&& INFO.getCompletedCount(Terran_Factory, S) > 1 && (S->supplyUsed() >= 70 || INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) >= 3))
-				BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, true);
-		}
-
-		// 시즈모드 업
-		if (EIB != Toss_cannon_rush && (EMB == UnknownMainBuild || EMB == Toss_dark) && !HasEnemyFirstExpansion()) {
-			// 적 빌드를 모른 상태에서 적 앞마당이 없이 4분이 지난 경우 탱-엔베-탱 찍고 시즈모드업
-			if (TIME > 24 * 240 && isTimeToMachineShopUpgrade(TechTypes::Tank_Siege_Mode)
-					&& INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) > 1 && INFO.getAllCount(Terran_Engineering_Bay, S) > 0)
-				BM.buildQueue.queueAsHighestPriority(TechTypes::Tank_Siege_Mode, true);
-		}
-		else if (isExistOrUnderConstruction(Terran_Siege_Tank_Tank_Mode) && isTimeToMachineShopUpgrade(TechTypes::Tank_Siege_Mode)) {
-			BM.buildQueue.queueAsHighestPriority(TechTypes::Tank_Siege_Mode, true);
-		}
-
-		if (isResearchingOrResearched(TechTypes::Tank_Siege_Mode) && canBuildFirstTurret(60))
-			BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, getSecondChokePointTurretPosition(), true);
-
-		if (INFO.getCompletedCount(Terran_Vulture, S) >= 1 && isResearchingOrResearched(TechTypes::Tank_Siege_Mode) && isTimeToMachineShopUpgrade(TechTypes::Spider_Mines)) {
-			BM.buildQueue.queueAsHighestPriority(TechTypes::Spider_Mines, false);
-		}
-
-		if (EMB >= Toss_fast_carrier && EMB != UnknownMainBuild)
-		{
-			if (INFO.getCompletedCount(Terran_Goliath, S) >= 1 && isTimeToMachineShopUpgrade(TechTypes::None, UpgradeTypes::Charon_Boosters))
-				BM.buildQueue.queueAsHighestPriority(UpgradeTypes::Charon_Boosters, false);
-		}
-
-		// 아카데미
-		if (isResearchingOrResearched(TechTypes::Tank_Siege_Mode) && INFO.getAllCount(Terran_Factory, S) >= 2
-				&& canBuildFirstAcademy(70)) {
-			BM.buildQueue.queueAsHighestPriority(Terran_Academy, false);
-		}
-
-		// 아모리
-		if (EMB == Toss_Scout || EMB == Toss_fast_carrier || EMB == Toss_arbiter_carrier || EMB == Toss_arbiter) {
-			if (canBuildFirstArmory(0))
-				BM.buildQueue.queueAsHighestPriority(Terran_Armory, false);
-		}
-		else if (INFO.getAllCount(Terran_Academy, S) > 0) {
-			int amoryTiming = 70;
-
-			if (EMB == Toss_dark || EMB == Toss_1base_fast_zealot) {
-				amoryTiming = 80;
-			}
-
-			if (canBuildFirstArmory(amoryTiming))
-				BM.buildQueue.queueAsHighestPriority(Terran_Armory, false);
-		}
-
-		if (canBuildSecondArmory(0))
-			BM.buildQueue.queueAsHighestPriority(Terran_Armory, BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation, false);
-
-		if (!S->isUpgrading(UpgradeTypes::Terran_Vehicle_Weapons) || !S->isUpgrading(UpgradeTypes::Terran_Vehicle_Plating)) {
-			// 공업 먼저
-			UpgradeType highPriority = UpgradeTypes::Terran_Vehicle_Weapons;
-			UpgradeType lowPriority = UpgradeTypes::Terran_Vehicle_Plating;
-			UpgradeType upgradeType = S->isUpgrading(highPriority) ? lowPriority : S->isUpgrading(lowPriority) ? highPriority : S->getUpgradeLevel(highPriority) > S->getUpgradeLevel(lowPriority) ? lowPriority : highPriority;
-
-			// 메카닉 공방업
-			if (isTimeToArmoryUpgrade(upgradeType, S->getUpgradeLevel(upgradeType) + 1))
-			{
-				BM.buildQueue.queueAsHighestPriority(upgradeType, false);
-			}
-		}
-
-		// 두번째 가스
-		if (canBuildRefinery(80, BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation)
-				&& (INFO.getAllCount(Terran_Factory, S) >= 2 && INFO.getAllCount(Terran_Academy, S) && INFO.getAllCount(Terran_Armory, S) || S->minerals() > 400)) {
-			TilePosition refineryPos = ConstructionPlaceFinder::Instance().getRefineryPositionNear(BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation);
-
-			if (refineryPos.isValid())
-				BM.buildQueue.queueAsHighestPriority(Terran_Refinery, refineryPos, false);
-		}
-
-		if (INFO.getCompletedCount(Terran_Vulture, S) >= 6 &&
-				isResearchingOrResearched(TechTypes::Tank_Siege_Mode) &&
-				isResearchingOrResearched(TechTypes::Spider_Mines)
-				&& isTimeToMachineShopUpgrade(TechTypes::None, UpgradeTypes::Ion_Thrusters))
-			BM.buildQueue.queueAsLowestPriority(UpgradeTypes::Ion_Thrusters);
-
-		// 스타포트
-		if (EMB == Toss_arbiter)
-		{
-			if (canBuildFirstStarport(60)) {
-				BM.buildQueue.queueAsHighestPriority(Terran_Starport);
-			}
-		}
-		else
-		{
-			if (canBuildFirstStarport(80) && S->getUpgradeLevel(UpgradeTypes::Terran_Vehicle_Weapons) > 0) {
-				BM.buildQueue.queueAsHighestPriority(Terran_Starport, false);
-			}
-		}
-
-		// 사이언스 퍼실러티
-		if (EMB == Toss_arbiter || EMB == Toss_arbiter_carrier)
-		{
-			if (canBuildFirstScienceFacility(0)) {
-				BM.buildQueue.queueAsHighestPriority(Terran_Science_Facility);
-			}
-		}
-		else
-		{
-			if (canBuildFirstScienceFacility(80)) {
-				BM.buildQueue.queueAsHighestPriority(Terran_Science_Facility, false);
-			}
-		}
-
-		// EMP Shockwave 업그레이드
-		if (isTimeToScienceFacilityUpgrade(TechTypes::EMP_Shockwave) && INFO.getAllCount(Terran_Science_Vessel, S) > 0) {
-			BM.buildQueue.queueAsHighestPriority(TechTypes::EMP_Shockwave, false);
-		}
-
-		if (canBuildadditionalFactory()) {
-			BM.buildQueue.queueAsHighestPriority(Terran_Factory, false);
-		}
-
-		if (canBuildSecondExpansion(100) && SM.getNeedSecondExpansion())
-		{
-			BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, INFO.getSecondExpansionLocation(S)->getTilePosition());
-			cout << "2멀티 위치 : " << INFO.getSecondExpansionLocation(S)->getTilePosition() << endl;
-		}
-
-		if (canBuildThirdExpansion(100) && SM.getNeedThirdExpansion())
-		{
-			BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, INFO.getThirdExpansionLocation(S)->getTilePosition());
-			cout << "3멀티 위치 : " << INFO.getThirdExpansionLocation(S)->getTilePosition() << endl;
-		}
-
-		//// Factory 2개 완성되면 본진에 터렛 건설
-		//if (canBuildMissileTurret(INFO.getMainBaseLocation(S)->getTilePosition()) && INFO.getCompletedCount(Terran_Factory, S) > 1)
-		//	BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, true);
+	else if (INFO.enemyRace == Races::Protoss)
+	{
+		
+		if (SM.getMyBuild() == MyBuildTypes::Protoss_MineKiller)
+			ProtossMineKillerBuild();
+		else if (SM.getMyBuild() == MyBuildTypes::Protoss_DragoonKiller)
+			ProtossDragoonKillerBuild();
+		else if (SM.getMyBuild() == MyBuildTypes::Protoss_CarrierKiller)
+			ProtossCarrierKillerBuild();
+		else if (SM.getMyBuild() == MyBuildTypes::Protoss_ZealotKiller)
+			ProtossZealotKillerBuild();
+		else if (SM.getMyBuild() == MyBuildTypes::Protoss_TemplarKiller)
+			ProtossTemplarKillerBuild();
+		else if (SM.getMyBuild() == MyBuildTypes::Protoss_CannonKiller)
+			ProtossCannonKillerBuild();
+		
 	}
-	// 저그 혹은 랜덤
-	else {
+	else if (INFO.enemyRace == Races::Zerg)
+	{
+		if (SM.getMyBuild() == MyBuildTypes::Zerg_MMtoMachanic)
+			ZergMMtoMachanicBuild();
+	}
+}
+
+//执行基本建造策略********************===============================================================================
+void BasicBuildStrategy::executeBasicBuildStrategy()
+{
+	if (TIME % 12 != 0)//12帧跟新一次，也就是0.5s
+		return;
+
+	//如果没有建造基地==============================================
+	if (INFO.getTypeBuildingsInRadius(Terran_Command_Center, S, MYBASE, 5 * TILE_SIZE, true).empty()
+		&& INFO.getUnitsInArea(E, MYBASE, true, true, false).empty()
+		&& !CM.existConstructionQueueItem(Terran_Command_Center)
+		&& !BM.buildQueue.existItem(Terran_Command_Center)
+		)
+	{
+		int remainingM = 0;
+		//将所有mineral加入remainingM
+		for (auto m : INFO.getMainBaseLocation(S)->Minerals())
+			remainingM += m->Amount();
+
+		if (remainingM >= 2000)//如果家里的mineral有2000多，建造一个cc
+			BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, BuildOrderItem::SeedPositionStrategy::MainBaseLocation);
+	}
+	
+	setmyBasicBuildStrategy();
+
+	
+	if (INFO.enemyRace == Races::Zerg&& SM.getMyBuild() != MyBuildTypes::Zerg_MMtoMachanic)
+	{
 		// 1배럭 + 1팩 + 앞마당 + 5팩(탱크) + 방1업 진출
 		if (canBuildFirstBarrack(20)) {
 			BM.buildQueue.queueAsHighestPriority(Terran_Barracks, false);
@@ -1662,7 +1546,7 @@ void BasicBuildStrategy::executeBasicBuildStrategy()
 				baseVultureCount = 4;
 
 			if (canBuildSecondChokePointBunker(38) && (isMyCommandAtFirstExpansion() || getEnemyInMyYard(1000, Zerg_Zergling).empty())
-					&& (INFO.getCompletedCount(Terran_Vulture, S) >= baseVultureCount || INFO.getDestroyedCount(Zerg_Zergling, E) >= 10))
+				&& (INFO.getCompletedCount(Terran_Vulture, S) >= baseVultureCount || INFO.getDestroyedCount(Zerg_Zergling, E) >= 10))
 			{
 				BM.buildQueue.queueAsHighestPriority(Terran_Bunker, BuildOrderItem::SeedPositionStrategy::SecondChokePoint, false);
 			}
@@ -1670,7 +1554,7 @@ void BasicBuildStrategy::executeBasicBuildStrategy()
 		else
 		{
 			if (canBuildSecondChokePointBunker(38)
-					&& (INFO.getCompletedCount(Terran_Vulture, S) > 0 || INFO.getCompletedCount(Terran_Goliath, S) > 0 || INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) > 0))
+				&& (INFO.getCompletedCount(Terran_Vulture, S) > 0 || INFO.getCompletedCount(Terran_Goliath, S) > 0 || INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) > 0))
 			{
 				BM.buildQueue.queueAsHighestPriority(Terran_Bunker, BuildOrderItem::SeedPositionStrategy::SecondChokePoint, false);
 			}
@@ -1713,7 +1597,7 @@ void BasicBuildStrategy::executeBasicBuildStrategy()
 				baseVultureCount = 4;
 
 			if ((INFO.getCompletedCount(Terran_Vulture, S) >= baseVultureCount || INFO.getDestroyedCount(Zerg_Zergling, E) >= 10 || S->minerals() > 500)
-					&& canBuildFirstExpansion(42))
+				&& canBuildFirstExpansion(42))
 				//BM.buildQueue.queueAsLowestPriority(Terran_Command_Center, BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation, false);
 				BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, getSecondCommandPosition(true), false);
 		}
@@ -1721,7 +1605,7 @@ void BasicBuildStrategy::executeBasicBuildStrategy()
 		{
 			// 마인업, 엔베까지 건설 후 커맨드 추가
 			if (canBuildFirstExpansion(42) && (S->hasResearched(TechTypes::Spider_Mines) || S->isResearching(TechTypes::Spider_Mines))
-					&& INFO.getAllCount(Terran_Engineering_Bay, S) > 0) {
+				&& INFO.getAllCount(Terran_Engineering_Bay, S) > 0) {
 				BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation, false);
 			}
 		}
@@ -1800,10 +1684,10 @@ void BasicBuildStrategy::executeBasicBuildStrategy()
 
 		// 멀티별 미사일 터렛 짓기
 		if ((EMB == Zerg_main_mutal
-				|| EMB == Zerg_main_maybe_mutal
-				|| EMB == Zerg_main_fast_mutal
-				|| EMB == Zerg_main_hydra_mutal)
-				&& INFO.getCompletedCount(Terran_Engineering_Bay, S) > 0)
+			|| EMB == Zerg_main_maybe_mutal
+			|| EMB == Zerg_main_fast_mutal
+			|| EMB == Zerg_main_hydra_mutal)
+			&& INFO.getCompletedCount(Terran_Engineering_Bay, S) > 0)
 		{
 			if (completeTime != INT_MAX && completeTime <= TIME)
 			{
@@ -1888,16 +1772,16 @@ void BasicBuildStrategy::executeBasicBuildStrategy()
 		{
 			// 저글링 이외 벌쳐 속업은 제일 마지막으로
 			if (S->hasResearched(TechTypes::Tank_Siege_Mode) &&
-					S->hasResearched(TechTypes::Spider_Mines) &&
-					S->getUpgradeLevel(UpgradeTypes::Charon_Boosters) == 1 &&
-					isTimeToMachineShopUpgrade(TechTypes::None, UpgradeTypes::Ion_Thrusters)) {
+				S->hasResearched(TechTypes::Spider_Mines) &&
+				S->getUpgradeLevel(UpgradeTypes::Charon_Boosters) == 1 &&
+				isTimeToMachineShopUpgrade(TechTypes::None, UpgradeTypes::Ion_Thrusters)) {
 				BM.buildQueue.queueAsHighestPriority(UpgradeTypes::Ion_Thrusters, false);
 			}
 		}
 
 		// 시즈모드업
 		if (EMB == Zerg_main_hydra
-				|| EMB == Zerg_main_hydra_mutal)
+			|| EMB == Zerg_main_hydra_mutal)
 		{
 			if (INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) > 0 && isTimeToMachineShopUpgrade(TechTypes::Tank_Siege_Mode)) {
 				BM.buildQueue.queueAsHighestPriority(TechTypes::Tank_Siege_Mode, false);
@@ -1906,15 +1790,15 @@ void BasicBuildStrategy::executeBasicBuildStrategy()
 		else if (EMB == Zerg_main_lurker)
 		{
 			if (S->getUpgradeLevel(UpgradeTypes::Charon_Boosters) && INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) > 0
-					&& isTimeToMachineShopUpgrade(TechTypes::Tank_Siege_Mode)) {
+				&& isTimeToMachineShopUpgrade(TechTypes::Tank_Siege_Mode)) {
 				BM.buildQueue.queueAsHighestPriority(TechTypes::Tank_Siege_Mode, false);
 			}
 		}
 		else
 		{
 			if (INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) > 0
-					&& INFO.getCompletedCount(Terran_Goliath, S) >= 8
-					&& isTimeToMachineShopUpgrade(TechTypes::Tank_Siege_Mode)) {
+				&& INFO.getCompletedCount(Terran_Goliath, S) >= 8
+				&& isTimeToMachineShopUpgrade(TechTypes::Tank_Siege_Mode)) {
 				BM.buildQueue.queueAsHighestPriority(TechTypes::Tank_Siege_Mode, false);
 			}
 		}
@@ -1958,8 +1842,8 @@ void BasicBuildStrategy::executeBasicBuildStrategy()
 
 		// 아머리
 		if (EMB == Zerg_main_mutal
-				|| EMB == Zerg_main_fast_mutal
-				|| EMB == Zerg_main_hydra_mutal)
+			|| EMB == Zerg_main_fast_mutal
+			|| EMB == Zerg_main_hydra_mutal)
 		{
 			if (canBuildFirstArmory(0) && INFO.getAllCount(Terran_Factory, S) >= 1) {
 				BM.buildQueue.queueAsHighestPriority(Terran_Armory);
@@ -1968,7 +1852,7 @@ void BasicBuildStrategy::executeBasicBuildStrategy()
 		else
 		{
 			if (canBuildFirstArmory(50) && INFO.getAllCount(Terran_Factory, S) >= 1
-					&& (INFO.getAllCount(Terran_Vulture, S) + INFO.getDestroyedCount(Terran_Vulture, S))) {
+				&& (INFO.getAllCount(Terran_Vulture, S) + INFO.getDestroyedCount(Terran_Vulture, S))) {
 				BM.buildQueue.queueAsHighestPriority(Terran_Armory);
 			}
 		}
@@ -2067,6 +1951,9 @@ void BasicBuildStrategy::executeBasicBuildStrategy()
 			}
 		}
 
+		
+
+
 		// Irradiate 업그레이드
 		if (isTimeToScienceFacilityUpgrade(TechTypes::Irradiate) && INFO.getAllCount(Terran_Science_Vessel, S) > 0) {
 			BM.buildQueue.queueAsHighestPriority(TechTypes::Irradiate, false);
@@ -2075,18 +1962,43 @@ void BasicBuildStrategy::executeBasicBuildStrategy()
 		if (canBuildSecondExpansion(100) && SM.getNeedSecondExpansion())
 		{
 			BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, INFO.getSecondExpansionLocation(S)->getTilePosition());
-			cout << "2멀티 위치 : " << INFO.getSecondExpansionLocation(S)->getTilePosition() << endl;
+
 		}
 
 		if (canBuildThirdExpansion(100) && SM.getNeedThirdExpansion())
 		{
 			BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, INFO.getThirdExpansionLocation(S)->getTilePosition());
-			cout << "3멀티 위치 : " << INFO.getThirdExpansionLocation(S)->getTilePosition() << endl;
+
 		}
 	}
+	else
+	{
 
+		//兵营的建造=======================================================
+		if (canBuildFirstBarrack(22))
+		{
+			BM.buildQueue.queueAsHighestPriority(Terran_Barracks, false);
+		}
+
+		//瓦斯场的建造=======================================================
+		if (canBuildRefinery(24, BuildOrderItem::SeedPositionStrategy::MainBaseLocation))  //如果12人口可以造精炼厂
+		{
+			TilePosition refineryPos = ConstructionPlaceFinder::Instance().getRefineryPositionNear(BuildOrderItem::SeedPositionStrategy::MainBaseLocation);
+
+			if (refineryPos.isValid())
+				BM.buildQueue.queueAsHighestPriority(Terran_Refinery, refineryPos, false);
+		}
+		//工厂的建造=======================================================
+		if (canBuildFirstFactory(32))  //如果16人口可以造Factory
+		{
+			BM.buildQueue.queueAsHighestPriority(Terran_Factory, false);
+		}
+
+
+	}
 	// 공통 체크 (엘리가 되면 공중유닛을 뽑는다.)
-	if (SM.getMainStrategy() == Eliminate) {
+	if (SM.getMainStrategy() == Eliminate)
+	{
 		if (canBuildFirstStarport(48)) {
 			BM.buildQueue.queueAsHighestPriority(Terran_Starport, false);
 		}
@@ -2116,7 +2028,7 @@ void BasicBuildStrategy::executeBasicBuildStrategy()
 		{
 			BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, multiBase->getTilePosition());
 			preBase = multiBase;
-			cout << "추가 멀티 위치 : " << multiBase->getTilePosition() << endl;
+
 		}
 	}
 
@@ -2152,7 +2064,7 @@ void BasicBuildStrategy::executeBasicBuildStrategy()
 	}
 
 }
-
+//获取第二个堵路防空塔位置==================================================================================
 TilePosition BasicBuildStrategy::getSecondChokePointTurretPosition() {
 	Unit bunkerUnit = nullptr;
 
@@ -2177,7 +2089,7 @@ TilePosition BasicBuildStrategy::getSecondChokePointTurretPosition() {
 	return mySecondChokePointBunker;
 }
 
-
+//取消主基地的堡垒==================================================================================
 void BasicBuildStrategy::cancelBunkerAtMainBase() {
 
 	if (CM.existConstructionQueueItem(Terran_Bunker)) {
@@ -2187,8 +2099,8 @@ void BasicBuildStrategy::cancelBunkerAtMainBase() {
 
 			if (b.type == Terran_Bunker) {
 				if (b.desiredPosition != TilePositions::None &&
-						(isSameArea(b.desiredPosition, INFO.getMainBaseLocation(S)->getTilePosition())
-						 || isSameArea(b.finalPosition, INFO.getMainBaseLocation(S)->getTilePosition()))) {
+					(isSameArea(b.desiredPosition, INFO.getMainBaseLocation(S)->getTilePosition())
+					|| isSameArea(b.finalPosition, INFO.getMainBaseLocation(S)->getTilePosition()))) {
 					CM.cancelConstructionTask(b);
 					return;
 				}
@@ -2199,7 +2111,7 @@ void BasicBuildStrategy::cancelBunkerAtMainBase() {
 	BM.buildQueue.removeQueue(Terran_Bunker, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, true);
 	return;
 }
-
+//取消第一次扩张==================================================================================
 void BasicBuildStrategy::cancelFirstExpansion()
 {
 	if (CM.existConstructionQueueItem(Terran_Command_Center)) {
@@ -2220,6 +2132,7 @@ void BasicBuildStrategy::cancelFirstExpansion()
 	BM.buildQueue.removeQueue(Terran_Command_Center, BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation, true);
 	return;
 }
+//取消第一个工厂附属建筑的建造==================================================================================
 void BasicBuildStrategy::cancelFirstMachineShop(InitialBuildType eib, MainBuildType emb)
 {
 	int baseVultureCount = TrainManager::Instance().getBaseVultureCount(eib, emb);
@@ -2241,7 +2154,7 @@ void BasicBuildStrategy::cancelFirstMachineShop(InitialBuildType eib, MainBuildT
 	}
 }
 
-/// 터렛 세개를 a - c에 이어서 짓는다.
+/// 从a到c建造三个防空塔
 void BasicBuildStrategy::buildTurretFromAtoB(Position a, Position c)
 {
 	/* Turret A */
@@ -2323,7 +2236,7 @@ void BasicBuildStrategy::buildTurretFromAtoB(Position a, Position c)
 		int dist = newPositionOfC.getApproxDistance((TilePosition)turretB->pos());
 
 		// A하고 거리를 일정하게 유지.
-		if (!bw->canBuildHere(newPositionOfC, Terran_Missile_Turret) || dist > 7 ) {
+		if (!bw->canBuildHere(newPositionOfC, Terran_Missile_Turret) || dist > 7) {
 			TilePosition temp =
 				ConstructionPlaceFinder::Instance().getBuildLocationBySpiralSearch(Terran_Missile_Turret, newPositionOfC, false, (Position)newPositionOfC);
 
@@ -2347,7 +2260,7 @@ void BasicBuildStrategy::buildTurretFromAtoB(Position a, Position c)
 
 	return;
 }
-
+//初始建造的改变==================================================================================
 void BasicBuildStrategy::onInitialBuildChange(InitialBuildType pre, InitialBuildType cur)
 {
 	cout << "Build Change Pre : " << pre << ", cur : " << cur << endl;
@@ -2402,7 +2315,7 @@ void BasicBuildStrategy::onInitialBuildChange(InitialBuildType pre, InitialBuild
 		cancelBunkerAtMainBase();
 	}
 }
-
+//主要建造的改变==================================================================================
 void BasicBuildStrategy::onMainBuildChange(MainBuildType pre, MainBuildType cur)
 {
 	cout << "MainBuild " << pre << " => " << cur << endl;
@@ -2415,22 +2328,24 @@ void BasicBuildStrategy::onMainBuildChange(MainBuildType pre, MainBuildType cur)
 		}
 	}
 }
-
+//雷车坦克维京的建造==================================================================================
 void BasicBuildStrategy::TerranVulutreTankWraithBuild()
 {
 	// 1배럭 + 1팩 + 앞마당 + 스타포트
-	if (canBuildFirstBarrack(20)) {
+	if (canBuildFirstBarrack(20))
+	{
 		BM.buildQueue.queueAsHighestPriority(Terran_Barracks, false);
 	}
 
-	if (canBuildRefinery(24, BuildOrderItem::SeedPositionStrategy::MainBaseLocation)) {
+	if (canBuildRefinery(24, BuildOrderItem::SeedPositionStrategy::MainBaseLocation))
+	{
 		TilePosition refineryPos = ConstructionPlaceFinder::Instance().getRefineryPositionNear(BuildOrderItem::SeedPositionStrategy::MainBaseLocation);
 
 		if (refineryPos.isValid())
 			BM.buildQueue.queueAsHighestPriority(Terran_Refinery, refineryPos, false);
 	}
 
-	if (canBuildFirstFactory(32)) {
+	if (canBuildFirstFactory(28)) {
 		BM.buildQueue.queueAsHighestPriority(Terran_Factory, false);
 	}
 
@@ -2443,16 +2358,21 @@ void BasicBuildStrategy::TerranVulutreTankWraithBuild()
 	}
 
 	// 이후의 로직은 앞마당을 먹은 뒤에 수행되도록 체크
-	if (!hasSecondCommand()) {
+	if (!hasSecondCommand())
+	{
 		return;
 	}
 
 	if (EIB == Terran_1fac_1star ||
-			EIB == Terran_1fac_2star ||
-			EIB == Terran_2fac_1star ||
-			SM.getMainStrategy() == AttackAll)
+		EIB == Terran_1fac_2star ||
+		EIB == Terran_2fac_1star ||
+		EMB == Terran_1fac_1star ||
+		EMB == Terran_1fac_2star ||
+		EMB == Terran_2fac_1star ||
+		SM.getMainStrategy() == AttackAll)
 	{
-		if (canBuildFirstStarport(48)) {
+		if (canBuildFirstStarport(48))
+		{
 			BM.buildQueue.queueAsHighestPriority(Terran_Starport, false);
 		}
 	}
@@ -2467,7 +2387,7 @@ void BasicBuildStrategy::TerranVulutreTankWraithBuild()
 	}
 
 	if (S->hasResearched(TechTypes::Spider_Mines) &&
-			isTimeToMachineShopUpgrade(TechTypes::None, UpgradeTypes::Ion_Thrusters))
+		isTimeToMachineShopUpgrade(TechTypes::None, UpgradeTypes::Ion_Thrusters))
 	{
 		BM.buildQueue.queueAsHighestPriority(UpgradeTypes::Ion_Thrusters, false);
 	}
@@ -2501,7 +2421,7 @@ void BasicBuildStrategy::TerranVulutreTankWraithBuild()
 		BM.buildQueue.queueAsHighestPriority(Terran_Academy, false);
 	}
 }
-
+//坦克机器人的建造==================================================================================
 void BasicBuildStrategy::TerranTankGoliathBuild()
 {
 	// 4팩 탱크 골리앗 드랍쉽 운영
@@ -2532,7 +2452,7 @@ void BasicBuildStrategy::TerranTankGoliathBuild()
 	}
 	// 적이 초반 러시인 경우
 	else if (canBuildFirstBunker(0) && INFO.getCompletedCount(Terran_Barracks, E) >= 2
-			 && (ESM.getEnemyInitialBuild() == Terran_bunker_rush || ESM.getEnemyInitialBuild() == Terran_2b_forward)) {
+		&& (ESM.getEnemyInitialBuild() == Terran_bunker_rush || ESM.getEnemyInitialBuild() == Terran_2b_forward)) {
 		// 적 배럭 위치에 따라 벙커 위치 정한다.
 		bool isEnemyBarracksNear = false;
 		int dist1 = getGroundDistance(MYBASE, INFO.getSecondChokePosition(S)) + 5 * TILE_SIZE;
@@ -2585,7 +2505,7 @@ void BasicBuildStrategy::TerranTankGoliathBuild()
 
 	// 엔지니어링 베이
 	if (INFO.getCompletedCount(Terran_Machine_Shop, S) >= 2
-			&& (S->hasResearched(TechTypes::Tank_Siege_Mode) || S->isResearching(TechTypes::Tank_Siege_Mode))) {
+		&& (S->hasResearched(TechTypes::Tank_Siege_Mode) || S->isResearching(TechTypes::Tank_Siege_Mode))) {
 		if (INFO.getAllCount(Terran_Wraith, E) > 0)
 		{
 			if (canBuildFirstEngineeringBay(60))
@@ -2608,7 +2528,7 @@ void BasicBuildStrategy::TerranTankGoliathBuild()
 		else
 		{
 			if ((canBuildFirstStarport(240) && INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) >= 12)
-					&& INFO.getCompletedCount(Terran_Factory, S) >= 4)
+				&& INFO.getCompletedCount(Terran_Factory, S) >= 4)
 				BM.buildQueue.queueAsHighestPriority(Terran_Starport, false);
 		}
 	}
@@ -2619,8 +2539,8 @@ void BasicBuildStrategy::TerranTankGoliathBuild()
 
 		// 공1업 완성됐거나 절반쯤 완성됐을 때
 		if (S->getUpgradeLevel(UpgradeTypes::Terran_Vehicle_Weapons) ||
-				(armory != nullptr && armory->unit()->isUpgrading()
-				 && (armory->unit()->getRemainingUpgradeTime() * 100) / UpgradeTypes::Terran_Vehicle_Weapons.upgradeTime() < 50))
+			(armory != nullptr && armory->unit()->isUpgrading()
+				&& (armory->unit()->getRemainingUpgradeTime() * 100) / UpgradeTypes::Terran_Vehicle_Weapons.upgradeTime() < 50))
 		{
 			BM.buildQueue.queueAsHighestPriority(Terran_Science_Facility, false);
 		}
@@ -2628,8 +2548,8 @@ void BasicBuildStrategy::TerranTankGoliathBuild()
 
 	// 시즈모드업
 	if (isTimeToMachineShopUpgrade(TechTypes::Tank_Siege_Mode)
-			&& INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) >= 2
-			&& INFO.getAllCount(Terran_Goliath, S) >= 4) {
+		&& INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) >= 2
+		&& INFO.getAllCount(Terran_Goliath, S) >= 4) {
 		BM.buildQueue.queueAsHighestPriority(TechTypes::Tank_Siege_Mode, false);
 	}
 
@@ -2669,7 +2589,7 @@ void BasicBuildStrategy::TerranTankGoliathBuild()
 
 	// 2번째 멀티, 가스 멀티를 우선 확인
 	if (canBuildSecondExpansion(100) && SM.getNeedSecondExpansion() && INFO.getSecondExpansionLocation(S)
-			&& (SM.getMainStrategy() == DrawLine || SM.getMainStrategy() == WaitLine || SM.getMainStrategy() == AttackAll))
+		&& (SM.getMainStrategy() == DrawLine || SM.getMainStrategy() == WaitLine || SM.getMainStrategy() == AttackAll))
 	{
 		BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, INFO.getSecondExpansionLocation(S)->getTilePosition());
 		cout << "멀티 위치 : " << INFO.getSecondExpansionLocation(S)->getTilePosition() << endl;
@@ -2677,7 +2597,7 @@ void BasicBuildStrategy::TerranTankGoliathBuild()
 
 	// 3번째 멀티, 가스 멀티를 우선 확인
 	if (canBuildThirdExpansion(100) && SM.getNeedThirdExpansion() && INFO.getThirdExpansionLocation(S)
-			&& (SM.getMainStrategy() == DrawLine || SM.getMainStrategy() == WaitLine || SM.getMainStrategy() == AttackAll))
+		&& (SM.getMainStrategy() == DrawLine || SM.getMainStrategy() == WaitLine || SM.getMainStrategy() == AttackAll))
 	{
 		BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, INFO.getThirdExpansionLocation(S)->getTilePosition());
 		cout << "멀티 위치 : " << INFO.getThirdExpansionLocation(S)->getTilePosition() << endl;
@@ -2695,4 +2615,1203 @@ void BasicBuildStrategy::TerranTankGoliathBuild()
 			BM.buildQueue.queueAsLowestPriority(UpgradeTypes::Ion_Thrusters, false);
 		}
 	}
+}
+void BasicBuildStrategy::ProtossMineKillerBuild()
+{
+	//兵营的建造=======================================================
+	if (canBuildFirstBarrack(22))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Barracks, false);
+
+	}
+
+	if (canBuildSecondBarrack(0))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Barracks, false);
+
+	}
+
+	//瓦斯场的建造=======================================================
+	if (canBuildRefinery(40, BuildOrderItem::SeedPositionStrategy::MainBaseLocation))  //如果12人口可以造精炼厂
+	{
+		TilePosition refineryPos = ConstructionPlaceFinder::Instance().getRefineryPositionNear(BuildOrderItem::SeedPositionStrategy::MainBaseLocation);
+
+		if (refineryPos.isValid())
+			BM.buildQueue.queueAsHighestPriority(Terran_Refinery, refineryPos, false);
+	}
+
+
+	if (canBuildFirstFactory(32)) {
+		BM.buildQueue.queueAsHighestPriority(Terran_Factory, false);
+	}
+
+
+	if (canBuildSecondBarrack(0))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Barracks, false);
+
+	}
+	if (canBuildadditionalFactory())
+
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Factory, false);
+
+	}
+
+	if (canBuildFirstBunker(0))//立即建造地堡（1堵路点）
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Bunker, BuildOrderItem::SeedPositionStrategy::EnemySecondChokePoint, false);
+	}
+
+	if (isTimeToMachineShopUpgrade(TechTypes::Tank_Siege_Mode))
+	{
+		BM.buildQueue.queueAsHighestPriority(TechTypes::Tank_Siege_Mode, true);
+	}
+	if (INFO.getAllCount(Terran_Factory, S) < 1)
+		return;
+
+	if (canBuildFirstAcademy(50))
+		BM.buildQueue.queueAsHighestPriority(Terran_Academy, false);
+
+	if (isTimeToAcademyUpgrade(TechTypes::None, UpgradeTypes::U_238_Shells) && isResearchingOrResearched(TechTypes::Tank_Siege_Mode))
+		BM.buildQueue.queueAsHighestPriority(UpgradeTypes::U_238_Shells);
+
+	//if (isTimeToAcademyUpgrade(TechTypes::Stim_Packs) && isResearchingOrResearched(TechTypes::Tank_Siege_Mode))
+	//	BM.buildQueue.queueAsHighestPriority(TechTypes::Stim_Packs);
+	
+
+}
+void BasicBuildStrategy::ProtossDragoonKillerBuild()
+{
+	//兵营的建造=======================================================
+	if (canBuildFirstBarrack(22))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Barracks, false);
+	}
+
+	//瓦斯场的建造=======================================================
+	if (canBuildRefinery(24, BuildOrderItem::SeedPositionStrategy::MainBaseLocation))  //如果12人口可以造精炼厂
+	{
+		TilePosition refineryPos = ConstructionPlaceFinder::Instance().getRefineryPositionNear(BuildOrderItem::SeedPositionStrategy::MainBaseLocation);
+
+		if (refineryPos.isValid())
+			BM.buildQueue.queueAsHighestPriority(Terran_Refinery, refineryPos, false);
+	}
+	//工厂的建造=======================================================
+	if (canBuildFirstFactory(32))  //如果16人口可以造Factory
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Factory, false);
+	}
+	
+		if (canBuildFirstBunker(42))
+		{
+			BM.buildQueue.queueAsHighestPriority(Terran_Bunker, BuildOrderItem::SeedPositionStrategy::SecondChokePoint, false);
+		}
+
+		if (canBuildFirstExpansion(44))
+		{
+			BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation, false);
+		}
+
+		//坦克立即升级
+		if (isExistOrUnderConstruction(Terran_Siege_Tank_Tank_Mode) && isTimeToMachineShopUpgrade(TechTypes::Tank_Siege_Mode))
+		{
+			BM.buildQueue.queueAsHighestPriority(TechTypes::Tank_Siege_Mode, true);
+		}
+	
+		if (INFO.getAllCount(Terran_Command_Center, S) < 2)
+		{
+			return;
+		}
+//================2矿分界线========================================================================
+	//28人口造学院
+	if (canBuildFirstAcademy(56))
+		BM.buildQueue.queueAsHighestPriority(Terran_Academy, false);
+
+
+	//蜘蛛雷升级==================================================================
+	if (isTimeToMachineShopUpgrade(TechTypes::Spider_Mines) && isResearchingOrResearched(TechTypes::Tank_Siege_Mode))
+		BM.buildQueue.queueAsHighestPriority(TechTypes::Spider_Mines);
+
+//	if (isTimeToAcademyUpgrade(TechTypes::Stim_Packs) && isResearchingOrResearched(TechTypes::Spider_Mines))
+	//	BM.buildQueue.queueAsHighestPriority(TechTypes::Stim_Packs);
+
+	//if (isTimeToAcademyUpgrade(TechTypes::None, UpgradeTypes::U_238_Shells) && isResearchingOrResearched(TechTypes::EMP_Shockwave) )
+	//	BM.buildQueue.queueAsHighestPriority(UpgradeTypes::U_238_Shells);
+
+
+	//雷车速度建造==================================================================
+	if (isResearchingOrResearched(TechTypes::Spider_Mines)&& isTimeToMachineShopUpgrade(TechTypes::None, UpgradeTypes::Ion_Thrusters)&&INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode,S)>=4)
+		BM.buildQueue.queueAsLowestPriority(UpgradeTypes::Ion_Thrusters);
+
+
+
+	//第二个工厂=======================================================
+//if (canBuildSecondFactory(64))//32人口造第二个工厂
+	//{
+//		BM.buildQueue.queueAsHighestPriority(Terran_Factory, false);
+	//}
+	string enemyName = BWAPI::Broodwar->enemy()->getName();
+
+
+	//EngineeringBay的建造=============================================================
+	if (EMB == Toss_Scout || EMB == Toss_dark || EMB == Toss_dark_drop || EMB == Toss_drop || EMB == Toss_reaver_drop)
+	{
+		if (canBuildFirstEngineeringBay(72))
+			BM.buildQueue.queueAsHighestPriority(Terran_Engineering_Bay, false);
+
+	}
+
+	else
+	{
+		
+		 if (canBuildFirstEngineeringBay(82))
+			BM.buildQueue.queueAsHighestPriority(Terran_Engineering_Bay, false);
+	}
+
+
+
+	//防空塔的建造================================================================================================
+	if (EMB == Toss_dark || (EIB != Toss_cannon_rush && EMB == UnknownMainBuild  && TIME > 24 * 240))
+	{
+
+		if (INFO.getFirstExpansionLocation(S) && INFO.getSecondChokePoint(S)
+			&& (isMyCommandAtFirstExpansion() || INFO.getCompletedCount(Terran_Bunker, S) != 0)
+			&& INFO.getTypeUnitsInRadius(Protoss_Dark_Templar, E, (Position)INFO.getSecondChokePoint(S)->Center(), 8 * TILE_SIZE).empty()
+			&& TIME < (24 * 270 + Protoss_Dark_Templar.buildTime() + 24 * 60)) {
+
+
+			if (canBuildMissileTurret(getSecondChokePointTurretPosition())) {
+				BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, getSecondChokePointTurretPosition(), true);
+			}
+
+		}
+		else {
+			if (INFO.getSecondChokePoint(S) && INFO.getTypeBuildingsInRadius(Terran_Missile_Turret, S, (Position)INFO.getSecondChokePoint(S)->Center(), 8 * TILE_SIZE, true).empty())
+			{
+				if (canBuildMissileTurret(getTurretPositionOnTheHill()))
+					BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, (TilePosition)getTurretPositionOnTheHill(), true);
+
+				if (canBuildMissileTurret(getSecondChokePointTurretPosition()))
+					BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, (TilePosition)getSecondChokePointTurretPosition(), true);
+			}
+		}
+
+		if (canBuildMissileTurret((TilePosition)MYBASE) && S->supplyUsed() >= 80) {
+			BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, true);
+		}
+	}
+	else if (EMB == Toss_dark_drop)
+	{
+		if (canBuildMissileTurret((TilePosition)MYBASE, 2))
+		{
+			BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, true);
+		}
+
+		if (canBuildMissileTurret(getSecondChokePointTurretPosition()))
+		{
+			BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, getSecondChokePointTurretPosition(), true);
+		}
+	}
+	
+	else if (EMB == Toss_fast_carrier) {
+		// 아무 전략이 없을때도 그냥 본진에 터렛 하나는 짓자
+		if (canBuildMissileTurret(getSecondChokePointTurretPosition())
+			&& INFO.getCompletedCount(Terran_Factory, S) > 5 && S->supplyUsed() >= 100)
+			BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, getSecondChokePointTurretPosition(), true);
+
+
+		if (canBuildMissileTurret((TilePosition)MYBASE)
+			&& INFO.getCompletedCount(Terran_Factory, S) > 5 && S->supplyUsed() >= 100)
+			BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, true);
+
+		// 후반에 터렛 무작위로 짓기 로직
+		if (TrainManager::Instance().getAvailableMinerals() > 800) {
+			if (CM.getConstructionQueueItemCount(Terran_Missile_Turret)
+				+ BM.buildQueue.getItemCount(Terran_Missile_Turret)
+				+ INFO.getTypeBuildingsInArea(Terran_Missile_Turret, S, MYBASE).size() < 6) {
+
+				BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, false);
+
+			}
+		}
+	}
+	else if (EMB == Toss_arbiter || EMB == Toss_arbiter_carrier) {
+		buildMissileTurrets(INFO.getCompletedCount(Terran_Command_Center, S) >= 3 ? 2 : 1);
+	}
+	else {
+
+		// 아무 전략이 없을때도 그냥 본진에 터렛 하나는 짓자
+		if (canBuildMissileTurret(getSecondChokePointTurretPosition())
+			&& INFO.getCompletedCount(Terran_Factory, S) > 1 && (S->supplyUsed() >= 60 || INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) >= 3))
+			BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, getSecondChokePointTurretPosition(), true);
+
+
+		if (canBuildMissileTurret((TilePosition)MYBASE)
+			&& INFO.getCompletedCount(Terran_Factory, S) > 1 && (S->supplyUsed() >= 70 || INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) >= 3))
+			BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, true);
+	}
+
+	
+
+
+	if (isResearchingOrResearched(TechTypes::Tank_Siege_Mode) && canBuildFirstTurret(80))
+		BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, getSecondChokePointTurretPosition(), true);
+
+	
+
+	if (EMB >= Toss_fast_carrier && EMB != UnknownMainBuild)
+	{
+		if (INFO.getCompletedCount(Terran_Goliath, S) >= 1 && isTimeToMachineShopUpgrade(TechTypes::None, UpgradeTypes::Charon_Boosters))
+			BM.buildQueue.queueAsHighestPriority(UpgradeTypes::Charon_Boosters, false);
+	}
+
+	// 分矿瓦斯建造==================================================================
+	if (canBuildRefinery(60, BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation) && INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) >= 3)
+	{
+		TilePosition refineryPos = ConstructionPlaceFinder::Instance().getRefineryPositionNear(BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation);
+
+		if (refineryPos.isValid())
+			BM.buildQueue.queueAsHighestPriority(Terran_Refinery, refineryPos, false);
+	}
+
+	// 三基地建造===========================================================
+
+
+		//if (canBuildSecondExpansion(70)&&INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode,S)>=3)
+	//	{
+	//		BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, INFO.getSecondExpansionLocation(S)->getTilePosition());
+	//	}
+
+	
+	
+	//四基地建造============================================================
+	//	if (canBuildThirdExpansion(72)&&INFO.getCompletedCount(Terran_Command_Center,S)==3)
+	//	{
+	//		BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, INFO.getThirdExpansionLocation(S)->getTilePosition());
+//}
+	//军械库的建造============================================================
+	if (canBuildFirstArmory(74))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Armory, false);
+	}
+	//军械库的升级==================================================================
+	if (!S->isUpgrading(UpgradeTypes::Terran_Vehicle_Weapons) || !S->isUpgrading(UpgradeTypes::Terran_Vehicle_Plating))
+	{
+		// 공업 먼저
+		UpgradeType highPriority = UpgradeTypes::Terran_Vehicle_Weapons;
+		UpgradeType lowPriority = UpgradeTypes::Terran_Vehicle_Plating;
+		UpgradeType upgradeType = S->isUpgrading(highPriority) ? lowPriority : S->isUpgrading(lowPriority) ? highPriority : S->getUpgradeLevel(highPriority) > S->getUpgradeLevel(lowPriority) ? lowPriority : highPriority;
+
+		// 메카닉 공방업
+		if (isTimeToArmoryUpgrade(upgradeType, S->getUpgradeLevel(upgradeType) + 1) )
+		{
+			BM.buildQueue.queueAsHighestPriority(upgradeType, false);
+		}
+	}
+	// 第二个军械库的建造===========================================================
+	if (canBuildSecondArmory(86))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Armory, false);
+	}
+
+
+
+	// 飞机场建造===========================================================
+	  if (canBuildFirstStarport(104))
+		BM.buildQueue.queueAsHighestPriority(Terran_Starport, false);
+
+	 	
+
+	// 科学院的建造===========================================================
+	  if (canBuildFirstScienceFacility(106))
+		BM.buildQueue.queueAsHighestPriority(Terran_Science_Facility, false);
+
+
+
+
+
+	
+	// EMP Shockwave ===========================================================
+	if (isTimeToScienceFacilityUpgrade(TechTypes::EMP_Shockwave) && (INFO.getAllCount(Terran_Science_Vessel, S) > 0) && isResearchingOrResearched(TechTypes::Tank_Siege_Mode))
+	{
+		BM.buildQueue.queueAsHighestPriority(TechTypes::EMP_Shockwave, false);
+	}
+
+	// 额外工厂建造===========================================================
+	if (canBuildadditionalFactory())
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Factory, false);
+	}
+	int TankAllCountinESC = INFO.getTypeUnitsInRadius(Terran_Siege_Tank_Siege_Mode, S, INFO.getSecondChokePosition(E),25 * TILE_SIZE).size() + INFO.getTypeUnitsInRadius(Terran_Siege_Tank_Tank_Mode, S, INFO.getSecondChokePosition(E), 25 * TILE_SIZE).size();
+	int TankAllCountinMC = INFO.getTypeUnitsInRadius(Terran_Siege_Tank_Siege_Mode, S, theMap.Center(), 10 * TILE_SIZE).size() + INFO.getTypeUnitsInRadius(Terran_Siege_Tank_Tank_Mode, S, theMap.Center(), 10 * TILE_SIZE).size();
+
+	
+
+
+	if (canBuildSecondExpansion(160) && TankAllCountinESC >= 3 &&(INFO.getCompletedCount(Terran_Command_Center,S)==2))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, INFO.getSecondExpansionLocation(S)->getTilePosition());
+		
+	}
+	else if (TIME > 15.5 * 60 * 24 && SM.getMainStrategy() == AttackAll && canBuildSecondExpansion(160) && (INFO.getCompletedCount(Terran_Command_Center, S) == 2))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, INFO.getSecondExpansionLocation(S)->getTilePosition());
+	}
+
+	if (canBuildThirdExpansion(180)  && (INFO.getAllCount(Terran_Command_Center, S) == 3))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, INFO.getThirdExpansionLocation(S)->getTilePosition());
+
+	}
+}
+void BasicBuildStrategy::ProtossZealotKillerBuild()
+{	
+	
+
+	//兵营的建造=======================================================
+	if (canBuildFirstBarrack(22))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Barracks, false);
+
+	}
+
+	//瓦斯场的建造=======================================================
+	if (canBuildRefinery(40, BuildOrderItem::SeedPositionStrategy::MainBaseLocation))  //如果12人口可以造精炼厂
+	{
+		TilePosition refineryPos = ConstructionPlaceFinder::Instance().getRefineryPositionNear(BuildOrderItem::SeedPositionStrategy::MainBaseLocation);
+
+		if (refineryPos.isValid())
+			BM.buildQueue.queueAsHighestPriority(Terran_Refinery, refineryPos, false);
+	}
+
+
+
+
+	if (canBuildFirstFactory(32)) {
+		BM.buildQueue.queueAsHighestPriority(Terran_Factory, false);
+	}
+
+	//军械库的建造============================================================
+	if (canBuildFirstArmory(40))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Armory, false);
+	}
+
+
+
+	//蜘蛛雷升级
+	if (isTimeToMachineShopUpgrade(TechTypes::Spider_Mines))
+		BM.buildQueue.queueAsHighestPriority(TechTypes::Spider_Mines);
+
+	Position backPos1 = (INFO.getFirstChokePosition(S) + INFO.getMainBaseLocation(S)->getPosition()) / 2;
+	if (canBuildFirstBunker(0))//立即建造地堡（1堵路点）
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Bunker, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, false);
+	} 
+
+
+
+	if (INFO.getCompletedCount(Terran_Vulture, S)>=2)
+	{
+		if (canBuildSecondBunker(0))//立即建造地堡（1堵路点）
+		{
+			BM.buildQueue.queueAsHighestPriority(Terran_Bunker, BuildOrderItem::SeedPositionStrategy::SecondChokePoint, false);
+		}
+	}
+	
+	
+	if (isResearchingOrResearched(TechTypes::Spider_Mines) && isTimeToMachineShopUpgrade(TechTypes::Tank_Siege_Mode))
+	{
+		BM.buildQueue.queueAsHighestPriority(TechTypes::Tank_Siege_Mode, true);
+	}
+	
+
+
+	if (INFO.getCompletedCount(Terran_Bunker, S) >= 2)
+	{
+		if (canBuildFirstExpansion(0))
+		{
+			BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation, false);
+		}
+	}
+
+	if (INFO.getAllCount(Terran_Command_Center, S) < 2)
+	{
+		return;
+	}
+
+	// 分矿瓦斯建造==================================================================
+	if (canBuildRefinery(60, BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation))
+	{
+		TilePosition refineryPos = ConstructionPlaceFinder::Instance().getRefineryPositionNear(BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation);
+
+		if (refineryPos.isValid())
+			BM.buildQueue.queueAsHighestPriority(Terran_Refinery, refineryPos, false);
+	}
+
+
+	if (canBuildSecondArmory(64))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Armory, false);
+	}
+
+
+	if (isResearchingOrResearched(TechTypes::Tank_Siege_Mode) && isTimeToMachineShopUpgrade(TechTypes::None, UpgradeTypes::Ion_Thrusters))
+	{
+		BM.buildQueue.queueAsHighestPriority( UpgradeTypes::Ion_Thrusters, true);
+	}
+
+	if (canBuildFirstAcademy(70))
+		BM.buildQueue.queueAsHighestPriority(Terran_Academy, false);
+
+	//EngineeringBay的建造=============================================================
+	if (EMB == Toss_Scout || EMB == Toss_dark || EMB == Toss_dark_drop || EMB == Toss_drop || EMB == Toss_reaver_drop)
+	{
+		if (canBuildFirstEngineeringBay(120))
+			BM.buildQueue.queueAsHighestPriority(Terran_Engineering_Bay, false);
+
+	}
+
+	else
+	{
+
+		if (canBuildFirstEngineeringBay(180))
+			BM.buildQueue.queueAsHighestPriority(Terran_Engineering_Bay, false);
+	}
+
+	
+	//军械库的升级==================================================================
+	if (!S->isUpgrading(UpgradeTypes::Terran_Vehicle_Weapons) || !S->isUpgrading(UpgradeTypes::Terran_Vehicle_Plating))
+	{
+		// 공업 먼저
+		UpgradeType highPriority = UpgradeTypes::Terran_Vehicle_Weapons;
+		UpgradeType lowPriority = UpgradeTypes::Terran_Vehicle_Plating;
+		UpgradeType upgradeType = S->isUpgrading(highPriority) ? lowPriority : S->isUpgrading(lowPriority) ? highPriority : S->getUpgradeLevel(highPriority) > S->getUpgradeLevel(lowPriority) ? lowPriority : highPriority;
+
+		// 메카닉 공방업
+		if (isTimeToArmoryUpgrade(upgradeType, S->getUpgradeLevel(upgradeType) + 1))
+		{
+			BM.buildQueue.queueAsHighestPriority(upgradeType, false);
+		}
+	}
+
+	
+	// 飞机场建造===========================================================
+	if (canBuildFirstStarport(88))
+		BM.buildQueue.queueAsHighestPriority(Terran_Starport, false);
+
+
+
+	// 科学院的建造===========================================================
+	if (canBuildFirstScienceFacility(92))
+		BM.buildQueue.queueAsHighestPriority(Terran_Science_Facility, false);
+
+
+
+
+	if(canBuildadditionalFactory())
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Factory, false);
+	}
+
+
+
+}
+void BasicBuildStrategy::ProtossTemplarKillerBuild()
+{
+	//兵营的建造=======================================================
+	if (canBuildFirstBarrack(22))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Barracks, false);
+	}
+
+	//瓦斯场的建造=======================================================
+	if (canBuildRefinery(24, BuildOrderItem::SeedPositionStrategy::MainBaseLocation))  //如果12人口可以造精炼厂
+	{
+		TilePosition refineryPos = ConstructionPlaceFinder::Instance().getRefineryPositionNear(BuildOrderItem::SeedPositionStrategy::MainBaseLocation);
+
+		if (refineryPos.isValid())
+			BM.buildQueue.queueAsHighestPriority(Terran_Refinery, refineryPos, false);
+	}
+
+
+
+
+	//工厂的建造=======================================================
+	if (canBuildFirstFactory(32))  //如果16人口可以造Factory
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Factory, false);
+	}
+
+
+	if (canBuildFirstExpansion(42))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation, false);
+	}
+
+
+	if (canBuildFirstBunker(46))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Bunker, BuildOrderItem::SeedPositionStrategy::SecondChokePoint, false);
+	}
+
+
+	//坦克立即升级
+	if (isExistOrUnderConstruction(Terran_Siege_Tank_Tank_Mode) && isTimeToMachineShopUpgrade(TechTypes::Tank_Siege_Mode))
+	{
+		BM.buildQueue.queueAsHighestPriority(TechTypes::Tank_Siege_Mode, true);
+	}
+
+	if (INFO.getAllCount(Terran_Command_Center, S) < 2)
+	{
+		return;
+	}
+
+
+
+
+
+
+	//================2矿分界线========================================================================
+	//28人口造学院
+	if (canBuildFirstAcademy(50))
+		BM.buildQueue.queueAsHighestPriority(Terran_Academy, false);
+
+
+	if (canBuildSecondFactory(66))
+		BM.buildQueue.queueAsHighestPriority(Terran_Factory, false);
+
+
+	//蜘蛛雷升级==================================================================
+	if (isTimeToMachineShopUpgrade(TechTypes::Spider_Mines) && isResearchingOrResearched(TechTypes::Tank_Siege_Mode))
+		BM.buildQueue.queueAsHighestPriority(TechTypes::Spider_Mines);
+
+	// 分矿瓦斯建造==================================================================
+	if (canBuildRefinery(72, BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation) && INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) >= 3)
+	{
+		TilePosition refineryPos = ConstructionPlaceFinder::Instance().getRefineryPositionNear(BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation);
+
+		if (refineryPos.isValid())
+			BM.buildQueue.queueAsHighestPriority(Terran_Refinery, refineryPos, false);
+	}
+
+
+	// 飞机场建造===========================================================
+	if (canBuildFirstStarport(90))
+		BM.buildQueue.queueAsHighestPriority(Terran_Starport, false);
+
+
+
+	// 科学院的建造===========================================================
+	if (canBuildFirstScienceFacility(96))
+		BM.buildQueue.queueAsHighestPriority(Terran_Science_Facility, false);
+
+	if (canBuildSecondExpansion(110) && TIME>=7.9 * 60*24)
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, INFO.getSecondExpansionLocation(S)->getTilePosition());
+
+	}
+
+	if (canBuildadditionalFactory())
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Factory, false);
+	}
+
+
+	if (canBuildFirstArmory(0) && TIME>11 * 24 * 60)
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Armory, false);
+	}
+
+
+	if (canBuildSecondArmory(0) && TIME>11.2 * 24 * 60)
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Armory, false);
+	}
+
+	if (canBuildThirdExpansion(0) && TIME >= 11.5 * 60 * 24 && S->minerals()>700)
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, INFO.getThirdExpansionLocation(S)->getTilePosition());
+
+	}
+
+
+
+	//军械库的升级==================================================================
+	if (!S->isUpgrading(UpgradeTypes::Terran_Vehicle_Weapons) || !S->isUpgrading(UpgradeTypes::Terran_Vehicle_Plating))
+	{
+		// 공업 먼저
+		UpgradeType highPriority = UpgradeTypes::Terran_Vehicle_Weapons;
+		UpgradeType lowPriority = UpgradeTypes::Terran_Vehicle_Plating;
+		UpgradeType upgradeType = S->isUpgrading(highPriority) ? lowPriority : S->isUpgrading(lowPriority) ? highPriority : S->getUpgradeLevel(highPriority) > S->getUpgradeLevel(lowPriority) ? lowPriority : highPriority;
+
+		// 메카닉 공방업
+		if (isTimeToArmoryUpgrade(upgradeType, S->getUpgradeLevel(upgradeType) + 1))
+		{
+			BM.buildQueue.queueAsHighestPriority(upgradeType, false);
+		}
+	}
+
+
+
+
+}
+void BasicBuildStrategy::ProtossCannonKillerBuild()
+{
+	//兵营的建造=======================================================
+	if (canBuildFirstBarrack(22))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Barracks, false);
+	}
+
+	//瓦斯场的建造=======================================================
+	if (canBuildRefinery(24, BuildOrderItem::SeedPositionStrategy::MainBaseLocation))  //如果12人口可以造精炼厂
+	{
+		TilePosition refineryPos = ConstructionPlaceFinder::Instance().getRefineryPositionNear(BuildOrderItem::SeedPositionStrategy::MainBaseLocation);
+
+		if (refineryPos.isValid())
+			BM.buildQueue.queueAsHighestPriority(Terran_Refinery, refineryPos, false);
+	}
+	//工厂的建造=======================================================
+	if (canBuildFirstFactory(32))  //如果16人口可以造Factory
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Factory, false);
+	}
+
+	if (canBuildFirstExpansion(40))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation, false);
+	}
+
+	if (canBuildFirstBunker(44))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Bunker, BuildOrderItem::SeedPositionStrategy::SecondChokePoint, false);
+	}
+	if (INFO.getAllCount(Terran_Command_Center, S) < 2)
+		return;
+
+
+	//坦克立即升级
+	if (isExistOrUnderConstruction(Terran_Siege_Tank_Tank_Mode) && isTimeToMachineShopUpgrade(TechTypes::Tank_Siege_Mode))
+	{
+		BM.buildQueue.queueAsHighestPriority(TechTypes::Tank_Siege_Mode, true);
+	}
+
+
+	//================2矿分界线========================================================================
+	//28人口造学院
+	if (canBuildFirstAcademy(56))
+		BM.buildQueue.queueAsHighestPriority(Terran_Academy, false);
+
+
+	//蜘蛛雷升级==================================================================
+	if (isTimeToMachineShopUpgrade(TechTypes::Spider_Mines) && isResearchingOrResearched(TechTypes::Tank_Siege_Mode))
+		BM.buildQueue.queueAsHighestPriority(TechTypes::Spider_Mines);
+
+	//	if (isTimeToAcademyUpgrade(TechTypes::Stim_Packs) && isResearchingOrResearched(TechTypes::Spider_Mines))
+	//	BM.buildQueue.queueAsHighestPriority(TechTypes::Stim_Packs);
+
+	//if (isTimeToAcademyUpgrade(TechTypes::None, UpgradeTypes::U_238_Shells) && isResearchingOrResearched(TechTypes::EMP_Shockwave) )
+	//	BM.buildQueue.queueAsHighestPriority(UpgradeTypes::U_238_Shells);
+
+
+	//雷车速度建造==================================================================
+	if (isResearchingOrResearched(TechTypes::Spider_Mines) && isTimeToMachineShopUpgrade(TechTypes::None, UpgradeTypes::Ion_Thrusters) && INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) >= 4)
+		BM.buildQueue.queueAsLowestPriority(UpgradeTypes::Ion_Thrusters);
+
+
+
+	//第二个工厂=======================================================
+	//if (canBuildSecondFactory(64))//32人口造第二个工厂
+	//{
+	//		BM.buildQueue.queueAsHighestPriority(Terran_Factory, false);
+	//}
+	string enemyName = BWAPI::Broodwar->enemy()->getName();
+
+
+	//EngineeringBay的建造=============================================================
+	if (EMB == Toss_Scout || EMB == Toss_dark || EMB == Toss_dark_drop || EMB == Toss_drop || EMB == Toss_reaver_drop)
+	{
+		if (canBuildFirstEngineeringBay(72))
+			BM.buildQueue.queueAsHighestPriority(Terran_Engineering_Bay, false);
+
+	}
+
+	else
+	{
+
+		if (canBuildFirstEngineeringBay(82))
+			BM.buildQueue.queueAsHighestPriority(Terran_Engineering_Bay, false);
+	}
+
+
+
+	//防空塔的建造================================================================================================
+	if (EMB == Toss_dark || (EIB != Toss_cannon_rush && EMB == UnknownMainBuild  && TIME > 24 * 240))
+	{
+
+		if (INFO.getFirstExpansionLocation(S) && INFO.getSecondChokePoint(S)
+			&& (isMyCommandAtFirstExpansion() || INFO.getCompletedCount(Terran_Bunker, S) != 0)
+			&& INFO.getTypeUnitsInRadius(Protoss_Dark_Templar, E, (Position)INFO.getSecondChokePoint(S)->Center(), 8 * TILE_SIZE).empty()
+			&& TIME < (24 * 270 + Protoss_Dark_Templar.buildTime() + 24 * 60)) {
+
+
+			if (canBuildMissileTurret(getSecondChokePointTurretPosition())) {
+				BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, getSecondChokePointTurretPosition(), true);
+			}
+
+		}
+		else {
+			if (INFO.getSecondChokePoint(S) && INFO.getTypeBuildingsInRadius(Terran_Missile_Turret, S, (Position)INFO.getSecondChokePoint(S)->Center(), 8 * TILE_SIZE, true).empty())
+			{
+				if (canBuildMissileTurret(getTurretPositionOnTheHill()))
+					BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, (TilePosition)getTurretPositionOnTheHill(), true);
+
+				if (canBuildMissileTurret(getSecondChokePointTurretPosition()))
+					BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, (TilePosition)getSecondChokePointTurretPosition(), true);
+			}
+		}
+
+		if (canBuildMissileTurret((TilePosition)MYBASE) && S->supplyUsed() >= 80) {
+			BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, true);
+		}
+	}
+	else if (EMB == Toss_dark_drop)
+	{
+		if (canBuildMissileTurret((TilePosition)MYBASE, 2))
+		{
+			BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, true);
+		}
+
+		if (canBuildMissileTurret(getSecondChokePointTurretPosition()))
+		{
+			BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, getSecondChokePointTurretPosition(), true);
+		}
+	}
+
+	else if (EMB == Toss_fast_carrier) {
+		// 아무 전략이 없을때도 그냥 본진에 터렛 하나는 짓자
+		if (canBuildMissileTurret(getSecondChokePointTurretPosition())
+			&& INFO.getCompletedCount(Terran_Factory, S) > 5 && S->supplyUsed() >= 100)
+			BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, getSecondChokePointTurretPosition(), true);
+
+
+		if (canBuildMissileTurret((TilePosition)MYBASE)
+			&& INFO.getCompletedCount(Terran_Factory, S) > 5 && S->supplyUsed() >= 100)
+			BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, true);
+
+		// 후반에 터렛 무작위로 짓기 로직
+		if (TrainManager::Instance().getAvailableMinerals() > 800) {
+			if (CM.getConstructionQueueItemCount(Terran_Missile_Turret)
+				+ BM.buildQueue.getItemCount(Terran_Missile_Turret)
+				+ INFO.getTypeBuildingsInArea(Terran_Missile_Turret, S, MYBASE).size() < 6) {
+
+				BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, false);
+
+			}
+		}
+	}
+	else if (EMB == Toss_arbiter || EMB == Toss_arbiter_carrier) {
+		buildMissileTurrets(INFO.getCompletedCount(Terran_Command_Center, S) >= 3 ? 2 : 1);
+	}
+	else {
+
+		// 아무 전략이 없을때도 그냥 본진에 터렛 하나는 짓자
+		if (canBuildMissileTurret(getSecondChokePointTurretPosition())
+			&& INFO.getCompletedCount(Terran_Factory, S) > 1 && (S->supplyUsed() >= 60 || INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) >= 3))
+			BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, getSecondChokePointTurretPosition(), true);
+
+
+		if (canBuildMissileTurret((TilePosition)MYBASE)
+			&& INFO.getCompletedCount(Terran_Factory, S) > 1 && (S->supplyUsed() >= 70 || INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) >= 3))
+			BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, true);
+	}
+
+
+
+
+	if (isResearchingOrResearched(TechTypes::Tank_Siege_Mode) && canBuildFirstTurret(80))
+		BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, getSecondChokePointTurretPosition(), true);
+
+
+
+	if (EMB >= Toss_fast_carrier && EMB != UnknownMainBuild)
+	{
+		if (INFO.getCompletedCount(Terran_Goliath, S) >= 1 && isTimeToMachineShopUpgrade(TechTypes::None, UpgradeTypes::Charon_Boosters))
+			BM.buildQueue.queueAsHighestPriority(UpgradeTypes::Charon_Boosters, false);
+	}
+
+	// 分矿瓦斯建造==================================================================
+	if (canBuildRefinery(60, BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation) && INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) >= 3)
+	{
+		TilePosition refineryPos = ConstructionPlaceFinder::Instance().getRefineryPositionNear(BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation);
+
+		if (refineryPos.isValid())
+			BM.buildQueue.queueAsHighestPriority(Terran_Refinery, refineryPos, false);
+	}
+
+	// 三基地建造===========================================================
+
+
+	//if (canBuildSecondExpansion(70)&&INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode,S)>=3)
+	//	{
+	//		BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, INFO.getSecondExpansionLocation(S)->getTilePosition());
+	//	}
+
+
+
+	//四基地建造============================================================
+	//	if (canBuildThirdExpansion(72)&&INFO.getCompletedCount(Terran_Command_Center,S)==3)
+	//	{
+	//		BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, INFO.getThirdExpansionLocation(S)->getTilePosition());
+	//}
+	//军械库的建造============================================================
+	if (canBuildFirstArmory(74))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Armory, false);
+	}
+	//军械库的升级==================================================================
+	if (!S->isUpgrading(UpgradeTypes::Terran_Vehicle_Weapons) || !S->isUpgrading(UpgradeTypes::Terran_Vehicle_Plating))
+	{
+		// 공업 먼저
+		UpgradeType highPriority = UpgradeTypes::Terran_Vehicle_Weapons;
+		UpgradeType lowPriority = UpgradeTypes::Terran_Vehicle_Plating;
+		UpgradeType upgradeType = S->isUpgrading(highPriority) ? lowPriority : S->isUpgrading(lowPriority) ? highPriority : S->getUpgradeLevel(highPriority) > S->getUpgradeLevel(lowPriority) ? lowPriority : highPriority;
+
+		// 메카닉 공방업
+		if (isTimeToArmoryUpgrade(upgradeType, S->getUpgradeLevel(upgradeType) + 1))
+		{
+			BM.buildQueue.queueAsHighestPriority(upgradeType, false);
+		}
+	}
+	// 飞机场建造===========================================================
+	if (canBuildFirstStarport(80))
+		BM.buildQueue.queueAsHighestPriority(Terran_Starport, false);
+
+	if (canBuildSecondArmory(90))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Armory, false);
+	}
+
+	// 科学院的建造===========================================================
+	if (canBuildFirstScienceFacility(100))
+		BM.buildQueue.queueAsHighestPriority(Terran_Science_Facility, false);
+
+
+
+
+
+
+	// EMP Shockwave ===========================================================
+	if (isTimeToScienceFacilityUpgrade(TechTypes::EMP_Shockwave) && (INFO.getAllCount(Terran_Science_Vessel, S) > 0) && isResearchingOrResearched(TechTypes::Tank_Siege_Mode))
+	{
+		BM.buildQueue.queueAsHighestPriority(TechTypes::EMP_Shockwave, false);
+	}
+
+	// 额外工厂建造===========================================================
+	if (canBuildadditionalFactory())
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Factory, false);
+	}
+	
+	else if (TIME > 16 * 60 * 24 && SM.getMainStrategy() == AttackAll && canBuildSecondExpansion(160) && (INFO.getCompletedCount(Terran_Command_Center, S) == 2))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, INFO.getSecondExpansionLocation(S)->getTilePosition());
+	}
+
+	if (canBuildThirdExpansion(180) && (INFO.getAllCount(Terran_Command_Center, S) == 3))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, INFO.getThirdExpansionLocation(S)->getTilePosition());
+
+	}
+
+}
+void BasicBuildStrategy::ProtossCarrierKillerBuild()
+{
+	//兵营的建造=======================================================
+	if (canBuildFirstBarrack(22))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Barracks, false);
+	}
+
+	//瓦斯场的建造=======================================================
+	if (canBuildRefinery(24, BuildOrderItem::SeedPositionStrategy::MainBaseLocation))  //如果12人口可以造精炼厂
+	{
+		TilePosition refineryPos = ConstructionPlaceFinder::Instance().getRefineryPositionNear(BuildOrderItem::SeedPositionStrategy::MainBaseLocation);
+
+		if (refineryPos.isValid())
+			BM.buildQueue.queueAsHighestPriority(Terran_Refinery, refineryPos, false);
+	}
+	//工厂的建造=======================================================
+	if (canBuildFirstFactory(32))  //如果16人口可以造Factory
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Factory, false);
+	}
+
+
+
+	if (canBuildFirstExpansion(0))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation, false);
+	}
+
+
+
+	if (canBuildFirstBunker(46))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Bunker, BuildOrderItem::SeedPositionStrategy::SecondChokePoint, false);
+	}
+
+
+	//坦克立即升级
+	if (isExistOrUnderConstruction(Terran_Siege_Tank_Tank_Mode) && isTimeToMachineShopUpgrade(TechTypes::Tank_Siege_Mode))
+	{
+		BM.buildQueue.queueAsHighestPriority(TechTypes::Tank_Siege_Mode, true);
+	}
+
+	if (INFO.getAllCount(Terran_Command_Center, S) < 2)
+	{
+		return;
+	}
+	//================2矿分界线========================================================================
+	//28人口造学院
+	if (canBuildFirstAcademy(58))
+		BM.buildQueue.queueAsHighestPriority(Terran_Academy, false);
+
+	// 分矿瓦斯建造==================================================================
+	if (canBuildRefinery(60, BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation))
+	{
+		TilePosition refineryPos = ConstructionPlaceFinder::Instance().getRefineryPositionNear(BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation);
+
+		if (refineryPos.isValid())
+			BM.buildQueue.queueAsHighestPriority(Terran_Refinery, refineryPos, false);
+	}
+	//蜘蛛雷升级==================================================================
+	if (isTimeToMachineShopUpgrade(TechTypes::Spider_Mines) && isResearchingOrResearched(TechTypes::Tank_Siege_Mode))
+		BM.buildQueue.queueAsHighestPriority(TechTypes::Spider_Mines);
+
+	//	if (isTimeToAcademyUpgrade(TechTypes::Stim_Packs) && isResearchingOrResearched(TechTypes::Spider_Mines))
+	//	BM.buildQueue.queueAsHighestPriority(TechTypes::Stim_Packs);
+
+	if (isTimeToAcademyUpgrade(TechTypes::None, UpgradeTypes::U_238_Shells) && isResearchingOrResearched(TechTypes::Spider_Mines))
+		BM.buildQueue.queueAsHighestPriority(UpgradeTypes::U_238_Shells);
+
+
+	
+
+
+
+
+	//EngineeringBay的建造=============================================================
+	if (EMB == Toss_Scout || EMB == Toss_dark || EMB == Toss_dark_drop || EMB == Toss_drop || EMB == Toss_reaver_drop)
+	{
+		if (canBuildFirstEngineeringBay(62))
+			BM.buildQueue.queueAsHighestPriority(Terran_Engineering_Bay, false);
+
+	}
+
+	else
+	{
+
+		if (canBuildFirstEngineeringBay(70))
+			BM.buildQueue.queueAsHighestPriority(Terran_Engineering_Bay, false);
+	}
+
+
+	//防空塔的建造================================================================================================
+	if (EMB == Toss_dark || (EIB != Toss_cannon_rush && EMB == UnknownMainBuild  && TIME > 24 * 240))
+	{
+
+		if (INFO.getFirstExpansionLocation(S) && INFO.getSecondChokePoint(S)
+			&& (isMyCommandAtFirstExpansion() || INFO.getCompletedCount(Terran_Bunker, S) != 0)
+			&& INFO.getTypeUnitsInRadius(Protoss_Dark_Templar, E, (Position)INFO.getSecondChokePoint(S)->Center(), 8 * TILE_SIZE).empty()
+			&& TIME < (24 * 270 + Protoss_Dark_Templar.buildTime() + 24 * 60)) {
+
+
+			if (canBuildMissileTurret(getSecondChokePointTurretPosition())) {
+				BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, getSecondChokePointTurretPosition(), true);
+			}
+
+		}
+		else {
+			if (INFO.getSecondChokePoint(S) && INFO.getTypeBuildingsInRadius(Terran_Missile_Turret, S, (Position)INFO.getSecondChokePoint(S)->Center(), 8 * TILE_SIZE, true).empty())
+			{
+				if (canBuildMissileTurret(getTurretPositionOnTheHill()))
+					BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, (TilePosition)getTurretPositionOnTheHill(), true);
+
+				if (canBuildMissileTurret(getSecondChokePointTurretPosition()))
+					BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, (TilePosition)getSecondChokePointTurretPosition(), true);
+			}
+		}
+
+		if (canBuildMissileTurret((TilePosition)MYBASE) && S->supplyUsed() >= 80) {
+			BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, true);
+		}
+	}
+	else if (EMB == Toss_dark_drop)
+	{
+		if (canBuildMissileTurret((TilePosition)MYBASE, 2))
+		{
+			BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, true);
+		}
+
+		if (canBuildMissileTurret(getSecondChokePointTurretPosition()))
+		{
+			BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, getSecondChokePointTurretPosition(), true);
+		}
+	}
+
+	else if (EMB == Toss_fast_carrier) {
+		// 아무 전략이 없을때도 그냥 본진에 터렛 하나는 짓자
+		if (canBuildMissileTurret(getSecondChokePointTurretPosition())
+			&& INFO.getCompletedCount(Terran_Factory, S) > 5 && S->supplyUsed() >= 100)
+			BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, getSecondChokePointTurretPosition(), true);
+
+
+		if (canBuildMissileTurret((TilePosition)MYBASE)
+			&& INFO.getCompletedCount(Terran_Factory, S) > 5 && S->supplyUsed() >= 100)
+			BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, true);
+
+		// 후반에 터렛 무작위로 짓기 로직
+		if (TrainManager::Instance().getAvailableMinerals() > 800) {
+			if (CM.getConstructionQueueItemCount(Terran_Missile_Turret)
+				+ BM.buildQueue.getItemCount(Terran_Missile_Turret)
+				+ INFO.getTypeBuildingsInArea(Terran_Missile_Turret, S, MYBASE).size() < 6) {
+
+				BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, false);
+
+			}
+		}
+	}
+	else if (EMB == Toss_arbiter || EMB == Toss_arbiter_carrier) {
+		buildMissileTurrets(INFO.getCompletedCount(Terran_Command_Center, S) >= 3 ? 2 : 1);
+	}
+	else {
+
+		// 아무 전략이 없을때도 그냥 본진에 터렛 하나는 짓자
+		if (canBuildMissileTurret(getSecondChokePointTurretPosition())
+			&& INFO.getCompletedCount(Terran_Factory, S) > 1 && (S->supplyUsed() >= 60 || INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) >= 3))
+			BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, getSecondChokePointTurretPosition(), true);
+
+
+		if (canBuildMissileTurret((TilePosition)MYBASE)
+			&& INFO.getCompletedCount(Terran_Factory, S) > 1 && (S->supplyUsed() >= 70 || INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) >= 3))
+			BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, BuildOrderItem::SeedPositionStrategy::MainBaseLocation, true);
+	}
+
+
+
+
+	if (isResearchingOrResearched(TechTypes::Tank_Siege_Mode) && canBuildFirstTurret(80))
+		BM.buildQueue.queueAsHighestPriority(Terran_Missile_Turret, getSecondChokePointTurretPosition(), true);
+
+
+
+	if (EMB >= Toss_fast_carrier && EMB != UnknownMainBuild)
+	{
+		if (INFO.getCompletedCount(Terran_Goliath, S) >= 1 && isTimeToMachineShopUpgrade(TechTypes::None, UpgradeTypes::Charon_Boosters))
+			BM.buildQueue.queueAsHighestPriority(UpgradeTypes::Charon_Boosters, false);
+	}
+
+
+
+	if (EMB == Toss_fast_carrier || EMB == Toss_Scout || EMB == Toss_arbiter_carrier)
+	{
+		if (canBuildFirstStarport(70))
+			BM.buildQueue.queueAsHighestPriority(Terran_Starport, false);
+		//军械库的建造============================================================
+		if (canBuildFirstArmory(82))
+		{
+			BM.buildQueue.queueAsHighestPriority(Terran_Armory, false);
+		}
+	}
+	else
+		if (canBuildFirstStarport(104))
+			BM.buildQueue.queueAsHighestPriority(Terran_Starport, false);
+	    if (canBuildFirstArmory(76))
+	     {
+		BM.buildQueue.queueAsHighestPriority(Terran_Armory, false);
+	     }
+
+
+	//军械库的升级==================================================================
+		if (!S->isUpgrading(UpgradeTypes::Terran_Ship_Weapons) || !S->isUpgrading(UpgradeTypes::Terran_Vehicle_Weapons) || !S->isUpgrading(UpgradeTypes::Terran_Vehicle_Plating))
+	{
+		// 공업 먼저
+		UpgradeType highPriority = UpgradeTypes::Terran_Vehicle_Weapons;
+		UpgradeType lowPriority = UpgradeTypes::Terran_Vehicle_Plating;
+		UpgradeType lowestPriority = UpgradeTypes::Terran_Ship_Weapons;
+		UpgradeType upgradeType = UpgradeTypes::None;
+		 upgradeType = S->isUpgrading(highPriority) ? lowPriority : S->isUpgrading(lowPriority) ? highPriority : S->getUpgradeLevel(highPriority) > S->getUpgradeLevel(lowPriority) ? lowPriority : highPriority;
+		 if ((S->isUpgrading(highPriority) && S->isUpgrading(lowPriority)))
+			 upgradeType = lowestPriority;
+
+		 if (S->getUpgradeLevel(highPriority) >= 3 && S->getUpgradeLevel(lowPriority) >= 3)
+			 upgradeType = lowestPriority;
+
+
+
+
+		// 메카닉 공방업
+		if (isTimeToArmoryUpgrade(upgradeType, S->getUpgradeLevel(upgradeType) + 1))
+		{
+			BM.buildQueue.queueAsHighestPriority(upgradeType, false);
+		}
+	}
+	// 第二个军械库的建造===========================================================
+	if (canBuildSecondArmory(90))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Armory, false);
+	}
+
+	// 科学院的建造===========================================================
+	if (canBuildFirstScienceFacility(110))
+		BM.buildQueue.queueAsHighestPriority(Terran_Science_Facility, false);
+
+	if (canBuildThirdArmory(120))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Armory, false);
+	}
+
+
+
+	// EMP Shockwave ===========================================================
+	if (isTimeToScienceFacilityUpgrade(TechTypes::EMP_Shockwave) && (INFO.getAllCount(Terran_Science_Vessel, S) > 0) && (EMB != Toss_fast_carrier && EMB != Toss_arbiter_carrier))
+	{
+		BM.buildQueue.queueAsHighestPriority(TechTypes::EMP_Shockwave, false);
+	}
+
+	// 额外工厂建造===========================================================
+	if (canBuildadditionalFactory())
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Factory, false);
+	}
+	int TankAllCountinESC = INFO.getTypeUnitsInRadius(Terran_Siege_Tank_Siege_Mode, S, INFO.getSecondChokePosition(E), 25 * TILE_SIZE).size() + INFO.getTypeUnitsInRadius(Terran_Siege_Tank_Tank_Mode, S, INFO.getSecondChokePosition(E), 25 * TILE_SIZE).size();
+	int TankAllCountinMC = INFO.getTypeUnitsInRadius(Terran_Siege_Tank_Siege_Mode, S, theMap.Center(), 10 * TILE_SIZE).size() + INFO.getTypeUnitsInRadius(Terran_Siege_Tank_Tank_Mode, S, theMap.Center(), 10 * TILE_SIZE).size();
+
+
+
+
+	if (canBuildSecondExpansion(160) && TankAllCountinESC >= 3 && (INFO.getCompletedCount(Terran_Command_Center, S) == 2))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, INFO.getSecondExpansionLocation(S)->getTilePosition());
+
+	}
+
+	else if (TIME > 14.5* 60 * 24 && SM.getMainStrategy() == AttackAll && canBuildSecondExpansion(160) && (INFO.getCompletedCount(Terran_Command_Center, S) == 2))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, INFO.getSecondExpansionLocation(S)->getTilePosition());
+	}
+
+	if (canBuildThirdExpansion(180) && (INFO.getAllCount(Terran_Command_Center, S) == 3))
+	{
+		BM.buildQueue.queueAsHighestPriority(Terran_Command_Center, INFO.getThirdExpansionLocation(S)->getTilePosition());
+
+	}
+	
+}
+void BasicBuildStrategy::ZergMMtoMachanicBuild()
+{
+
 }

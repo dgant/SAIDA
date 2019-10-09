@@ -62,7 +62,7 @@ bool MyBot::isBlocked(int top, int left, int bottom, int right, int size) {
 	Position center = Position((left + right) / 2, (top + bottom) / 2);
 
 	if (getAltitude(center + Position(0, size)) > size || getAltitude(center + Position(0, -size)) > size
-			|| getAltitude(center + Position(size, 0)) > size || getAltitude(center + Position(-size, 0)) > size)
+		|| getAltitude(center + Position(size, 0)) > size || getAltitude(center + Position(-size, 0)) > size)
 		return false;
 
 	int minX = left / 8;
@@ -168,16 +168,16 @@ bool MyBot::isInMyArea(Position p, bool getMyAllbase)
 
 		// 모든 Base를 체크
 		if (isSameArea(MYBASE, p) ||
-				(INFO.getFirstExpansionLocation(S) != nullptr &&
-				 INFO.getFirstExpansionLocation(S)->GetOccupiedInfo() == myBase &&
-				 isSameArea(INFO.getFirstExpansionLocation(S)->Center(), p)) ||
-				(INFO.getSecondExpansionLocation(S) != nullptr &&
-				 INFO.getSecondExpansionLocation(S)->GetOccupiedInfo() == myBase &&
-				 isSameArea(INFO.getSecondExpansionLocation(S)->Center(), p)) ||
-				(INFO.getThirdExpansionLocation(S) != nullptr &&
-				 INFO.getThirdExpansionLocation(S)->GetOccupiedInfo() == myBase &&
-				 isSameArea(INFO.getThirdExpansionLocation(S)->Center(), p))
-		   )
+			(INFO.getFirstExpansionLocation(S) != nullptr &&
+			INFO.getFirstExpansionLocation(S)->GetOccupiedInfo() == myBase &&
+			isSameArea(INFO.getFirstExpansionLocation(S)->Center(), p)) ||
+			(INFO.getSecondExpansionLocation(S) != nullptr &&
+			INFO.getSecondExpansionLocation(S)->GetOccupiedInfo() == myBase &&
+			isSameArea(INFO.getSecondExpansionLocation(S)->Center(), p)) ||
+			(INFO.getThirdExpansionLocation(S) != nullptr &&
+			INFO.getThirdExpansionLocation(S)->GetOccupiedInfo() == myBase &&
+			isSameArea(INFO.getThirdExpansionLocation(S)->Center(), p))
+			)
 		{
 			return true;
 		}
@@ -194,9 +194,9 @@ bool MyBot::isInMyArea(Position p, bool getMyAllbase)
 
 		// 모든 Base를 체크 하지 않고 본진, 앞마당만 본다.
 		if (isSameArea(MYBASE, p) ||
-				(INFO.getFirstExpansionLocation(S) != nullptr &&
-				 INFO.getFirstExpansionLocation(S)->GetOccupiedInfo() == myBase &&
-				 isSameArea(INFO.getFirstExpansionLocation(S)->Center(), p)))
+			(INFO.getFirstExpansionLocation(S) != nullptr &&
+			INFO.getFirstExpansionLocation(S)->GetOccupiedInfo() == myBase &&
+			isSameArea(INFO.getFirstExpansionLocation(S)->Center(), p)))
 		{
 			return true;
 		}
@@ -212,9 +212,9 @@ bool MyBot::isInMyAreaAir(Position p)
 
 	// 모든 Base를 체크 하지 않고 본진, 앞마당만 본다.
 	if (isSameArea(MYBASE, p) ||
-			(INFO.getFirstExpansionLocation(S) != nullptr &&
-			 INFO.getFirstExpansionLocation(S)->GetOccupiedInfo() == myBase &&
-			 isSameArea(INFO.getFirstExpansionLocation(S)->Center(), p)))
+		(INFO.getFirstExpansionLocation(S) != nullptr &&
+		INFO.getFirstExpansionLocation(S)->GetOccupiedInfo() == myBase &&
+		isSameArea(INFO.getFirstExpansionLocation(S)->Center(), p)))
 	{
 		return true;
 	}
@@ -227,7 +227,7 @@ bool MyBot::isInMyAreaAir(Position p)
 		return true;
 	else {
 		if (INFO.getFirstExpansionLocation(S) != nullptr &&
-				INFO.getFirstExpansionLocation(S)->GetOccupiedInfo() == myBase)
+			INFO.getFirstExpansionLocation(S)->GetOccupiedInfo() == myBase)
 		{
 			nearestPos = findNearestTileInMyArea(INFO.getFirstExpansionLocation(S)->getTilePosition(), TilePosition(p), tileRad);
 
@@ -445,7 +445,7 @@ int MyBot::getPathValue(Position st, Position en)
 
 	// Not walkable 또는 장애물이 있는 경우
 	if (theMap.Valid(en) == false || getAltitude(WE) <= 0 ||
-			Broodwar->getUnitsInRadius(en, 16, Filter::IsBuilding || Filter::IsNeutral).size())
+		Broodwar->getUnitsInRadius(en, 16, Filter::IsBuilding || Filter::IsNeutral).size())
 	{
 		return -1;
 	}
@@ -496,7 +496,7 @@ int MyBot::getPathValue(Position st, Position en)
 
 	if (gDistS > 0 && gDistE > 0)
 	{
-		point = point + ((gDistS - gDistE) * (gDistFromE / gDistA));
+	point = point + ((gDistS - gDistE) * (gDistFromE / gDistA));
 	}
 	*/
 	return point;
@@ -535,7 +535,7 @@ int MyBot::getPathValueForMarine(Position st, Position en)
 	int point = 0;
 
 	// Not walkable 또는 장애물이 있는 경우
-	if (theMap.Valid(en) == false ||	getAltitude(WE) <= 0)
+	if (theMap.Valid(en) == false || getAltitude(WE) <= 0)
 		return -1;
 
 	int gap = 16;
@@ -595,10 +595,6 @@ int MyBot::getPathValueForAir(Position en)
 	return dangerPoint;
 }
 
-// 해당 위치 Pos에서 아군 지상 유닛이 위험한 정도를 점수로 환산
-// Range Unit의 사거리를 계산하여 공격 범위로부터 멀수록 높은 포인트를 줘보자.
-// 가장 위협적인 Unit에 일꾼을 돌려주진 않는다. 단 아무공격 유닛이 없을때는 일꾼의 위험도를 돌려준다.
-// 이는 일꾼 카이팅을 위함.
 UnitInfo *MyBot::getDangerUnitNPoint(Position pos, int *point, bool isFlyer)
 {
 	uList enemyUnits = INFO.getUnitsInRadius(E, pos, 18 * TILE_SIZE, true, true, false, true);
@@ -611,7 +607,11 @@ UnitInfo *MyBot::getDangerUnitNPoint(Position pos, int *point, bool isFlyer)
 			for (auto b : INFO.getTypeBuildingsInRadius(Terran_Missile_Turret, E, pos, 16 * TILE_SIZE, false, true))
 				enemyDefence.push_back(b);
 		}
-
+		if (INFO.enemyRace == Races::Protoss)
+		{
+			for (auto b : INFO.getTypeBuildingsInRadius(Protoss_Photon_Cannon, E, pos, 16 * TILE_SIZE, false, true))
+				enemyDefence.push_back(b);
+		}
 		if (INFO.enemyRace == Races::Zerg)
 		{
 			for (auto b : INFO.getTypeBuildingsInRadius(Zerg_Spore_Colony, E, pos, 16 * TILE_SIZE, false, true))
@@ -886,7 +886,7 @@ vector<Position> MyBot::getRoundPositions(Position source, int gap, int angle)
 		total_angle += angle;
 
 		if (theMap.Valid(pos) == false || getAltitude(pos) <= 0 ||
-				bw->getUnitsInRadius(pos, TILE_SIZE, (Filter::IsMineralField || Filter::IsRefinery || (Filter::IsBuilding && !Filter::IsFlyingBuilding))).size())
+			bw->getUnitsInRadius(pos, TILE_SIZE, (Filter::IsMineralField || Filter::IsRefinery || (Filter::IsBuilding && !Filter::IsFlyingBuilding))).size())
 			continue;
 
 		l.push_back(pos);
@@ -1205,8 +1205,8 @@ uList MyBot::getEnemyInMyYard(int pixel, UnitType uType, bool hide)
 					myUnits = INFO.getAllInRadius(S);
 
 					for (auto su : myUnits)
-						if (isInMyArea(su))
-							nearMyUnits.push_back(su);
+					if (isInMyArea(su))
+						nearMyUnits.push_back(su);
 				}
 
 				int maxRange = e->type().groundWeapon().maxRange();
@@ -1259,7 +1259,7 @@ TilePosition MyBot::findNearestTileInMyArea(TilePosition origin, TilePosition ta
 		return TilePositions::None;
 
 	if (theMap.GetArea(origin) != nullptr && theMap.GetArea(target) != nullptr &&
-			theMap.GetArea(origin) == theMap.GetArea(target))
+		theMap.GetArea(origin) == theMap.GetArea(target))
 		return target;
 
 	int originAreaId = theMap.GetArea(origin)->Id();
@@ -1307,7 +1307,7 @@ vector<UnitInfo *>MyBot::getEnemyScountInMyArea()
 		if (u->pos() != Positions::Unknown)
 		{
 			if (isSameArea(u->pos(), INFO.getMainBaseLocation(S)->getPosition())
-					|| isSameArea(u->pos(), INFO.getFirstExpansionLocation(S)->getPosition()))
+				|| isSameArea(u->pos(), INFO.getFirstExpansionLocation(S)->getPosition()))
 				scouts.push_back(u);
 		}
 	}
@@ -1422,13 +1422,13 @@ Base *MyBot::getMinePosition(Base *preTarget)
 	for (auto base : INFO.getBaseLocations())
 	{
 		if (base->GetOccupiedInfo() == myBase ||
-				(base->GetOccupiedInfo() == enemyBase && base->GetEnemyGroundDefenseBuildingCount() == 0))
+			(base->GetOccupiedInfo() == enemyBase && base->GetEnemyGroundDefenseBuildingCount() == 0))
 			continue;
 
 		// 상대방 앞마당보다 가까운 멀티는 스카웃 하지 않는다.(안드로메다 등)
 		if (INFO.getFirstExpansionLocation(E) &&
-				getGroundDistance(INFO.getMainBaseLocation(E)->Center(), base->Center()) <=
-				getGroundDistance(INFO.getMainBaseLocation(E)->Center(), INFO.getFirstExpansionLocation(E)->Center()))
+			getGroundDistance(INFO.getMainBaseLocation(E)->Center(), base->Center()) <=
+			getGroundDistance(INFO.getMainBaseLocation(E)->Center(), INFO.getFirstExpansionLocation(E)->Center()))
 			continue;
 
 		if (base->isIsland()) continue;
@@ -1437,7 +1437,7 @@ Base *MyBot::getMinePosition(Base *preTarget)
 		if (base->Center().getApproxDistance(theMap.Center()) < 10 * TILE_SIZE) continue;
 
 		// 본지 40초가 안된곳은 돌지 않는다.
-		if (base->GetLastVisitedTime() + (24 * 60 ) > TIME) continue;
+		if (base->GetLastVisitedTime() + (24 * 60) > TIME) continue;
 
 		int curDist = getGroundDistance(base->Center(), prePosition);
 
@@ -1512,7 +1512,7 @@ int MyBot::getDamageAtPosition(Position p, Unit unit, uList enemyList, bool only
 			// 건물 중에는 사거리 긴 유닛이 없음.
 			if (!onlyFromBuilding && !enemy->type().isBuilding()) {
 				if (getAttackDistance(enemy->type(), enemy->pos(), unit->getType(), p) < UnitUtil::GetAttackRange(enemy->type(), E, unit->isFlying()))
-					damage += getDamage(enemy->type(), unit ->getType(), E, S);
+					damage += getDamage(enemy->type(), unit->getType(), E, S);
 			}
 		}
 	}
@@ -1633,7 +1633,7 @@ bool MyBot::isBeingRepaired(Unit u)
 {
 	for (auto scv : INFO.getTypeUnitsInRadius(Terran_SCV, S, u->getPosition(), 2 * TILE_SIZE))
 	{
-		if ((scv->getState() == "Repair" ) && scv->getTarget() == u)
+		if ((scv->getState() == "Repair") && scv->getTarget() == u)
 		{
 			return true;
 		}
@@ -1660,8 +1660,8 @@ bool MyBot::checkZeroAltitueAroundMe(Position myPosition, int width) {
 		return true;
 
 	// 12방향 체크
-	double dx[] = { 1, -1, 0, 0, 1, -1, 1, -1, 0.5, -0.5, 0.5, -0.5};
-	double dy[] = { 0, 0, -1, 1, 1, -1, -1, 1, 1, -1, -1, 1};
+	double dx[] = { 1, -1, 0, 0, 1, -1, 1, -1, 0.5, -0.5, 0.5, -0.5 };
+	double dy[] = { 0, 0, -1, 1, 1, -1, -1, 1, 1, -1, -1, 1 };
 
 	bool flag = false;
 
@@ -1760,8 +1760,8 @@ bool MyBot::HasEnemyFirstExpansion() {
 	}
 
 	for (auto e : enemyResourceDepot)
-		if (isSameArea(enemyFirstExpansionLocation->Center(), e->pos()))
-			return true;
+	if (isSameArea(enemyFirstExpansionLocation->Center(), e->pos()))
+		return true;
 
 	return false;
 }
@@ -1894,24 +1894,38 @@ bool MyBot::goWithoutDamageForSCV(Unit u, Position target, int direction)
 
 void MyBot::kiting(UnitInfo *attacker, UnitInfo *target, int distance, int threshold)
 {
-	int backDistance = 3;
+	/*int backDistance = 3;
 	int weapon_range = attacker->type().groundWeapon().maxRange();
 	int distToTarget = attacker->pos().getApproxDistance(target->pos());
 
 	if (target->type().isWorker())
-		backDistance = 2;
+	backDistance = 2;
 
 	if (distance > threshold)
 	{
-		if (attacker->unit()->getGroundWeaponCooldown() == 0)
-			CommandUtil::attackUnit(attacker->unit(), target->unit());
+	if (attacker->unit()->getGroundWeaponCooldown() == 0)
+	CommandUtil::attackUnit(attacker->unit(), target->unit());
 
-		if (attacker->posChange(target) == PosChange::Farther)
-			attacker->unit()->move((attacker->pos() + target->vPos()) / 2);
-		else if (!target->type().isWorker() && distToTarget < weapon_range)
-			moveBackPostion(attacker, target->pos(), backDistance * TILE_SIZE);
+	if (attacker->posChange(target) == PosChange::Farther)
+	{
+	attacker->unit()->move((attacker->pos() + target->vPos()) / 2);
+	//CommandUtil::attackUnit(attacker->unit(), target->unit());
+	}
+	else if (!target->type().isWorker() && distToTarget < weapon_range)
+	moveBackPostion(attacker, target->pos(), backDistance * TILE_SIZE);
+	// CommandUtil::attackUnit(attacker->unit(), target->unit());
 	}
 	else
+	{
+	moveBackPostion(attacker, target->pos(), backDistance * TILE_SIZE);
+	CommandUtil::attackUnit(attacker->unit(), target->unit());
+	}
+	}*/
+	int backDistance = 2;
+
+	if (attacker->unit()->getGroundWeaponCooldown() == 0)
+		CommandUtil::attackUnit(attacker->unit(), target->unit());
+	else if (distance < threshold)
 		moveBackPostion(attacker, target->pos(), backDistance * TILE_SIZE);
 }
 
@@ -1967,7 +1981,7 @@ UnitInfo *MyBot::getGroundWeakTargetInRange(UnitInfo *attacker, bool worker)
 	for (auto eu : enemy)
 	{
 		if (eu->type() == UnitTypes::Zerg_Egg || eu->type() == UnitTypes::Zerg_Larva || eu->type() == UnitTypes::Protoss_Interceptor ||
-				eu->type() == UnitTypes::Protoss_Scarab || eu->type() == UnitTypes::Zerg_Broodling)
+			eu->type() == UnitTypes::Protoss_Scarab || eu->type() == UnitTypes::Zerg_Broodling)
 			continue;
 
 		if (hp > eu->hp())
@@ -1989,7 +2003,7 @@ int MyBot::needCountForBreakMulti(UnitType uType)
 
 	if (uType == Terran_Vulture)
 	{
-		return base->GetEnemyGroundDefenseUnitCount() + 4;
+		return base->GetEnemyGroundDefenseUnitCount() + 3;
 	}
 	else if (uType == Terran_Goliath)
 	{
@@ -2430,16 +2444,31 @@ uList MyBot::getEnemyOutOfRange(Position pos, bool gDist, bool hide)
 	return list.size() ? list : list_worker;
 }
 
-
+bool MyBot::isNeedKitingUnitTypeforMarine(UnitType uType)
+{
+	return  uType == Terran_Firebat  || Terran_Medic ||  uType == Protoss_Dark_Templar || uType == Protoss_Dark_Archon || Terran_Dropship
+		|| uType == Zerg_Overlord || uType == Zerg_Defiler || uType == Zerg_Devourer || uType == Protoss_Corsair
+		|| uType == Protoss_Carrier || uType == Zerg_Scourge || uType == Terran_Science_Vessel || uType == Terran_Valkyrie;
+}
 bool MyBot::isNeedKitingUnitType(UnitType uType)
 {
 	return uType == Protoss_Zealot || uType == Protoss_Dark_Templar || uType == Protoss_Dark_Archon || uType == Terran_Marine
-		   || uType == Terran_Firebat || uType == Zerg_Zergling || uType == Zerg_Ultralisk || uType.isWorker();
+		|| uType == Terran_Firebat || uType == Zerg_Zergling || uType == Zerg_Ultralisk || uType.isWorker();
 }
-
+bool MyBot::isNeedKitingUnitTypeinAir(UnitType uType)
+{
+	return uType == Protoss_Zealot || uType == Protoss_Dark_Templar || uType == Protoss_Dark_Archon || uType == Protoss_Dragoon
+		|| uType == Terran_Firebat || uType == Terran_Marine || uType == Zerg_Zergling || uType == Zerg_Ultralisk || uType == Zerg_Hydralisk || uType.isWorker()
+		|| uType == Zerg_Mutalisk || uType == Zerg_Guardian || uType == Zerg_Queen || uType == Zerg_Devourer || uType == Zerg_Scourge || uType == Zerg_Zergling
+		|| uType == Zerg_Lurker || uType == Zerg_Defiler || uType == Terran_Science_Vessel || uType == Terran_Ghost
+		|| uType == Terran_Battlecruiser || uType == Terran_Vulture || uType == Terran_Siege_Tank_Tank_Mode || uType == Terran_Siege_Tank_Siege_Mode || uType == Terran_Siege_Tank_Tank_Mode
+		|| uType == Terran_Wraith || uType == Terran_Medic || uType == Protoss_High_Templar||uType == Protoss_Shuttle
+		|| uType == Protoss_Reaver || uType == Protoss_Observer || uType == Protoss_Scout || uType == Protoss_Corsair
+		|| uType == Protoss_Carrier || uType == Terran_Valkyrie || uType == Terran_Dropship ||  uType == Protoss_Archon;
+}
 bool MyBot::isMyCommandAtFirstExpansion() {
 	return INFO.getFirstExpansionLocation(S)
-		   && (INFO.getTypeBuildingsInRadius(Terran_Command_Center, S, INFO.getFirstExpansionLocation(S)->Center(), 5 * TILE_SIZE, true).size() > 0);
+		&& (INFO.getTypeBuildingsInRadius(Terran_Command_Center, S, INFO.getFirstExpansionLocation(S)->Center(), 5 * TILE_SIZE, true).size() > 0);
 }
 
 bool MyBot::isStuckOrUnderSpell(UnitInfo *uInfo)
@@ -2461,9 +2490,9 @@ bool MyBot::isStuckOrUnderSpell(UnitInfo *uInfo)
 	}
 
 	if (INFO.needMoveInside() // 안으로 가야 되고
-			&& uInfo->pos().getApproxDistance(INFO.getFirstChokePosition(E)) < 6 * TILE_SIZE // 6 TILE 안에 있는 유닛 중에
-			&& (uInfo->pos().getApproxDistance(INFO.getFirstChokePosition(E)) < 3 * TILE_SIZE // 초크 근처거나
-				|| isSameArea(uInfo->pos(), INFO.getMainBaseLocation(E)->Center())))					// 이미 상대 본진에 들어간 유닛에 대하여
+		&& uInfo->pos().getApproxDistance(INFO.getFirstChokePosition(E)) < 6 * TILE_SIZE // 6 TILE 안에 있는 유닛 중에
+		&& (uInfo->pos().getApproxDistance(INFO.getFirstChokePosition(E)) < 3 * TILE_SIZE // 초크 근처거나
+		|| isSameArea(uInfo->pos(), INFO.getMainBaseLocation(E)->Center())))					// 이미 상대 본진에 들어간 유닛에 대하여
 	{
 		bw->drawCircleMap(uInfo->pos(), 12, Colors::Cyan, true);
 

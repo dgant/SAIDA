@@ -95,7 +95,8 @@ void GoliathManager::update()
 				}
 			}
 		}
-		else if (SM.getMainStrategy() == BackAll) {
+		else if (SM.getMainStrategy() == BackAll) 
+		{
 
 			if (INFO.enemyRace == Races::Zerg)
 				allAttackFrame = 0;
@@ -104,7 +105,8 @@ void GoliathManager::update()
 				g->setState(new GoliathMoveState(INFO.getSecondChokePosition(S)));
 			}
 		}
-		else {
+		else 
+		{
 			if (INFO.enemyRace == Races::Zerg)
 			{
 				allAttackFrame = 0;

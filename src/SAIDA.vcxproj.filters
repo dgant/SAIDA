@@ -214,6 +214,18 @@
     <ClCompile Include="SAIDA\DeepLearning\Supervised.cpp">
       <Filter>DeepLearning</Filter>
     </ClCompile>
+    <ClCompile Include="SAIDA\UnitState\ValkyrieState.cpp">
+      <Filter>BotSource\UnitState</Filter>
+    </ClCompile>
+    <ClCompile Include="SAIDA\UnitManager\ValkyrieManager.cpp">
+      <Filter>BotSource\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="SAIDA\UnitManager\MedicManager.cpp">
+      <Filter>BotSource\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="SAIDA\UnitState\MedicState.cpp">
+      <Filter>BotSource\UnitState</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SAIDA\MyBotModule.h">
@@ -428,6 +440,18 @@
     </ClInclude>
     <ClInclude Include="SAIDA\DeepLearning\Supervised.h">
       <Filter>DeepLearning</Filter>
+    </ClInclude>
+    <ClInclude Include="SAIDA\UnitState\ValkyrieState.h">
+      <Filter>BotSource\UnitState</Filter>
+    </ClInclude>
+    <ClInclude Include="SAIDA\UnitManager\ValkyrieManager.h">
+      <Filter>BotSource\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="SAIDA\UnitManager\MedicManager.h">
+      <Filter>BotSource\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="SAIDA\UnitState\MedicState.h">
+      <Filter>BotSource\UnitState</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

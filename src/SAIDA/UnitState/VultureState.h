@@ -28,6 +28,9 @@ namespace MyBot
 		UnitInfo *me = nullptr;
 	};
 
+
+
+
 	class VultureKitingState : public State
 	{
 	public:

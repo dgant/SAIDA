@@ -151,7 +151,7 @@ void TankManager::update()
 		bool gatherFlag = false;
 
 		try {
-			if (INFO.enemyRace == Races::Protoss)
+			if (INFO.enemyRace == Races::Protoss&&SM.getMyBuild() != MyBuildTypes::Protoss_MineKiller)
 				gatherFlag = needGathering();
 		}
 		catch (SAIDA_Exception e) {

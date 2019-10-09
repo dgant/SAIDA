@@ -586,7 +586,7 @@ void UXManager::drawScoutInformation(int x, int y)
 	}
 
 	bw->setTextSize(Text::Size::Small);
-	bw->drawTextScreen(450, 16, "%cSelf Strategy : %s", Text::Yellow, SM.getMainStrategy().c_str());
+	bw->drawTextScreen(450, 16, "%cCurrent Attack Strategy : %s", Text::Yellow, SM.getMainStrategy().c_str());
 
 	if (SM.getMainAttackPosition() == Positions::Unknown)
 		bw->drawTextScreen(450, 28, "%cMainAttackPosition : Unknown", Text::Yellow);
@@ -610,6 +610,21 @@ void UXManager::drawScoutInformation(int x, int y)
 
 	bw->drawTextScreen(450, 76, "%cEnemy Initialbuild : %s", Text::Yellow, ESM.getEnemyInitialBuild().c_str());
 	bw->drawTextScreen(450, 88, "%cEnemy Mainbuild : %s", Text::Yellow, ESM.getEnemyMainBuild().c_str());
+
+	if (SM.getMyBuild() == MyBuildTypes::Protoss_DragoonKiller)
+		bw->drawTextScreen(450, 100, "%cMy Strategy is : Dragoon Killer", Text::Yellow);
+	else if (SM.getMyBuild() == MyBuildTypes::Protoss_MineKiller)
+		bw->drawTextScreen(450, 100, "%cMy Strategy is : Mine Killer", Text::Yellow);
+	else if (SM.getMyBuild() == MyBuildTypes::Protoss_ZealotKiller)
+		bw->drawTextScreen(450, 100, "%cMy Strategy is : Zealot Killer", Text::Yellow);
+	else if (SM.getMyBuild() == MyBuildTypes::Protoss_CarrierKiller)
+		bw->drawTextScreen(450, 100, "%cMy Strategy is : Carrier Killer", Text::Yellow);
+	else if (SM.getMyBuild() == MyBuildTypes::Protoss_CannonKiller)
+		bw->drawTextScreen(450, 100, "%cMy Strategy is : Cannon Killer", Text::Yellow);
+	else if (SM.getMyBuild() == MyBuildTypes::Protoss_TemplarKiller)
+		bw->drawTextScreen(450, 100, "%cMy Strategy is : Templar Killer", Text::Yellow);
+	else
+		bw->drawTextScreen(450, 100, "%cMy Strategy is : None", Text::Yellow);
 
 	bw->setTextSize(Text::Size::Large);
 	if (SHM.getWinningRate() > 0)

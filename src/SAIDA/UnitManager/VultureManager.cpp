@@ -59,12 +59,12 @@ void VultureManager::update()
 		// 새로 만들어진 Vulture라면 Idle 로 설정
 		if (state == "New" && v->isComplete()) {
 
-			if (SM.getNeedKeepSecondExpansion(Terran_Vulture) || SM.getNeedKeepThirdExpansion(Terran_Vulture) && keepMultiSet.size() < 8)
-			{
-				v->setState(new VultureKeepMultiState());
-				keepMultiSet.add(v);
-			}
-			else if (needScoutCnt)
+			//if (SM.getNeedKeepSecondExpansion(Terran_Vulture) || SM.getNeedKeepThirdExpansion(Terran_Vulture) && keepMultiSet.size() < 2)
+			//{
+			//	v->setState(new VultureKeepMultiState());
+			//	keepMultiSet.add(v);
+			//}
+			 if (needScoutCnt)
 			{
 				v->setState(new VultureScoutState());
 				needScoutCnt--;
@@ -94,7 +94,7 @@ void VultureManager::update()
 			Base *firstExpension = INFO.getFirstExpansionLocation(E);
 
 			if (firstExpension != nullptr && firstExpension->GetOccupiedInfo() == enemyBase && SM.getMainStrategy() != AttackAll &&
-					isSameArea(v->pos(), INFO.getMainBaseLocation(E)->getPosition()))
+				isSameArea(v->pos(), INFO.getMainBaseLocation(E)->getPosition()))
 			{
 				v->setState(new VultureDiveState());
 				kitingSet.del(v);
@@ -126,7 +126,7 @@ void VultureManager::update()
 		kitingSecondSet.setTarget(SM.getSecondAttackPosition());
 		kitingSecondSet.action();
 	}
-
+	
 	if (needKeepMulti())
 	{
 		if (SM.getNeedKeepSecondExpansion(Terran_Vulture))
@@ -140,7 +140,7 @@ void VultureManager::update()
 	{
 		keepMultiSet.clearSet();
 	}
-
+	
 	return;
 }
 
@@ -156,8 +156,8 @@ bool VultureManager::moveAsideForCarrierDefence(UnitInfo *v) {
 
 				for (auto g : INFO.getUnits(Terran_Goliath, S)) {
 					if (g->getState() == "CarrierDefence")
-						if (g->pos().getApproxDistance(INFO.getFirstChokePosition(S)) <= 10 * TILE_SIZE)
-							carrierDefenceCntNearFirstChoke++;
+					if (g->pos().getApproxDistance(INFO.getFirstChokePosition(S)) <= 10 * TILE_SIZE)
+						carrierDefenceCntNearFirstChoke++;
 				}
 
 				// 본진으로 움직여 준다.
@@ -178,7 +178,7 @@ bool VultureManager::needKeepMulti()
 	{
 		if (!SM.getNeedKeepSecondExpansion(Terran_Siege_Tank_Tank_Mode))
 		{
-			// 마인만 필요한 상태
+
 			uList vset = keepMultiSet.getUnits();
 
 			for (auto v : vset)
@@ -297,7 +297,7 @@ Position VultureManager::checkForwardPylon()
 	}
 	else
 	{
-		if (checkedForwardPylon == false) { // 전진 건물은 찾음
+		if (checkedForwardPylon == false) {
 			UnitInfo *forwardPylon = INFO.getClosestTypeUnit(E, forwardBuildingPosition, Protoss_Pylon, 10 * TILE_SIZE, true);
 
 			if (forwardPylon != nullptr) {
@@ -310,7 +310,6 @@ Position VultureManager::checkForwardPylon()
 	}
 }
 
-// Dive 할 Vulture를 정한다. 게임 초반에 한번만 수행한다.
 void VultureManager::checkDiveVulture()
 {
 	// 앞마당의 Tower
@@ -326,7 +325,7 @@ void VultureManager::checkDiveVulture()
 	for (auto v : diveVultures)
 	{
 		// hp 60% 이상인 Vulture만 Check
-		if (v->hp() > (int)(v->type().maxHitPoints() * 0.6) )
+		if (v->hp() > (int)(v->type().maxHitPoints() * 0.6))
 			VultureCnt++;
 	}
 
@@ -433,39 +432,39 @@ void VultureManager::checkSpiderMine(uList &vList)
 	/*
 	for (auto m : INFO.getUnits(Terran_SCV, S))
 	{
-		if (m->getKillMe() == AssignedKill && removeMineMap[m->unit()]->exists() == false)
-			m->setKillMe(KillMe);
+	if (m->getKillMe() == AssignedKill && removeMineMap[m->unit()]->exists() == false)
+	m->setKillMe(KillMe);
 
-		if (m->getKillMe() == MustKillAssigned && removeMineMap[m->unit()]->exists() == false)
-			m->setKillMe(MustKill);
+	if (m->getKillMe() == MustKillAssigned && removeMineMap[m->unit()]->exists() == false)
+	m->setKillMe(MustKill);
 
-		if (m->getKillMe() != NoKill)
-		{
-			if ((m->getKillMe() == AssignedKill || m->getKillMe() == MustKillAssigned) && removeMineMap[m->unit()]->exists())
-				continue;
+	if (m->getKillMe() != NoKill)
+	{
+	if ((m->getKillMe() == AssignedKill || m->getKillMe() == MustKillAssigned) && removeMineMap[m->unit()]->exists())
+	continue;
 
-			// kiting Set에서 Mine에 가장 가까운 Vulture
-			UnitInfo *toBeAssigned = kitingSet.getFrontUnitFromPosition(m->pos());
+	// kiting Set에서 Mine에 가장 가까운 Vulture
+	UnitInfo *toBeAssigned = kitingSet.getFrontUnitFromPosition(m->pos());
 
-			if (toBeAssigned == nullptr) continue;
+	if (toBeAssigned == nullptr) continue;
 
-			if (m->getKillMe() == KillMe && toBeAssigned->pos().getApproxDistance(m->pos()) > 6 * TILE_SIZE)
-				continue;
+	if (m->getKillMe() == KillMe && toBeAssigned->pos().getApproxDistance(m->pos()) > 6 * TILE_SIZE)
+	continue;
 
-			// State를 Mine제거로 바꿔줌
-			toBeAssigned->setState(new VultureRemoveMineState(m->unit()));
+	// State를 Mine제거로 바꿔줌
+	toBeAssigned->setState(new VultureRemoveMineState(m->unit()));
 
-			// MineMap에 할당해 줌
-			removeMineMap[m->unit()] = toBeAssigned->unit();
-			// KitingSet에서는 delete
-			kitingSet.del(toBeAssigned);
+	// MineMap에 할당해 줌
+	removeMineMap[m->unit()] = toBeAssigned->unit();
+	// KitingSet에서는 delete
+	kitingSet.del(toBeAssigned);
 
-			// KillMe Flag 는 2로
-			if (m->getKillMe() == KillMe)
-				m->setKillMe(AssignedKill);
-			else if (m->getKillMe() == MustKill)
-				m->setKillMe(MustKillAssigned);
-		}
+	// KillMe Flag 는 2로
+	if (m->getKillMe() == KillMe)
+	m->setKillMe(AssignedKill);
+	else if (m->getKillMe() == MustKill)
+	m->setKillMe(MustKillAssigned);
+	}
 	}*/
 }
 
@@ -494,9 +493,9 @@ void VultureManager::setVultureDefence(uList &vList)
 
 		// 적이 없어도 드랍이 올 것 같으면 일단 Defence
 		if (SM.getMainStrategy() != AttackAll &&
-				(ESM.getWaitTimeForDrop() > 0 || E->getUpgradeLevel(UpgradeTypes::Ventral_Sacs))
-				&& TIME - ESM.getWaitTimeForDrop() <= 24 * 60 * 3
-				&& BasicBuildStrategy::Instance().hasSecondCommand()) {
+			(ESM.getWaitTimeForDrop() > 0 || E->getUpgradeLevel(UpgradeTypes::Ventral_Sacs))
+			&& TIME - ESM.getWaitTimeForDrop() <= 24 * 60 * 3
+			&& BasicBuildStrategy::Instance().hasSecondCommand()) {
 
 			if (INFO.enemyRace != Races::Protoss || (EMB == Toss_drop || EMB == Toss_dark_drop))
 			{
@@ -655,7 +654,7 @@ void VultureKiting::action()
 
 	if (S->hasResearched(TechTypes::Spider_Mines)) {
 		if ((INFO.getSecondExpansionLocation(S) && target == INFO.getSecondExpansionLocation(S)->Center()) ||
-				(INFO.getThirdExpansionLocation(S) && target == INFO.getThirdExpansionLocation(S)->Center()))
+			(INFO.getThirdExpansionLocation(S) && target == INFO.getThirdExpansionLocation(S)->Center()))
 		{
 			defenceMinePos = getRoundPositions(target, 7 * TILE_SIZE, 20);
 		}
@@ -674,10 +673,12 @@ void VultureKiting::action()
 		}
 	}
 
-	if (needFight) {
+	if (needFight)
+	{
 		if (needBack(frontUnit->pos()))	needFight = false;
 	}
-	else {
+	else
+	{
 		if (canFight(frontUnit->pos()))	needFight = true;
 	}
 
@@ -689,8 +690,18 @@ void VultureKiting::action()
 		if (VultureManager::Instance().moveAsideForCarrierDefence(v))
 			continue;
 
+		UnitInfo *closestTank = TM.getFrontTankFromPos(SM.getMainAttackPosition());
+		if (SM.getMainStrategy() == AttackAll)
+		{
+			if (closestTank != nullptr)
+				if (getGroundDistance(closestTank->pos(), v->pos()) > 12 * TILE_SIZE)
+				{
+					CommandUtil::attackMove(v->unit(), closestTank->pos());
+					continue;
+				}
+		}
 		if ((TIME - v->unit()->getLastCommandFrame() < 24) &&
-				v->unit()->getLastCommand().getType() == UnitCommandTypes::Use_Tech_Position)
+			v->unit()->getLastCommand().getType() == UnitCommandTypes::Use_Tech_Position)
 			continue;
 
 		int dangerPoint = 0;
@@ -771,7 +782,7 @@ void VultureKiting::action()
 					/*UnitInfo *closestWorker = INFO.getClosestTypeUnit(E, v->pos(), INFO.getWorkerType(INFO.enemyRace), 10 * TILE_SIZE);
 
 					if (closestWorker != nullptr)
-						kiting(v, closestWorker, dangerPoint, 2 * TILE_SIZE);
+					kiting(v, closestWorker, dangerPoint, 2 * TILE_SIZE);
 					else*/
 					CommandUtil::attackMove(v->unit(), target);
 				}
@@ -787,13 +798,13 @@ void VultureKiting::action()
 						if (VM.getNeedPcon())
 							pControl(v, closestAttack);
 						else
-							kiting(v, closestAttack, dangerPoint, 3 * TILE_SIZE);
+							kiting(v, closestAttack, dangerPoint, 4 * TILE_SIZE);
 					}
 				}
 			} // 질저 Kiting 종료
 			else // 질저 아님
 			{
-				// 싸워야 하는 경우 질저 아니면 그냥 일점사
+
 				if (needFight)
 				{
 					UnitInfo *closestAttack = INFO.getClosestUnit(E, frontUnit->pos(), GroundCombatKind, 15 * TILE_SIZE, false, false, true);
@@ -811,10 +822,12 @@ void VultureKiting::action()
 					{
 						UnitInfo *weakUnit = getGroundWeakTargetInRange(v);
 
-						if (weakUnit != nullptr) // 공격 대상 설정 변경
+						if (weakUnit != nullptr)
+						{
 							closestAttack = weakUnit;
+							kiting(v, closestAttack, dangerPoint, 4 * TILE_SIZE);
+						}
 
-						////////////////////// Bunker는 수리 SCV 체크해야 함.
 						if (closestAttack->type() == Terran_Bunker)
 						{
 							UnitInfo *closestWorker = INFO.getClosestTypeUnit(E, closestAttack->pos(), INFO.getWorkerType(INFO.enemyRace), 2 * TILE_SIZE);
@@ -840,8 +853,8 @@ void VultureKiting::action()
 					if (dangerUnit->type() == INFO.getAdvancedDefenseBuildingType(INFO.enemyRace))
 					{
 						if (dangerPoint > 4 * TILE_SIZE) // 멀찌감치면 그냥 공격하고...
-							if (setDefenceMine(v))
-								continue;
+						if (setDefenceMine(v))
+							continue;
 
 						if (frontTank)
 						{
@@ -891,7 +904,7 @@ void VultureKiting::action()
 								else
 								{
 									if (INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) > 5 ||
-											INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) > INFO.getCompletedCount(Terran_Goliath, S))
+										INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) > INFO.getCompletedCount(Terran_Goliath, S))
 										closest = closestTank;
 									else
 										closest = closestGoliath;
@@ -993,7 +1006,7 @@ void VultureKiting::action()
 
 									if (closestWorker != nullptr)
 									{
-										kiting(v, closestWorker, dangerPoint, 3 * TILE_SIZE);
+										kiting(v, closestWorker, dangerPoint, 4 * TILE_SIZE);
 									}
 									else
 									{
@@ -1014,7 +1027,7 @@ void VultureKiting::action()
 								{
 									if (isNeedKitingUnitType(closestAttack->type()))
 									{
-										kiting(v, closestAttack, dangerPoint, 3 * TILE_SIZE);
+										kiting(v, closestAttack, dangerPoint, 4 * TILE_SIZE);
 									}
 								}
 							}
@@ -1100,7 +1113,8 @@ void VultureKiting::actionVsT()
 
 	if (frontUnit == nullptr) return;
 
-	if (needFight) {
+	if (needFight)
+	{
 		if (needBack(frontUnit->pos()))	needFight = false;
 	}
 	else {
@@ -1115,7 +1129,7 @@ void VultureKiting::actionVsT()
 			continue;
 
 		if ((TIME - v->unit()->getLastCommandFrame() < 24) &&
-				v->unit()->getLastCommand().getType() == UnitCommandTypes::Use_Tech_Position)
+			v->unit()->getLastCommand().getType() == UnitCommandTypes::Use_Tech_Position)
 			continue;
 
 		int dangerPoint = 0;
@@ -1218,11 +1232,9 @@ void VultureKiting::clearSet() {
 	clear();
 }
 
-// 벌쳐가 충분히 많으면 그냥 공격하도록 하자.
+
 bool VultureKiting::canFight(Position frontPos)
 {
-	// 전진 게이트에 대한 특별 처리 - 마린이 있으면 그냥 싸우는 로직 필요
-
 	int range = 10 * TILE_SIZE;
 
 	if (size() > 5)
@@ -1243,12 +1255,12 @@ bool VultureKiting::canFight(Position frontPos)
 		airCombat += INFO.getTypeUnitsInRadius(Protoss_Scout, E, frontPos, 15 * TILE_SIZE, true).size();
 
 		// Attack All 일때는 왠만하면 벌쳐끼리 공격가지 말자.
-		if (SM.getMainStrategy() == AttackAll)
-			dragoon *= 2;
+		/*if (SM.getMainStrategy() == AttackAll)
+		dragoon *= 2;*/
 
-		preAmountOfEnemy = dragoon + zealot + photo;
+		//preAmountOfEnemy = dragoon + zealot + photo;
 
-		if ((dragoon * 3) + (photo * 5) + (zealot / 2) < vultureCnt && airCombat == 0)
+		if ((dragoon * 2) + (photo * 2) + (zealot / 4) < vultureCnt && airCombat == 0)
 			return true;
 	}
 	else if (INFO.enemyRace == Races::Zerg)
@@ -1261,12 +1273,12 @@ bool VultureKiting::canFight(Position frontPos)
 		word lucker = 0;
 
 		for (auto l : luckers)
-			if (!l->unit()->canBurrow(false))
-				lucker++;
+		if (!l->unit()->canBurrow(false))
+			lucker++;
 
 		preAmountOfEnemy = hydra + zergling + sunken + lucker;
 
-		if ((zergling / 4) + (sunken * 7) + hydra + (lucker * 2) < vultureCnt && mutal == 0)
+		if ((sunken * 3) + hydra + (lucker) < vultureCnt && mutal == 0)
 			return true;
 	}
 	else
@@ -1279,12 +1291,12 @@ bool VultureKiting::canFight(Position frontPos)
 		word bunker = 0;
 
 		for (auto b : bunkers)
-			if (b->getMarinesInBunker())
-				bunker++;
+		if (b->getMarinesInBunker())
+			bunker++;
 
-		preAmountOfEnemy = vulture + tank + goliath + bunker + marine;
+		//preAmountOfEnemy = vulture + tank + goliath + bunker + marine;
 
-		if ((marine / 2) + vulture + (goliath * 2) + (tank * 3) + (bunker * 6 )  < vultureCnt)
+		if (vulture + (goliath * 1) + (tank * 2) + (bunker * 4)  < vultureCnt)
 			return true;
 	}
 
@@ -1309,8 +1321,9 @@ bool VultureKiting::needBack(Position frontPos)
 		word airCombat = INFO.getTypeUnitsInRadius(Protoss_Carrier, E, frontPos, 15 * TILE_SIZE, true).size();
 		airCombat += INFO.getTypeUnitsInRadius(Protoss_Scout, E, frontPos, 15 * TILE_SIZE, true).size();
 
-		if ((preAmountOfEnemy < dragoon + zealot + photo) ||
-				((dragoon * 2) + (photo * 4)) > vultureCnt || airCombat != 0)
+		/*if ((preAmountOfEnemy < dragoon + zealot + photo) ||
+		((dragoon * 2) + (photo * 4)) > vultureCnt || airCombat != 0)*/
+		if (((dragoon * 2) + (photo * 3)) > vultureCnt || airCombat != 0)
 			return true;
 	}
 	else if (INFO.enemyRace == Races::Zerg)
@@ -1323,11 +1336,12 @@ bool VultureKiting::needBack(Position frontPos)
 		word lucker = 0;
 
 		for (auto l : luckers)
-			if (!l->unit()->canBurrow(false))
-				lucker++;
+		if (!l->unit()->canBurrow(false))
+			lucker++;
 
-		if ( (preAmountOfEnemy < hydra + zergling + sunken + lucker) ||
-				((int)(zergling / 2) + (sunken * 4) + hydra + (lucker * 2)) >= vultureCnt || mutal != 0)
+		/*if ( (preAmountOfEnemy < hydra + zergling + sunken + lucker) ||
+		((int)(zergling / 2) + (sunken * 4) + hydra + (lucker * 2)) >= vultureCnt || mutal != 0)*/
+		if (((sunken * 3) + hydra + (lucker)) >= vultureCnt || mutal != 0)
 			return true;
 	}
 	else
@@ -1340,11 +1354,10 @@ bool VultureKiting::needBack(Position frontPos)
 		word bunker = 0;
 
 		for (auto b : bunkers)
-			if (b->getMarinesInBunker())
-				bunker++;
+		if (b->getMarinesInBunker())
+			bunker++;
 
-		if ((preAmountOfEnemy < vulture + tank + goliath + marine) ||
-				((marine / 2) + vulture + (goliath * 1) + (tank * 2) + (bunker * 4)) > vultureCnt)
+		if ((vulture + (goliath * 1) + (tank * 2) + (bunker * 6)) > vultureCnt)
 			return true;
 	}
 
@@ -1378,7 +1391,7 @@ bool VultureKiting::setGuardMine(UnitInfo *v)
 		return false;
 
 	if ((INFO.getSecondExpansionLocation(S) && target == INFO.getSecondExpansionLocation(S)->Center()) ||
-			(INFO.getThirdExpansionLocation(S) && target == INFO.getThirdExpansionLocation(S)->Center()))
+		(INFO.getThirdExpansionLocation(S) && target == INFO.getThirdExpansionLocation(S)->Center()))
 	{
 		if (v->pos().getApproxDistance(target) > 10 * TILE_SIZE)
 			return false;

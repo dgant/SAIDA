@@ -12,6 +12,7 @@
 #include "UnitManager\ComsatStationManager.h"
 #include "UnitManager\EngineeringBayManager.h"
 #include "UnitManager\MarineManager.h"
+#include "UnitManager\ValkyrieManager.h"
 #include "UnitManager\ScvManager.h"
 #include "UnitManager\TankManager.h"
 #include "UnitManager\VultureManager.h"
@@ -19,6 +20,7 @@
 #include "UnitManager\WraithManager.h"
 #include "UnitManager\VessleManager.h"
 #include "UnitManager\DropshipManager.h"
+#include "UnitManager\MedicManager.h"
 #include "DeepLearning\SharedMemoryManager.h"
 
 namespace MyBot

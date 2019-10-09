@@ -2,6 +2,7 @@
 
 #include "../Common.h"
 #include "../UnitData.h"
+
 #include "State.h"
 
 namespace MyBot
@@ -14,7 +15,13 @@ namespace MyBot
 		}
 		virtual State *action() override;
 	};
-
+	class WraithKitingState : public State
+	{
+	public:
+		virtual string getName() override {
+			return "Kiting";
+		}
+	};
 	class WraithScoutState : public State
 	{
 	public:
@@ -51,6 +58,32 @@ namespace MyBot
 	public:
 		virtual string getName() override {
 			return "FollowTank";
+		}
+		virtual State *action() override;
+	};
+
+	class WraithRetreatState : public State
+	{
+	public:
+		virtual string getName() override {
+			return "Retreat";
+		}
+		virtual State *action() override;
+	};
+	class WraithCloakState : public State
+	{
+	public:
+		virtual string getName() override {
+			return "Cloak";
+		}
+		virtual State *action() override;
+	};
+
+	class WraithBattleAssistState : public State
+	{
+	public:
+		virtual string getName() override {
+			return "BattleAssist";
 		}
 		virtual State *action() override;
 	};

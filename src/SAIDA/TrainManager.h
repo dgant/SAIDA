@@ -50,6 +50,7 @@ namespace MyBot
 		int getMaxScvNeedCount();
 
 		bool isFirstFactory();
+		bool isFirstBarrack();
 		void findAndSaveFirstFactoryPos(Unit factory);
 		TilePosition moveFirstFactoryPos = TilePositions::None;
 		bool isTimeToMoveCommandCenter(UnitInfo *c);

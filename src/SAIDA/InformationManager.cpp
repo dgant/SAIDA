@@ -1849,19 +1849,21 @@ UnitInfo *InformationManager::getUnitInfo(Unit unit, Player p)
 
 int InformationManager::getCompletedCount(UnitType t, Player p)
 {
-	if (p == S)
+	if (p == S)//如果是自家人
 		return _unitData[S].getCompletedCount(t);
 	else
 	{
 		int compleCnt = 0;
 
-		if (t.isBuilding()) {
+		if (t.isBuilding()) 
+		{
 			for (auto u : _unitData[E].getBuildingVector(t)) {
 				if (u->isComplete())
 					compleCnt++;
 			}
 		}
-		else {
+		else 
+		{
 			for (auto u : _unitData[E].getUnitVector(t)) {
 				if (u->isComplete())
 					compleCnt++;

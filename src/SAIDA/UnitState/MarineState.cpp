@@ -1,94 +1,33 @@
 #include "MarineState.h"
+#include "../InformationManager.h"
+#include "../StrategyManager.h"
+#include "../EnemyStrategyManager.h"
 using namespace MyBot;
 
 State *MarineIdleState::action()
 {
-	Unit b = MM.getBunker();
-
-	// 내가 타고 있는 벙커가 getBunker가 아닌 경우 나온다.
-	if (b != nullptr && unit->isLoaded() && b->isCompleted() && unit->getTransport() != b)
-	{
-		unit->getTransport()->unload(unit);
-
-		return nullptr;
-	}
-
-	if (b != nullptr && b->getLoadedUnits().size() != 4) {
-
-		if (b->isCompleted())
-			unit->rightClick(b);
-		else
-			CommandUtil::attackMove(unit, b->getPosition(), true);
-
-		return nullptr;
-	}
-
-
-	if (INFO.enemyRace == Races::Zerg) {
-		uList commandCenterList = INFO.getBuildings(Terran_Command_Center, S);
-
-		if (commandCenterList.empty())
-			return nullptr;
-
-		if (commandCenterList.size() == 1)
-		{
-			// 9드론 이하 빌드일 때 마린들 커맨드 아래에 대기
-			if (ESM.getEnemyInitialBuild() <= Zerg_12_Ap || ESM.getEnemyInitialBuild() == UnknownBuild)
-			{
-				Unit mineral = bw->getClosestUnit(commandCenterList[0]->pos(), Filter::IsMineralField);
-
-				if (mineral != nullptr) {
-					Position target = (commandCenterList[0]->pos() + mineral->getPosition()) / 2;
-					unit->move(target);
-					return nullptr;
-				}
-			}
-		}
-	}
-	else if (ESM.getEnemyInitialBuild() == Toss_cannon_rush && INFO.getSecondChokePosition(S)) {
-		if (INFO.getFirstChokePosition(S).getApproxDistance(unit->getPosition()) - INFO.getFirstChokePosition(S).getApproxDistance(INFO.getSecondChokePosition(S)) > 3 * TILE_SIZE)
-			CommandUtil::move(unit, INFO.getSecondChokePosition(S), true);
-		else {
-			uList eList = INFO.getUnitsInRadius(E, unit->getPosition(), 7 * TILE_SIZE);
-
-			if (eList.empty()) {
-				uList eBuildingList = INFO.getBuildingsInRadius(E, unit->getPosition(), 7 * TILE_SIZE);
-
-				if (eBuildingList.empty())
-					CommandUtil::attackMove(unit, INFO.getSecondChokePosition(S));
-				else
-					CommandUtil::attackUnit(unit, eBuildingList.at(0)->unit());
-			}
-			else
-				return new MarineAttackState(eList.at(0));
-		}
-
-		return nullptr;
-	}
-
-	if (unit->getDistance(MM.waitingNearCommand) > 50) {
-		//unit->move(pos);
-		CommandUtil::move(unit, MM.waitingNearCommand, true);
-	}
-
+		CommandUtil::move(unit, MM.waitnearsecondchokepoint, true);
 	return nullptr;
 }
 
-State *MarineAttackState::action() {
-	if (m_targetUnit != nullptr) {
+State *MarineAttackState::action() 
+{
+	if (m_targetUnit != nullptr) 
+	{
 		UnitInfo *eUnit = INFO.getUnitInfo(m_targetUnit, E);
 
-		// 상대봇이 죽은 경우 본진, 앞마당의 안보이는 시야를 탐색한다.
+		
 		if (!eUnit) {
-			// 근처 유닛이 있으면 변경
+		
 			uList eList = INFO.getUnitsInRadius(E, unit->getPosition(), 8 * TILE_SIZE);
 
 			if (!eList.empty()) {
 				m_targetUnit = eList.at(0)->unit();
 				m_targetPos = m_targetUnit->getPosition();
 			}
-			// 근처 유닛이 없으면 MainAttackPosition 으로 변경
-			else if (eList.empty() && (EIB == Toss_1g_forward || EIB == Toss_2g_forward)) {
+		
+			else if (eList.empty() && (EIB == Toss_1g_forward || EIB == Toss_2g_forward))
+			{
 				m_targetUnit = nullptr;
 				m_targetPos = SM.getMainAttackPosition();
 			}
@@ -98,8 +37,9 @@ State *MarineAttackState::action() {
 			return nullptr;
 		}
 
-		// target 이 없어졌으면 idle 변경.
-		if (eUnit->pos() == Positions::Unknown) {
+	
+		if (eUnit->pos() == Positions::Unknown)
+		{
 			if (unit->isMoving())
 				return nullptr;
 
@@ -199,7 +139,6 @@ State *MarineAttackState::action() {
 	return nullptr;
 }
 
-// ## 적군 일꾼 정찰 잡기용
 State *MarineKillScouterState::action(Position lastScouterPosition)
 {
 	if (!unit->isMoving() && !unit->isAttacking() && TIME % 24 == 0) {
@@ -244,7 +183,7 @@ State *MarineKillScouterState::action(Position lastScouterPosition)
 			return nullptr;
 
 		attackFirstkiting(uinfo, enemUinfo, enemUinfo->pos().getApproxDistance(unit->getPosition()), 3 * TILE_SIZE);
-
+		return nullptr;
 	}
 	else
 	{
@@ -254,80 +193,615 @@ State *MarineKillScouterState::action(Position lastScouterPosition)
 		{
 			//if (unit->isInWeaponRange(closestEnem->unit()) && unit->getGroundWeaponCooldown() == 0)
 			CommandUtil::attackUnit(unit, closestEnem->unit());
+			return nullptr;
 			//else
 			//	CommandUtil::attackMove(unit, lastScouterPosition);
 		}
 		else
 			CommandUtil::attackMove(unit, lastScouterPosition);
+		return nullptr;
 	}
 
 
 	return nullptr;
 }
 
-State *MarineKitingState::action()
+State *MarineGoGoGoState::action()
 {
-	// 벙커 입성하면 Defence State
-	if (unit->isLoaded())
-		return new MarineDefenceState();
+	bool canStim = false;
+	if (S->hasResearched(TechTypes::Stim_Packs))
+		canStim = true;
+	if (unit->isLoaded()) return nullptr;
 
-	// 상대가 에어 유닛이거나 나보다 사정거리가 길거나 같으면 벙커에서 대기하거나 그냥 공격한다.
-	UnitInfo *closeUnit = INFO.getClosestUnit(E, unit->getPosition(), AllUnitKind);
+	int dangerPoint = 0;
+	UnitInfo *dangerUnit = getDangerUnitNPoint(unit->getPosition(), &dangerPoint, false);
+	UnitInfo *closestTank = TM.getFrontTankFromPos(SM.getMainAttackPosition());
 
-	if (closeUnit == nullptr || unit->getDistance(closeUnit->pos()) > 1600)
-		return new MarineIdleState();
-
-	int distanceFromMainBase = 0;
-
-	theMap.GetPath(unit->getPosition(), MYBASE, &distanceFromMainBase);
-
-	// 본진에서 너무 멀리간 마린은 DefenceMode로 변환
-	if (distanceFromMainBase >= 1600) {
-		return new MarineDefenceState();
-	}
-
-	Unit bunker = MM.getBunker();
-
-	// 벙커가 완성되어 있거나 근처 유닛이 없으면 Defence Mode로 변환
-	if (bunker != nullptr && bunker->isCompleted()) {
-		return new MarineDefenceState();
-	}
-
-	if (ESM.getEnemyInitialBuild() <= Zerg_12_Pool) // 9발업 이하에서는 마린이 밖으로 나가지 않는다.
+	if (dangerUnit == nullptr)
 	{
-		if (INFO.getTypeUnitsInRadius(Zerg_Zergling, E, unit->getPosition(), 8 * TILE_SIZE).size()
-				> INFO.getTypeUnitsInRadius(Terran_Marine, S, unit->getPosition(), 8 * TILE_SIZE).size())
+		CommandUtil::attackMove(unit, SM.getMainAttackPosition());
+	}
+	else if (dangerUnit != nullptr && closestTank != nullptr)
+	{
+		if (unit->getPosition().getApproxDistance(closestTank->pos()) < 5 * TILE_SIZE)
 		{
-			Position myBase = INFO.getMainBaseLocation(S)->Center();
-
-			TilePosition myBaseTile = INFO.getMainBaseLocation(S)->getTilePosition();
-
-			if (!isSameArea(theMap.GetArea((WalkPosition)unit->getPosition()), theMap.GetArea(myBaseTile))
-					|| INFO.getFirstChokePosition(S).getApproxDistance(unit->getPosition()) < 3 * TILE_SIZE)
+			if (canStim && (!unit->isStimmed()))
 			{
-				unit->move(myBase);
-				return nullptr;
+				unit->useTech(TechTypes::Stim_Packs);
 			}
+			CommandUtil::attackMove(unit, dangerUnit->pos(), true);
 		}
-	}
-
-	if (!unit->isInWeaponRange(closeUnit->unit()))
-	{
-		CommandUtil::attackUnit(unit, closeUnit->unit());
-	}
-	// 사거리 안이면
-	else {
-		uList Scvs = INFO.getTypeUnitsInRadius(Terran_SCV, S, (unit->getPosition() + closeUnit->pos()) / 2, 50);
-
-		if (unit->getGroundWeaponCooldown() == 0 && (Scvs.size() >= 3 || unit->getDistance(closeUnit->unit()) > 2 * TILE_SIZE))
+		else if (unit->getPosition().getApproxDistance(closestTank->pos()) > 8 * TILE_SIZE)
 		{
-			CommandUtil::attackUnit(unit, closeUnit->unit());
+			CommandUtil::attackMove(unit, closestTank->pos());
+		}
+
+	}
+
+	return nullptr;
+}
+State *MarineKillDState::action()
+{
+	bool canStim = false;
+	if (S->hasResearched(TechTypes::Stim_Packs))
+		canStim = true;
+	if (unit->isLoaded()) return nullptr;
+
+	int dangerPoint = 0;
+	UnitInfo *dangerUnit = getDangerUnitNPoint(unit->getPosition(), &dangerPoint, false);
+	UnitInfo *closestAttack = INFO.getClosestUnit(E, unit->getPosition(), GroundCombatKind, 10 * TILE_SIZE, false, false, true);
+	UnitInfo *me = INFO.getUnitInfo(unit, S);
+	if (getGroundDistance(MYBASE, unit->getPosition())>=4 * TILE_SIZE)
+	{
+		CommandUtil::attackMove(unit, MYBASE);
+		return nullptr;
+	}
+	else if (closestAttack!=nullptr)
+	{
+		
+		kiting(me, closestAttack, dangerPoint, 2 * TILE_SIZE);
+		return nullptr;
+	}
+
+	return nullptr;
+}
+State *MarineDiveState::action()
+{
+	if (TIME - unit->getLastCommandFrame() < 24)
+		return nullptr;
+
+	UnitInfo *me = INFO.getUnitInfo(unit, S);
+
+	Position target = INFO.getMainBaseLocation(E)->Center();
+	Position targetsecond = INFO.getFirstExpansionLocation(E)->Center();
+	if (!isSameArea(me->pos(), target))
+	{
+		unit->move(target);
+		return nullptr;
+	}
+
+	int dangerPoint = 0;
+	UnitInfo *dangerUnit = getDangerUnitNPoint(me->pos(), &dangerPoint, false);
+	if (dangerUnit == nullptr)
+	{
+		UnitInfo *closestWorker = INFO.getClosestTypeUnit(E, me->pos(), INFO.getWorkerType(INFO.enemyRace), 10 * TILE_SIZE);
+
+		if (closestWorker != nullptr && isSameArea(closestWorker->pos(), target))
+		{
+			kiting(me, closestWorker, dangerPoint, 2 * TILE_SIZE);
+			return nullptr;
+				//覩윱돨kiting(me, closestWorker, dangerPoint, 2 * TILE_SIZE);
+		}
+		else if (me->pos().getApproxDistance(target) > 5 * TILE_SIZE)
+		{
+			CommandUtil::move(unit, target);
+			return nullptr;
 		}
 		else
 		{
-			if (closeUnit->type().groundWeapon().maxRange() < 4 * TILE_SIZE) {
-				moveBackPostionMarine(INFO.getUnitInfo(unit, S), closeUnit->vPos(), 1 * TILE_SIZE);
+			if (INFO.enemyRace == Races::Zerg)
+			{
+				UnitInfo *larva = INFO.getClosestTypeUnit(E, me->pos(), Zerg_Larva, 8 * TILE_SIZE);
+
+				if (larva) {
+					CommandUtil::attackUnit(me->unit(), larva->unit());
+					return nullptr;
+				}
+
+				UnitInfo *egg = INFO.getClosestTypeUnit(E, me->pos(), Zerg_Egg, 8 * TILE_SIZE);
+
+				if (egg) {
+					CommandUtil::attackUnit(me->unit(), egg->unit());
+					return nullptr;
+				}
 			}
+		}
+	}
+	else 
+	{
+		
+		if (!isSameArea(dangerUnit->pos(), target))
+		{
+			if (me->pos().getApproxDistance(target) > 3 * TILE_SIZE)
+				CommandUtil::move(unit, target);
+
+			return nullptr;
+		}
+
+		UnitInfo *closestAttack = INFO.getClosestUnit(E, me->pos(), GroundUnitKind, 10 * TILE_SIZE, true, false, true);
+
+		if (dangerUnit->type() == INFO.getAdvancedDefenseBuildingType(INFO.enemyRace))
+		{
+			if (closestAttack == nullptr)
+			{
+				if (goWithoutDamage(unit, target, direction) == false)
+					direction *= -1;
+			}
+			else 
+			{
+				kiting(me, closestAttack, dangerPoint, 3 * TILE_SIZE);
+				return nullptr;
+			}
+		}
+		else if (isNeedKitingUnitType(dangerUnit->type()))
+		{
+			if (closestAttack == nullptr)
+			{
+				if (me->pos().getApproxDistance(target) > 3 * TILE_SIZE)
+					CommandUtil::move(unit, target);
+				return nullptr;
+			}
+			else // closest Attacker 존재
+			{
+			
+					kiting(me, closestAttack, dangerPoint, 3 * TILE_SIZE);
+					return nullptr;
+			}
+		}
+		else
+		{
+			
+			return new MarineKillWorkerFirstState();
+		}
+	}
+
+	return nullptr;
+}
+
+State *MarineDive2State::action()
+{
+	if (TIME - unit->getLastCommandFrame() < 24)
+		return nullptr;
+
+	UnitInfo *me = INFO.getUnitInfo(unit, S);
+
+	
+	Position target = INFO.getFirstExpansionLocation(E)->Center();
+	if (!isSameArea(me->pos(), target))
+	{
+		unit->move(target);
+		return nullptr;
+	}
+
+	int dangerPoint = 0;
+	UnitInfo *dangerUnit = getDangerUnitNPoint(me->pos(), &dangerPoint, false);
+	if (dangerUnit == nullptr)
+	{
+		UnitInfo *closestWorker = INFO.getClosestTypeUnit(E, me->pos(), INFO.getWorkerType(INFO.enemyRace), 10 * TILE_SIZE);
+
+		if (closestWorker != nullptr && isSameArea(closestWorker->pos(), target))
+		{
+			CommandUtil::attackUnit(me->unit(), closestWorker->unit());
+			return nullptr;
+			//覩윱돨kiting(me, closestWorker, dangerPoint, 2 * TILE_SIZE);
+		}
+		else if (me->pos().getApproxDistance(target) > 5 * TILE_SIZE)
+		{
+			CommandUtil::move(unit, target);
+			return nullptr;
+		}
+		else
+		{
+			if (INFO.enemyRace == Races::Zerg)
+			{
+				UnitInfo *larva = INFO.getClosestTypeUnit(E, me->pos(), Zerg_Larva, 8 * TILE_SIZE);
+
+				if (larva) {
+					CommandUtil::attackUnit(me->unit(), larva->unit());
+					return nullptr;
+				}
+
+				UnitInfo *egg = INFO.getClosestTypeUnit(E, me->pos(), Zerg_Egg, 8 * TILE_SIZE);
+
+				if (egg) {
+					CommandUtil::attackUnit(me->unit(), egg->unit());
+					return nullptr;
+				}
+			}
+		}
+	}
+	else
+	{
+
+		if (!isSameArea(dangerUnit->pos(), target))
+		{
+			if (me->pos().getApproxDistance(target) > 3 * TILE_SIZE)
+				CommandUtil::move(unit, target);
+
+			return nullptr;
+		}
+
+		UnitInfo *closestAttack = INFO.getClosestUnit(E, me->pos(), GroundUnitKind, 10 * TILE_SIZE, true, false, true);
+
+		if (dangerUnit->type() == INFO.getAdvancedDefenseBuildingType(INFO.enemyRace))
+		{
+			if (closestAttack == nullptr)
+			{
+				if (goWithoutDamage(unit, target, direction) == false)
+					direction *= -1;
+			}
+			else
+			{
+				kiting(me, closestAttack, dangerPoint, 2 * TILE_SIZE);
+				return nullptr;
+			}
+		}
+		else if (isNeedKitingUnitType(dangerUnit->type()))
+		{
+			if (closestAttack == nullptr)
+			{
+				if (me->pos().getApproxDistance(target) > 3 * TILE_SIZE)
+					CommandUtil::move(unit, target);
+				return nullptr;
+			}
+			else 
+			{
+
+				kiting(me, closestAttack, dangerPoint, 2 * TILE_SIZE);
+				return nullptr;
+			}
+		}
+		else
+		{
+
+			return new MarineKillWorkerFirstState();
+		}
+	}
+
+	return nullptr;
+}
+
+State *MarineKillWorkerFirstState::action()
+{
+	UnitInfo *me = INFO.getUnitInfo(unit, S);
+
+	uList workers = INFO.getTypeUnitsInRadius(INFO.getWorkerType(INFO.enemyRace), E, me->pos(), 15 * TILE_SIZE, true);
+
+	for (auto w : workers)
+	{
+		if (!unit->isInWeaponRange(w->unit()))
+			continue;
+
+		if (me->hp() < me->expectedDamage())
+			continue;
+
+		if (unit->getGroundWeaponCooldown() == 0)
+		{
+			w->setDamage(unit);
+			break;
+		}
+
+	
+		CommandUtil::attackUnit(unit, w->unit());
+		return nullptr;
+	}
+
+	UnitInfo *closestWorker = INFO.getClosestTypeUnit(E, me->pos(), INFO.getWorkerType(INFO.enemyRace), 0, true, true);
+
+	if (closestWorker)
+		CommandUtil::attackUnit(me->unit(), closestWorker->unit());
+		//kiting(me, closestWorker, unit->getDistance(closestWorker->unit()), 2 * TILE_SIZE);
+	else
+	{
+		if (checkBase)
+			CommandUtil::attackMove(unit, INFO.getMainBaseLocation(E)->Center());
+		else
+		{
+			if (me->pos().getApproxDistance(INFO.getMainBaseLocation(E)->Center()) < 5 * TILE_SIZE)
+				checkBase = true;
+			else
+				CommandUtil::move(unit, INFO.getMainBaseLocation(E)->Center());
+		}
+	}
+
+	return nullptr;
+}
+
+State *MarineDefenceState::action()
+{
+	
+	UnitInfo *closeUnit = getMarineDefenceTargetUnit(unit);
+
+	Unit bunker = MM.getBunker();
+	//盧땡돕뒈광쟁==================================
+	if (closeUnit == nullptr) 
+	{
+		if (unit->isSelected()) cout << "Close unit 없당 " << endl;
+
+		if (bunker && bunker->isCompleted()) {
+			if (!unit->isLoaded()) 
+			{
+				if (unit->isSelected()) cout << "벙커 들어가자 " << endl;
+
+				unit->rightClick(bunker);
+				return nullptr;
+			}
+		}
+		//盧땡돕離쐤돨譴옹컸긋==================================
+		if (INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) < 4) {
+
+			if (unit->isSelected()) cout << "탱크 한테 붙자" << endl;
+
+			UnitInfo *closeTank = INFO.getClosestTypeUnit(S, unit->getPosition(), Terran_Siege_Tank_Tank_Mode, 0, false, true);
+
+			if (closeTank) {
+				if (unit->getDistance(closeTank->pos()) > 2 * TILE_SIZE) {
+					CommandUtil::move(unit, closeTank->pos());
+					return nullptr;
+				}
+			}
+		}
+
+		return nullptr;
+	}
+
+	//盧땡돕소쟁==================================
+	if (!isInMyArea(unit->getPosition())) {
+		if (unit->isSelected()) cout << "내가 영역 밖으로 나갔다" << endl;
+
+		
+		if (getGroundDistance(MYBASE, closeUnit->pos()) < getGroundDistance(MYBASE, unit->getPosition()))
+		{
+			CommandUtil::attackUnit(unit, closeUnit->unit());
+			return nullptr;
+		}
+		else
+			CommandUtil::move(unit, MYBASE, true);
+
+		return nullptr;
+	}
+
+	
+	//흔벎소쟁청唐譴옹뵨잉났，菌潼뒈광==================================
+	uList vultures = INFO.getTypeUnitsInRadius(Terran_Vulture, S, MYBASE, 30 * TILE_SIZE);
+	uList tanks = INFO.getTypeUnitsInRadius(Terran_Siege_Tank_Tank_Mode, S, MYBASE, 30 * TILE_SIZE);
+	uList marineList = INFO.getUnits(Terran_Marine, S);
+
+	if (bunker && bunker->isCompleted())
+	{
+		if (unit->isLoaded()) 
+		{
+			// 이미 벌처가 있으면 벙커에서 대기.
+			if (!vultures.empty() || !tanks.empty())
+				return nullptr;
+
+			if (MM.isRangeUnitClose())
+				return nullptr;
+
+			// 벙커에 들어가 있는 경우, 사거리에서 멀어지면 빼서 치고 가까이오면 들어감.
+			// 질럿이 가까이오면 들어가고, 멀어지면 뺀다.
+			bool isUnderAttack = false;
+			uList baseUnits = INFO.getUnits(Terran_SCV, S);
+			uList baseBuildings = INFO.getBuildingsInRadius(S, MYBASE, 15 * TILE_SIZE);
+
+			for (auto u : baseUnits)
+			{
+				if (u->unit()->isUnderAttack() && u->getState() != "Scout")
+				{
+					isUnderAttack = true;
+					break;
+				}
+			}
+
+			if (isUnderAttack == false)
+			{
+				for (auto u : baseBuildings)
+				{
+					if (u->unit()->isUnderAttack())
+					{
+						isUnderAttack = true;
+						break;
+					}
+				}
+			}
+
+			if (isUnderAttack && unit == marineList.at(0)->unit() && bunker->getDistance(closeUnit->unit()) > 5 * TILE_SIZE && bunker->canUnload(unit)) {
+				bunker->unload(unit);
+			}
+
+			return nullptr;
+		}
+		//퓜깡놔죄뒈광==================================
+		else 
+		{
+
+			if (escapeFromSpell(INFO.getUnitInfo(unit, S)))
+				return nullptr;
+
+			// 소쟁唐譴옹뵨잉났，앎路劤쀼뒈광
+			if ((!vultures.empty() || !tanks.empty()) && bunker->getLoadedUnits().size() != 4) 
+			{
+
+				CommandUtil::rightClick(unit, bunker);
+				/*if (bunker->getPosition().getApproxDistance(unit->getPosition()) <= 1 * TILE_SIZE)
+				else {
+				CommandUtil::attackMove(unit, bunker->getPosition());
+				}*/
+				return nullptr;
+			}
+			else 
+			{
+
+				if (closeUnit->type().isWorker() &&
+					INFO.getTypeUnitsInArea(INFO.getWorkerType(INFO.enemyRace), E, MYBASE).size()
+					+ INFO.getTypeUnitsInArea(INFO.getWorkerType(INFO.enemyRace), E, INFO.getFirstExpansionLocation(S)->Center()).size() <= 1) {
+					// 벙커로 들어가자.
+					if (bunker->getPosition().getApproxDistance(unit->getPosition()) < 2 * TILE_SIZE) {
+						CommandUtil::rightClick(unit, bunker);
+						return nullptr;
+					}
+					else {
+						CommandUtil::attackMove(unit, bunker->getPosition());
+					}
+
+					return nullptr;
+				}
+
+			
+				if (INFO.getFirstExpansionLocation(S) &&
+					isSameArea(INFO.getFirstExpansionLocation(S)->Center(), bunker->getPosition())
+					&& isSameArea(closeUnit->pos(), MYBASE)) {
+					// 계속 나와서 싸운다.
+					if (unit->getGroundWeaponCooldown() == 0) {
+						CommandUtil::attackUnit(unit, closeUnit->unit());
+						return nullptr;
+					}
+					else {
+						int range = closeUnit->type().groundWeapon().maxRange();
+
+						if (unit->getDistance(closeUnit->unit()) > range + 2 * TILE_SIZE){
+							CommandUtil::attackMove(unit, closeUnit->pos());
+							return nullptr;
+						}
+						else
+						{
+							moveBackPostion(INFO.getUnitInfo(unit, S), closeUnit->vPos(), 3 * TILE_SIZE);
+							return nullptr;
+						}
+					}
+
+					return nullptr;
+				}
+				else {
+
+					int dist = unit->getPosition().getApproxDistance(closeUnit->pos());
+
+					if (bunker->getLoadedUnits().size() != 4) {
+						// 벙커 들어가기
+						if (isNeedKitingUnitType(closeUnit->type()) && unit->getGroundWeaponCooldown() == 0 && dist > 4 * TILE_SIZE) {
+							CommandUtil::attackUnit(unit, closeUnit->unit());
+							return nullptr;
+						}
+						else {
+							CommandUtil::rightClick(unit, bunker);
+							return nullptr;
+						}
+					}
+					else {
+						// 밖에서 카이팅
+						if (unit->getGroundWeaponCooldown() == 0) {
+							CommandUtil::attackUnit(unit, closeUnit->unit());
+							return nullptr;
+						}
+						else {
+							int range = closeUnit->type().groundWeapon().maxRange();
+							
+
+							if (unit->getDistance(closeUnit->unit()) > range + 2 * TILE_SIZE)
+							{
+								CommandUtil::attackMove(unit, closeUnit->pos());
+								return nullptr;
+							}
+							else
+							{
+								moveBackPostion(INFO.getUnitInfo(unit, S), closeUnit->vPos(), 3 * TILE_SIZE);
+								return nullptr;
+							}
+						}
+					}
+				}
+
+				return nullptr;
+			}
+
+		}
+	}
+	else {
+
+		if (escapeFromSpell(INFO.getUnitInfo(unit, S)))
+			return nullptr;
+
+		if (vultures.size() != 0) {
+
+			if (INFO.getUnits(Protoss_Dragoon, E).empty()) {
+				if (unit->getDistance(MM.waitingNearCommand) > 50)
+					CommandUtil::attackMove(unit, MM.waitingNearCommand, true);
+
+				return nullptr;
+			}
+			else {
+				if (INFO.getUnits(Terran_Siege_Tank_Tank_Mode, S).size() >= 2)
+					return nullptr;
+			}
+		}
+
+		if (INFO.enemyRace == Races::Zerg) 
+		{
+			if (unit->getDistance(closeUnit->unit()) < 5 * TILE_SIZE) 
+			{
+				MM.doKiting(unit);
+				return nullptr;
+			}
+
+			bool isUnderAttack = false;
+
+			uList baseUnits = INFO.getUnits(Terran_SCV, S);
+			uList baseBuildings = INFO.getBuildingsInRadius(S, MYBASE, 15 * TILE_SIZE);
+
+			for (auto u : baseUnits)
+			{
+				if (u->unit()->isUnderAttack() && u->getState() != "Scout")
+				{
+					isUnderAttack = true;
+					break;
+				}
+			}
+
+			if (isUnderAttack == false)
+			{
+				for (auto u : baseBuildings)
+				{
+					if (u->unit()->isUnderAttack())
+					{
+						isUnderAttack = true;
+						break;
+					}
+				}
+			}
+
+			if (isUnderAttack) 
+			{
+				MM.doKiting(unit);
+				return nullptr;
+			}
+			else
+			{
+				uList centers = INFO.getBuildings(Terran_Command_Center, S);
+
+				if (centers.size())
+				{
+					UnitInfo *center = centers[0];
+					Unit mineral = bw->getClosestUnit(center->pos(), Filter::IsMineralField);
+
+					if (mineral != nullptr) {
+						Position target = (center->pos() + mineral->getPosition()) / 2;
+						unit->move(target);
+					}
+				}
+			}
+		}
+		else {
+			MM.doKiting(unit);
 		}
 
 	}
@@ -335,7 +809,54 @@ State *MarineKitingState::action()
 	return nullptr;
 }
 
-// 이 상태에서 다른 상태로 변경되는 경우, MarineManager 의 zealotDefenceMarine 를 Nullptr 처리 필요.
+UnitInfo *MarineDefenceState::getMarineDefenceTargetUnit(const Unit &unit) {
+	UnitInfo *closeUnit = nullptr;
+	uList eList = getEnemyInMyYard(1700, Men, false);
+	uList eList2;
+
+	if (INFO.getFirstExpansionLocation(S))
+		eList2 = INFO.getUnitsInArea(E, INFO.getFirstExpansionLocation(S)->Center(), true, true, true, false);
+
+	eList.insert(eList.end(), eList2.begin(), eList2.end());
+
+	int dist = MAXINT;
+	int temp = 0;
+
+	for (auto e : eList) {
+		theMap.GetPath(e->pos(), unit->getPosition(), &temp);
+
+		if (e->type().isWorker()) {
+			if (!closeUnit || (closeUnit->type().isWorker() && (temp >= 0 && dist > temp))) {
+				dist = temp;
+				closeUnit = e;
+			}
+		}
+		else {
+			if (temp >= 0 && dist > temp) {
+				dist = temp;
+				closeUnit = e;
+			}
+		}
+	}
+
+	if (!closeUnit) {
+		uList enemyBuildingsInMyYard = getEnemyInMyYard(1700, UnitTypes::Buildings);
+		dist = MAXINT;
+		temp = 0;
+
+		for (auto e : enemyBuildingsInMyYard) {
+			theMap.GetPath(e->pos(), unit->getPosition(), &temp);
+
+			if (temp >= 0 && dist > temp) {
+				dist = temp;
+				closeUnit = e;
+			}
+		}
+	}
+
+	return closeUnit;
+}
+
 State *MarineZealotDefenceState::action()
 {
 	UnitInfo *closeUnit = INFO.getClosestUnit(E, unit->getPosition(), AllUnitKind);
@@ -461,7 +982,7 @@ State *MarineZealotDefenceState::action()
 				// 너무 가까워서 도망가야되는데
 				// 1. 배럭의 반대편에 적이 있으면 공격
 				if ((unit->getPosition().y <= top && closeUnit->pos().y >= bottom)
-						|| (unit->getPosition().y >= bottom && closeUnit->pos().y <= top)) {
+					|| (unit->getPosition().y >= bottom && closeUnit->pos().y <= top)) {
 					CommandUtil::attackUnit(unit, closeUnit->unit());
 				}
 				// 2. 사거리 안이면 도망
@@ -528,294 +1049,6 @@ State *MarineZealotDefenceState::action()
 				}
 			}
 		}
-	}
-
-	return nullptr;
-}
-
-State *MarineDefenceState::action()
-{
-	if (ESM.getEnemyInitialBuild() == Terran_bunker_rush) {
-		if (unit->isSelected()) cout << "BunkerRush 수비 " << endl;
-
-		bunkerRushDefence();
-		return nullptr;
-	}
-
-	// 다크템플러, 셔틀 포함 같은 보이지 않는 유닛 포함
-	UnitInfo *closeUnit = getMarineDefenceTargetUnit(unit);
-
-	Unit bunker = MM.getBunker();
-
-	if (closeUnit == nullptr) {
-		if (unit->isSelected()) cout << "Close unit 없당 " << endl;
-
-		if (bunker && bunker->isCompleted()) {
-			if (!unit->isLoaded()) {
-				if (unit->isSelected()) cout << "벙커 들어가자 " << endl;
-
-				unit->rightClick(bunker);
-				return nullptr;
-			}
-		}
-
-		if (INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) < 4) {
-
-			if (unit->isSelected()) cout << "탱크 한테 붙자" << endl;
-
-			UnitInfo *closeTank = INFO.getClosestTypeUnit(S, unit->getPosition(), Terran_Siege_Tank_Tank_Mode, 0, false, true);
-
-			if (closeTank) {
-				if (unit->getDistance(closeTank->pos()) > 2 * TILE_SIZE) {
-					CommandUtil::move(unit, closeTank->pos());
-				}
-			}
-		}
-
-		return nullptr;
-	}
-
-	// 내가 영역 밖으로 나가면 안으로 들어오게 하는 코드
-	if (!isInMyArea(unit->getPosition())) {
-		if (unit->isSelected()) cout << "내가 영역 밖으로 나갔다" << endl;
-
-		// 영역 밖에서 공격하는 유닛에 대한 대처 필요
-		if (getGroundDistance(MYBASE, closeUnit->pos()) < getGroundDistance(MYBASE, unit->getPosition()))
-			CommandUtil::attackUnit(unit, closeUnit->unit());
-		else
-			CommandUtil::move(unit, MYBASE, true);
-
-		return nullptr;
-	}
-
-	if (INFO.enemyRace == Races::Protoss) {
-
-		// 본진 및 앞마당에 들어온 셔틀 방어로직. 명령이 들어가면 return true;
-		if (shuttleDefence(unit)) {
-			if (unit->isSelected()) cout << "셔틀 수비 " << endl;
-
-			return nullptr;
-		}
-
-		// 다템 방어 로직. 명령이 들어가면 return true;
-		if (closeUnit->type() == Protoss_Dark_Templar)
-			if (darkDefence(unit, closeUnit)) {
-				if (unit->isSelected()) cout << "다크 수비 " << endl;
-
-				return nullptr;
-			}
-
-	}
-
-	uList vultures = INFO.getTypeUnitsInRadius(Terran_Vulture, S, MYBASE, 30 * TILE_SIZE);
-	uList tanks = INFO.getTypeUnitsInRadius(Terran_Siege_Tank_Tank_Mode, S, MYBASE, 30 * TILE_SIZE);
-	uList marineList = INFO.getUnits(Terran_Marine, S);
-
-	if (bunker && bunker->isCompleted()) {
-		if (unit->isLoaded()) {
-			// 이미 벌처가 있으면 벙커에서 대기.
-			if (!vultures.empty() || !tanks.empty())
-				return nullptr;
-
-			if (MM.isRangeUnitClose())
-				return nullptr;
-
-			// 벙커에 들어가 있는 경우, 사거리에서 멀어지면 빼서 치고 가까이오면 들어감.
-			// 질럿이 가까이오면 들어가고, 멀어지면 뺀다.
-			bool isUnderAttack = false;
-			uList baseUnits = INFO.getUnits(Terran_SCV, S);
-			uList baseBuildings = INFO.getBuildingsInRadius(S, MYBASE, 15 * TILE_SIZE);
-
-			for (auto u : baseUnits)
-			{
-				if (u->unit()->isUnderAttack() && u->getState() != "Scout")
-				{
-					isUnderAttack = true;
-					break;
-				}
-			}
-
-			if (isUnderAttack == false)
-			{
-				for (auto u : baseBuildings)
-				{
-					if (u->unit()->isUnderAttack())
-					{
-						isUnderAttack = true;
-						break;
-					}
-				}
-			}
-
-			if (isUnderAttack && unit == marineList.at(0)->unit() && bunker->getDistance(closeUnit->unit()) > 5 * TILE_SIZE && bunker->canUnload(unit)) {
-				bunker->unload(unit);
-			}
-
-			return nullptr;
-		}
-		else {
-
-			if (escapeFromSpell(INFO.getUnitInfo(unit, S)))
-				return nullptr;
-
-			// 벌쳐가 나와있으면 벙커안으로 들어간다.
-			if ((!vultures.empty() || !tanks.empty()) && bunker->getLoadedUnits().size() != 4) {
-
-				CommandUtil::rightClick(unit, bunker);
-				/*if (bunker->getPosition().getApproxDistance(unit->getPosition()) <= 1 * TILE_SIZE)
-				else {
-				CommandUtil::attackMove(unit, bunker->getPosition());
-				}*/
-				return nullptr;
-			}
-			else {
-
-				if (closeUnit->type().isWorker() &&
-						INFO.getTypeUnitsInArea(INFO.getWorkerType(INFO.enemyRace), E, MYBASE).size()
-						+ INFO.getTypeUnitsInArea(INFO.getWorkerType(INFO.enemyRace), E, INFO.getFirstExpansionLocation(S)->Center()).size() <= 1) {
-					// 벙커로 들어가자.
-					if (bunker->getPosition().getApproxDistance(unit->getPosition()) < 2 * TILE_SIZE) {
-						CommandUtil::rightClick(unit, bunker);
-					}
-					else {
-						CommandUtil::attackMove(unit, bunker->getPosition());
-					}
-
-					return nullptr;
-				}
-
-				// 벌쳐가 없는 경우,
-				// 벙커에 들어가지 않고 마린이 밖으로 나와야 하는 경우는
-				// 본진 난입한 적을 막기 위한 경우 외에는 없다.
-
-				// 벙커가 앞마당에 있고, 적이 내 본진에 있으면
-				if (INFO.getFirstExpansionLocation(S) &&
-						isSameArea(INFO.getFirstExpansionLocation(S)->Center(), bunker->getPosition())
-						&& isSameArea(closeUnit->pos(), MYBASE)) {
-					// 계속 나와서 싸운다.
-					if (unit->getGroundWeaponCooldown() == 0) {
-						CommandUtil::attackUnit(unit, closeUnit->unit());
-					}
-					else {
-						int range = closeUnit->type().groundWeapon().maxRange();
-
-						if (unit->getDistance(closeUnit->unit()) > range + 2 * TILE_SIZE)
-							CommandUtil::attackMove(unit, closeUnit->pos());
-						else
-							moveBackPostion(INFO.getUnitInfo(unit, S), closeUnit->vPos(), 3 * TILE_SIZE);
-					}
-
-					return nullptr;
-				}
-				else {
-
-					int dist = unit->getPosition().getApproxDistance(closeUnit->pos());
-
-					if (bunker->getLoadedUnits().size() != 4) {
-						// 벙커 들어가기
-						if (isNeedKitingUnitType(closeUnit->type()) && unit->getGroundWeaponCooldown() == 0 && dist > 4 * TILE_SIZE) {
-							CommandUtil::attackUnit(unit, closeUnit->unit());
-						}
-						else {
-							CommandUtil::rightClick(unit, bunker);
-						}
-					}
-					else {
-						// 밖에서 카이팅
-						if (unit->getGroundWeaponCooldown() == 0) {
-							CommandUtil::attackUnit(unit, closeUnit->unit());
-						}
-						else {
-							int range = closeUnit->type().groundWeapon().maxRange();
-
-							if (unit->getDistance(closeUnit->unit()) > range + 2 * TILE_SIZE)
-								CommandUtil::attackMove(unit, closeUnit->pos());
-							else
-								moveBackPostion(INFO.getUnitInfo(unit, S), closeUnit->vPos(), 3 * TILE_SIZE);
-						}
-					}
-				}
-
-				return nullptr;
-			}
-
-		}
-	}
-	else {
-
-		if (escapeFromSpell(INFO.getUnitInfo(unit, S)))
-			return nullptr;
-
-		if (vultures.size() != 0) {
-
-			if (INFO.getUnits(Protoss_Dragoon, E).empty()) {
-				if (unit->getDistance(MM.waitingNearCommand) > 50)
-					CommandUtil::attackMove(unit, MM.waitingNearCommand, true);
-
-				return nullptr;
-			}
-			else {
-				if (INFO.getUnits(Terran_Siege_Tank_Tank_Mode, S).size() >= 2)
-					return nullptr;
-			}
-		}
-
-		if (INFO.enemyRace == Races::Zerg) {
-			if (unit->getDistance(closeUnit->unit()) < 5 * TILE_SIZE) {
-				MM.doKiting(unit);
-				return nullptr;
-			}
-
-			bool isUnderAttack = false;
-
-			uList baseUnits = INFO.getUnits(Terran_SCV, S);
-			uList baseBuildings = INFO.getBuildingsInRadius(S, MYBASE, 15 * TILE_SIZE);
-
-			for (auto u : baseUnits)
-			{
-				if (u->unit()->isUnderAttack() && u->getState() != "Scout")
-				{
-					isUnderAttack = true;
-					break;
-				}
-			}
-
-			if (isUnderAttack == false)
-			{
-				for (auto u : baseBuildings)
-				{
-					if (u->unit()->isUnderAttack())
-					{
-						isUnderAttack = true;
-						break;
-					}
-				}
-			}
-
-			if (isUnderAttack) {
-				MM.doKiting(unit);
-				return nullptr;
-			}
-			else
-			{
-				uList centers = INFO.getBuildings(Terran_Command_Center, S);
-
-				if (centers.size())
-				{
-					UnitInfo *center = centers[0];
-					Unit mineral = bw->getClosestUnit(center->pos(), Filter::IsMineralField);
-
-					if (mineral != nullptr) {
-						Position target = (center->pos() + mineral->getPosition()) / 2;
-						unit->move(target);
-					}
-				}
-			}
-		}
-		else {
-			MM.doKiting(unit);
-		}
-
 	}
 
 	return nullptr;
@@ -893,55 +1126,6 @@ State *MarineDefenceState::bunkerRushDefence()
 	return nullptr;
 }
 
-UnitInfo *MarineDefenceState::getMarineDefenceTargetUnit(const Unit &unit) {
-	UnitInfo *closeUnit = nullptr;
-	uList eList = getEnemyInMyYard(1700, Men, false);
-	uList eList2;
-
-	if (INFO.getFirstExpansionLocation(S))
-		eList2 = INFO.getUnitsInArea(E, INFO.getFirstExpansionLocation(S)->Center(), true, true, true, false);
-
-	eList.insert(eList.end(), eList2.begin(), eList2.end());
-
-	int dist = MAXINT;
-	int temp = 0;
-
-	for (auto e : eList) {
-		theMap.GetPath(e->pos(), unit->getPosition(), &temp);
-
-		if (e->type().isWorker()) {
-			if (!closeUnit || (closeUnit->type().isWorker() && (temp >= 0 && dist > temp))) {
-				dist = temp;
-				closeUnit = e;
-			}
-		}
-		else {
-			if (temp >= 0 && dist > temp) {
-				dist = temp;
-				closeUnit = e;
-			}
-		}
-	}
-
-	if (!closeUnit) {
-		uList enemyBuildingsInMyYard = getEnemyInMyYard(1700, UnitTypes::Buildings);
-		dist = MAXINT;
-		temp = 0;
-
-		for (auto e : enemyBuildingsInMyYard) {
-			theMap.GetPath(e->pos(), unit->getPosition(), &temp);
-
-			if (temp >= 0 && dist > temp) {
-				dist = temp;
-				closeUnit = e;
-			}
-		}
-	}
-
-	return closeUnit;
-}
-
-/// 본진이나 앞마당에 들어온 셔틀 방어로직. 명령이 들어가면 return true; 아니면 return false;
 bool MarineDefenceState::shuttleDefence(const Unit &unit) {
 
 	uList shuttles = INFO.getTypeUnitsInArea(Protoss_Shuttle, E, MYBASE, false);
@@ -990,7 +1174,6 @@ bool MarineDefenceState::shuttleDefence(const Unit &unit) {
 
 }
 
-/// 마린의 다크템플러 방어 로직. 명령이 들어가면 return true, 아니면 return false;
 bool MarineDefenceState::darkDefence(const Unit &unit, const UnitInfo *closeUnit) {
 
 	Unit bunker = MM.getBunker();
@@ -1054,89 +1237,45 @@ bool MarineDefenceState::darkDefence(const Unit &unit, const UnitInfo *closeUnit
 
 }
 
-MyBot::MarineFirstChokeDefenceState::MarineFirstChokeDefenceState(Position p)
+State *MarineIronmanState::action()
 {
-	defencePosition = p;
-}
+	UnitInfo *me = INFO.getUnitInfo(unit, S);
 
-// 마린 2기 + SCV를 이용해서 초반에 입구로 들어오는 적을 막는다.
-State *MarineFirstChokeDefenceState::action()
-{
-	if (INFO.isTimeToMoveCommandCenterToFirstExpansion()) {
+	uList zealot = INFO.getTypeUnitsInRadius(Protoss_Zealot, E, me->pos(), 8* TILE_SIZE, true);
 
-		UnitInfo *closeUnit = INFO.getClosestUnit(E, unit->getPosition(), TypeKind::GroundCombatKind, 20 * TILE_SIZE, false);
+	for (auto z : zealot)
+	{
+		if (!unit->isInWeaponRange(z->unit()))
+			continue;
 
-		UnitInfo *closeTank = INFO.getClosestTypeUnit(S, unit->getPosition(), Terran_Siege_Tank_Tank_Mode, 0, false, true);
 
-		if (closeUnit && closeTank) {
-			// 언덕 시즈와 너무 떨어지지 않는다.
-
-			if (unit->getDistance(closeTank->pos()) <= 2 * TILE_SIZE) {
-				CommandUtil::attackMove(unit, closeUnit->pos());
-			}
-			else {
-				CommandUtil::attackMove(unit, closeTank->pos());
-			}
-
-			return nullptr;
-		}
-		else {
-
-			if (INFO.getFirstExpansionLocation(S)) {
-				uList tList = INFO.getTypeBuildingsInArea(Terran_Missile_Turret, S, INFO.getFirstExpansionLocation(S)->Center());
-
-				if (!tList.empty()) {
-					CommandUtil::attackMove(unit, tList.at(0)->pos());
-				}
-				else {
-					if (closeTank)
-						if (closeTank->pos().getApproxDistance(unit->getPosition()) > 3 * TILE_SIZE)
-							CommandUtil::attackMove(unit, closeTank->pos());
-						else
-							CommandUtil::attackMove(unit, INFO.getSecondAverageChokePosition(S));
-					else
-						CommandUtil::attackMove(unit, INFO.getSecondAverageChokePosition(S));
-				}
-			}
+		if (unit->getGroundWeaponCooldown() == 0)
+		{
+			z->setDamage(unit);
+			break;
 		}
 
+		CommandUtil::attackUnit(unit, z->unit());
 		return nullptr;
 	}
 
-	if (unit->getDistance(defencePosition) > 16 ) {
-		CommandUtil::move(unit, defencePosition, true);
-	}
-	else {
-		CommandUtil::hold(unit, false);
-	}
+	UnitInfo *closestzealot = INFO.getClosestTypeUnit(E, me->pos(), Protoss_Zealot, 0, true, true);
 
+	if (closestzealot)
+		CommandUtil::attackUnit(me->unit(), closestzealot->unit());
+	
 	return nullptr;
 }
 
-State *MarineGoGoGoState::action()
+State *MarineGatherState::action()
 {
-	if (unit->isLoaded()) return nullptr;
+	if (unit->isLoaded())
+		return nullptr;
 
-	int dangerPoint = 0;
-	UnitInfo *dangerUnit = getDangerUnitNPoint(unit->getPosition(), &dangerPoint, false);
-	UnitInfo *closestTank = TM.getFrontTankFromPos(SM.getMainAttackPosition());
+	waitnearsecondchokepoint = INFO.getSecondChokePosition(E, ChokePoint::end1);
 
-	if (dangerUnit == nullptr)
-	{
-		CommandUtil::attackMove(unit, SM.getMainAttackPosition());
-	}
-	else if (dangerUnit != nullptr && closestTank != nullptr)
-	{
-		if (unit->getPosition().getApproxDistance(closestTank->pos()) < 5 * TILE_SIZE)
-		{
-			CommandUtil::attackMove(unit, dangerUnit->pos(), true);
-		}
-		else if (unit->getPosition().getApproxDistance(closestTank->pos()) > 8 * TILE_SIZE)
-		{
-			CommandUtil::attackMove(unit, closestTank->pos());
-		}
-
-	}
-
+	CommandUtil::attackMove(unit, theMap.Center());
 	return nullptr;
+
+	
 }

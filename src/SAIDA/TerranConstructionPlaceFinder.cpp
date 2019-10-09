@@ -132,9 +132,9 @@ void TerranConstructionPlaceFinder::setBasicVariable(const Base *base) {
 
 	const Area *pairBase = INFO.getMainBasePairArea(baseArea);
 
-	if (pairBase) {
-		cp = &pairBase->ChokePoints(INFO.getFirstExpansionLocation(S)->GetArea()).front();
-	}
+	//if (pairBase) {
+	//	cp = &pairBase->ChokePoints(INFO.getFirstExpansionLocation(S)->GetArea()).front();
+	//}
 
 	chokePoint = (TilePosition)cp->Pos(ChokePoint::middle);
 
@@ -758,7 +758,8 @@ TilePosition TerranConstructionPlaceFinder::getBuildLocationWithSeedPositionAndS
 	TilePosition desiredPosition = TilePositions::None;
 
 	if (buildingType == Terran_Bunker) {
-		switch (seedPositionStrategy) {
+		switch (seedPositionStrategy) 
+		{
 
 			case BuildOrderItem::SeedPositionStrategy::MainBaseLocation:
 
@@ -807,6 +808,32 @@ TilePosition TerranConstructionPlaceFinder::getBuildLocationWithSeedPositionAndS
 					}
 
 					if ((INFO.getFirstExpansionLocation(S)->getTilePosition() + Terran_Command_Center.tileSize()).y == desiredPosition.y) {
+						desiredPosition += TilePosition(0, 1);
+					}
+				}
+
+				break;
+
+			case BuildOrderItem::SeedPositionStrategy::EnemySecondChokePoint:
+				// pos 기준으로 나선형으로 돌며 건설 위치를 찾는다.
+				desiredPosition = ConstructionPlaceFinder::Instance().getBuildLocationBySpiralSearch(Terran_Bunker, INFO.getEnemySecondChokePointBunkerPosition(), false, INFO.getFirstExpansionLocation(E)->getPosition());
+
+				// 커멘드 센터와 겹치는 라인이 있으면 defense 일꾼때문에 못지을 수 있으므로 한칸 떼준다.
+				if (INFO.getFirstExpansionLocation(E)->Center().getApproxDistance((Position)desiredPosition + ((Position)Terran_Bunker.tileSize() / 2)) < 5 * TILE_SIZE) {
+					if (INFO.getFirstExpansionLocation(E)->getTilePosition().x == (desiredPosition + Terran_Bunker.tileSize()).x) {
+
+						desiredPosition -= TilePosition(1, 0);
+					}
+
+					if (INFO.getFirstExpansionLocation(E)->getTilePosition().y == (desiredPosition + Terran_Bunker.tileSize()).y) {
+						desiredPosition -= TilePosition(0, 1);
+					}
+
+					if ((INFO.getFirstExpansionLocation(E)->getTilePosition() + Terran_Command_Center.tileSize()).x == desiredPosition.x) {
+						desiredPosition += TilePosition(1, 0);
+					}
+
+					if ((INFO.getFirstExpansionLocation(E)->getTilePosition() + Terran_Command_Center.tileSize()).y == desiredPosition.y) {
 						desiredPosition += TilePosition(0, 1);
 					}
 				}
@@ -1018,6 +1045,9 @@ TilePosition TerranConstructionPlaceFinder::getBuildLocationWithSeedPositionAndS
 			base = INFO.getSecondExpansionLocation(S);
 		else if (seedPositionStrategy == BuildOrderItem::SeedPositionStrategy::ThirdExpansionLocation)
 			base = INFO.getThirdExpansionLocation(S);
+		else if (seedPositionStrategy == BuildOrderItem::SeedPositionStrategy::EnemySecondChokePoint)
+			base = INFO.getSecondExpansionLocation(E);
+
 		else if (seedPositionStrategy == BuildOrderItem::SeedPositionStrategy::SeedPositionSpecified) {
 			for (auto b : INFO.getBaseLocations()) {
 				if (b->getTilePosition() == seedPosition) {

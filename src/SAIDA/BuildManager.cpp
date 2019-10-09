@@ -6,10 +6,10 @@ BuildManager::BuildManager()
 {
 }
 
-// 빌드오더 큐에 있는 것에 대해 생산 / 건설 / 리서치 / 업그레이드를 실행한다
+// 对内部订单队列执行生产/建设/调研/升级 
 void BuildManager::update()
 {
-	// 1초(24프레임)에 4번 정도만 실행해도 충분하다
+	// 只在1秒（24帧）上运行4次就足够了 
 	if (Broodwar->getFrameCount() % 6 != 0) return;
 
 	if (buildQueue.isEmpty()) {
@@ -17,20 +17,21 @@ void BuildManager::update()
 	}
 
 	clock_t str = clock();
-	// Dead Lock 을 체크해서 제거한다
+	// //deadLock已被检出并删除 
 	checkBuildOrderQueueDeadlockAndAndFixIt();
 
-	// Dead Lock 제거후 Empty 될 수 있다
+	// deadlock移除后可能为空 
+
 	if (buildQueue.isEmpty()) {
 		return;
 	}
 
-	// the current item to be used
+	// 要使用的当前项目 
 	BuildOrderItem currentItem = buildQueue.getHighestPriorityItem();
 
 	//cout << "current HighestPriorityItem" << currentItem.metaType.getName() << endl;
 
-	// while there is still something left in the buildQueue
+	// 在buildqueue中还存在一些东西的时候 
 	while (!buildQueue.isEmpty())
 	{
 		bool isOkToRemoveQueue = true;

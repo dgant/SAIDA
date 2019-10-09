@@ -11,7 +11,7 @@ BuildOrderQueue::BuildOrderQueue()
 {
 
 }
-
+// 清除所有队列
 void BuildOrderQueue::clearAll()
 {
 	// clear the queue
@@ -47,7 +47,7 @@ bool BuildOrderQueue::removeQueue(UnitType _unitType, BuildOrderItem::SeedPositi
 
 	return removed;
 }
-
+//得到最高优先级的物品===============================================================
 BuildOrderItem BuildOrderQueue::getHighestPriorityItem()
 {
 	// reset the number of skipped items to zero
@@ -56,7 +56,7 @@ BuildOrderItem BuildOrderQueue::getHighestPriorityItem()
 	// the queue will be sorted with the highest priority at the back
 	return queue.back();
 }
-
+//得到下一件的物品======================================================================
 BuildOrderItem BuildOrderQueue::getNextItem()
 {
 	assert(queue.size() - 1 - numSkippedItems >= 0);
@@ -65,7 +65,7 @@ BuildOrderItem BuildOrderQueue::getNextItem()
 	return queue[queue.size() - 1 - numSkippedItems];
 }
 
-// BuildOrderQueue에 해당 type 의 Item 이 존재하는지 카운트한다. queryTilePosition 을 입력한 경우, 건물에 대해서 추가 탐색한다
+//得到物品位置（元）========================================================================
 int BuildOrderQueue::getItemCount(MetaType queryType, TilePosition queryTilePosition)
 {
 	// queryTilePosition 을 입력한 경우, 거리의 maxRange. 타일단위
@@ -145,22 +145,23 @@ int BuildOrderQueue::getItemCount(MetaType queryType, TilePosition queryTilePosi
 
 	return itemCount;
 }
+//得到物品位置（单位）========================================================================
 int BuildOrderQueue::getItemCount(UnitType         _unitType, TilePosition queryTilePosition)
 {
 	return getItemCount(MetaType(_unitType), queryTilePosition);
 }
-
+//得到物品位置（科技）========================================================================
 int BuildOrderQueue::getItemCount(TechType         _techType)
 {
 	return getItemCount(MetaType(_techType));
 }
-
+//得到物品位置（升级）========================================================================
 int BuildOrderQueue::getItemCount(UpgradeType      _upgradeType)
 {
 	return getItemCount(MetaType(_upgradeType));
 }
 
-// BuildOrderQueue에 해당 type 의 Item 이 존재하는지 카운트한다. queryTilePosition 을 입력한 경우, 건물에 대해서 추가 탐색한다
+// 计算该类型的物品是否存在（元）========================================================================
 bool BuildOrderQueue::existItem(MetaType queryType, TilePosition queryTilePosition)
 {
 	// queryTilePosition 을 입력한 경우, 거리의 maxRange. 타일단위
@@ -203,21 +204,22 @@ bool BuildOrderQueue::existItem(MetaType queryType, TilePosition queryTilePositi
 
 	return false;
 }
+// 计算该类型的物品是否存在（单位）========================================================================
 bool BuildOrderQueue::existItem(UnitType         _unitType, TilePosition queryTilePosition)
 {
 	return existItem(MetaType(_unitType), queryTilePosition);
 }
-
+// 计算该类型的物品是否存在（科技）========================================================================
 bool BuildOrderQueue::existItem(TechType         _techType)
 {
 	return existItem(MetaType(_techType));
 }
-
+// 计算该类型的物品是否存在（升级）========================================================================
 bool BuildOrderQueue::existItem(UpgradeType      _upgradeType)
 {
 	return existItem(MetaType(_upgradeType));
 }
-
+// 略过当前物品========================================================================
 void BuildOrderQueue::skipCurrentItem()
 {
 	// make sure we can skip
@@ -226,7 +228,7 @@ void BuildOrderQueue::skipCurrentItem()
 		numSkippedItems++;
 	}
 }
-
+// 能略过当前物品========================================================================
 bool BuildOrderQueue::canSkipCurrentItem()
 {
 	// does the queue have more elements
@@ -243,10 +245,10 @@ bool BuildOrderQueue::canSkipCurrentItem()
 	// this tells us if we can skip
 	return highestNotBlocking;
 }
-
+// 物品编队========================================================================
 void BuildOrderQueue::queueItem(BuildOrderItem b)
 {
-	// Queue 안에 동일한 건물이 6개 이상 쌓이지 않도록 한다.
+	// 队列内不要有6个以上的同一栋建筑。 
 	if (getItemCount(b.metaType) > 6) {
 		return;
 	}
@@ -301,28 +303,31 @@ void BuildOrderQueue::queueAsHighestPriority(UnitType         _unitType, BuildOr
 	int newPriority = highestPriority + defaultPrioritySpacing;
 	queueItem(BuildOrderItem(MetaType(_unitType), _seedPositionStrategy, newPriority, _blocking));
 }
-// SeedPosition 을 갖고 결정
+
+//设置为编队中的最高优先级（元单位）=====================================================================================
 void BuildOrderQueue::queueAsHighestPriority(MetaType                _metaType, TilePosition _seedPosition, bool _blocking)
 {
 	int newPriority = highestPriority + defaultPrioritySpacing;
 	queueItem(BuildOrderItem(_metaType, _seedPosition, newPriority, _blocking));
 }
-// SeedPosition 을 갖고 결정
+
+//设置为编队中的最高优先级（单位）=====================================================================================
 void BuildOrderQueue::queueAsHighestPriority(UnitType         _unitType, TilePosition _seedPosition, bool _blocking)
 {
 	int newPriority = highestPriority + defaultPrioritySpacing;
 	queueItem(BuildOrderItem(MetaType(_unitType), _seedPosition, newPriority, _blocking));
 }
-
+//设置为编队中的最高优先级（科技）=====================================================================================
 void BuildOrderQueue::queueAsHighestPriority(TechType         _techType, bool blocking, int _producerID) {
 	int newPriority = highestPriority + defaultPrioritySpacing;
 	queueItem(BuildOrderItem(MetaType(_techType), newPriority, blocking, _producerID));
 }
+//设置为编队中的最高优先级（升级）=====================================================================================
 void BuildOrderQueue::queueAsHighestPriority(UpgradeType      _upgradeType, bool blocking, int _producerID) {
 	int newPriority = highestPriority + defaultPrioritySpacing;
 	queueItem(BuildOrderItem(MetaType(_upgradeType), newPriority, blocking, _producerID));
 }
-
+//设置为编队中的最低优先级=======================================================================================
 void BuildOrderQueue::queueAsLowestPriority(MetaType                _metaType, bool blocking, int _producerID)
 {
 	// the new priority will be higher
@@ -378,7 +383,7 @@ void BuildOrderQueue::removeCurrentItem()
 {
 	// remove the back element of the vector
 	queue.erase(queue.begin() + queue.size() - 1 - numSkippedItems);
-
+	
 	//assert((int)(queue.size()) < size);
 
 	// if the list is not empty, set the highest accordingly

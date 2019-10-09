@@ -49,47 +49,67 @@ State *DropshipGoState::action()
 	}
 
 	//Dropship근처에 wraith잇으면
-	vector<UnitType> types = { Terran_Wraith, Terran_Battlecruiser, Terran_Valkyrie };
+	vector<UnitType> types = { Terran_Wraith, Terran_Battlecruiser, Terran_Valkyrie, Protoss_Corsair, Protoss_Scout };
 	UnitInfo *closestAirEnemy = INFO.getClosestTypeUnit(E, unit->getPosition(), types, 8 * TILE_SIZE, true, false, false);
 	// 가다가 건설중인 Command를 만났을 때
 	UnitInfo *closestCommand = INFO.getClosestTypeUnit(E, unit->getPosition(), Terran_Command_Center, 10 * TILE_SIZE, true);
-
-	if (closestAirEnemy != nullptr || (closestCommand && !closestCommand->isComplete()))
+	UnitInfo *closestNexus = INFO.getClosestTypeUnit(E, unit->getPosition(), Protoss_Nexus, 10 * TILE_SIZE, true);
+	if (INFO.enemyRace == Races::Terran)
 	{
-		Position pos = closestAirEnemy ? closestAirEnemy->pos() : closestCommand->pos();
-		int range = closestAirEnemy ? 8 : 10;
-
-		for (auto g : INFO.getTypeUnitsInRadius(Terran_Goliath, S, pos, range * TILE_SIZE)) {
-			if (!g->unit()->isLoaded())
-				return nullptr;
-		}
-
-		for (auto u : unit->getLoadedUnits())
+		if (closestAirEnemy != nullptr || (closestCommand && !closestCommand->isComplete()))
 		{
-			if (u->getType() == Terran_Goliath)
-			{
-				unit->unload(u);
-				return nullptr;
-			}
-		}
+			Position pos = closestAirEnemy ? closestAirEnemy->pos() : closestCommand->pos();
+			int range = closestAirEnemy ? 8 : 10;
 
-		return nullptr;
+			for (auto g : INFO.getTypeUnitsInRadius(Terran_Goliath, S, pos, range * TILE_SIZE)) {
+				if (!g->unit()->isLoaded())
+					return nullptr;
+			}
+
+			for (auto u : unit->getLoadedUnits())
+			{
+				if (u->getType() == Terran_Goliath)
+				{
+					unit->unload(u);
+					return nullptr;
+				}
+			}
+
+			return nullptr;
+		}
 	}
+	
+	
 
 	//가다가 멀티를 만나면
 	UnitInfo *closestRefinery = INFO.getClosestTypeUnit(E, unit->getPosition(), Terran_Refinery, 10 * TILE_SIZE, true);
-
-	if (closestCommand || (closestRefinery && INFO.getTypeUnitsInRadius(Terran_SCV, E, closestRefinery->pos(), 7 * TILE_SIZE).size() >= 2) )
+	UnitInfo *closestAssimilator = INFO.getClosestTypeUnit(E, unit->getPosition(), Protoss_Assimilator, 10 * TILE_SIZE, true);
+	if (INFO.enemyRace == Races::Terran)
 	{
-		for (auto u : unit->getLoadedUnits())
+		if (closestCommand || (closestRefinery && INFO.getTypeUnitsInRadius(Terran_SCV, E, closestRefinery->pos(), 7 * TILE_SIZE).size() >= 2))
 		{
-			unit->unload(u);
+			for (auto u : unit->getLoadedUnits())
+			{
+				unit->unload(u);
+			}
+
+			CommandUtil::move(unit, m_targetPos);
+			return nullptr;
 		}
-
-		CommandUtil::move(unit, m_targetPos);
-		return nullptr;
 	}
+	else if (INFO.enemyRace == Races::Protoss)
+	{
+		if (closestNexus || (closestAssimilator && INFO.getTypeUnitsInRadius(Protoss_Probe, E, closestAssimilator->pos(), 7 * TILE_SIZE).size() >= 1))
+		{
+			for (auto u : unit->getLoadedUnits())
+			{
+				unit->unload(u);
+			}
 
+			CommandUtil::move(unit, m_targetPos);
+			return nullptr;
+		}
+	}
 	//정상 루트로 가는 경우(멀티 안만난경우)
 	int routeSize = myRoute.size();
 
