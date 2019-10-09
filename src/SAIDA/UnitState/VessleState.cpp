@@ -26,7 +26,7 @@ State *VessleBattleGuideState::action(Unit targetUnit, Unit targetEnemy)
 	int dangerPoint = 0;
 	UnitInfo *dangerUnit = getDangerUnitNPoint(unit->getPosition(), &dangerPoint, true);
 
-	//Scourge가 너무 가까이 있으면 무조건 도망가는 로직 추가
+	
 	if (dangerUnit != nullptr && dangerUnit->type() == Zerg_Scourge && dangerUnit->pos().getApproxDistance(unit->getPosition()) < 4 * TILE_SIZE)
 	{
 		moveBackPostion(INFO.getUnitInfo(unit, S), dangerUnit->pos(), 8 * TILE_SIZE);
@@ -47,7 +47,7 @@ State *VessleBattleGuideState::action(Unit targetUnit, Unit targetEnemy)
 		}
 	}
 
-	if (targetUnit == nullptr || !targetUnit->exists()) //우리유닛 다 죽고 없음...
+	if (targetUnit == nullptr || !targetUnit->exists()) 
 	{
 		if (er == Races::Zerg && targetEnemy != nullptr && targetEnemy->exists() && S->hasResearched(TechTypes::Irradiate) && unit->getEnergy() >= 75)
 		{
@@ -82,17 +82,17 @@ State *VessleBattleGuideState::action(Unit targetUnit, Unit targetEnemy)
 		UnitInfo *closestLurker = INFO.getClosestTypeUnit(E, targetUnit->getPosition(), Zerg_Lurker, 20 * TILE_SIZE, true, false, false);
 
 
-		if (unit->getHitPoints() >= unit->getInitialHitPoints() * 0.7) //HP가 많으면 좀 위험해도 그냥 사용
+		if (unit->getHitPoints() >= unit->getInitialHitPoints() * 0.7) 
 		{
 			if (targetEnemy != nullptr && targetEnemy->exists() && S->hasResearched(TechTypes::Irradiate) && unit->getEnergy() >= 75)
 			{
-				//cout << unit->getID() << ": Irradiate 사용 : " << targetEnemy->getID() << endl;
+			
 				unit->useTech(TechTypes::Irradiate, targetEnemy);
 				return nullptr;
 			}
 		}
 
-		if (dangerUnit != nullptr && dangerPoint < 4 * TILE_SIZE) //위험에 처한 경우
+		if (dangerUnit != nullptr && dangerPoint < 4 * TILE_SIZE) 
 		{
 			if (dangerUnit->type() == Zerg_Scourge)
 			{
@@ -139,11 +139,11 @@ State *VessleBattleGuideState::action(Unit targetUnit, Unit targetEnemy)
 
 			return nullptr;
 		}
-		else //안전한 경우
+		else 
 		{
 			if (targetEnemy != nullptr && targetEnemy->exists() && S->hasResearched(TechTypes::Irradiate) && unit->getEnergy() >= 75)
 			{
-				//cout << unit->getID() << ": (2)Irradiate 사용 : " << targetEnemy->getID() << endl;
+				
 				unit->useTech(TechTypes::Irradiate, targetEnemy);
 				return nullptr;
 			}
@@ -185,22 +185,17 @@ State *VessleBattleGuideState::action(Unit targetUnit, Unit targetEnemy)
 	{
 		if (unit->getSpellCooldown() == 0 && unit->getLastCommand().getType() == UnitCommandTypes::Use_Tech_Position && targetEnemy != nullptr && targetEnemy->exists())
 		{
-			//cout << "지금 막 쓸려는 참이라구" << endl;
+		
 			unit->useTech(TechTypes::EMP_Shockwave, INFO.getUnitInfo(targetEnemy, E)->vPos());
 			return nullptr;
 		}
 
 
-		/*if (!unit->canUseTech(TechTypes::EMP_Shockwave, nullptr, true, true, true, false))
-		{
-			cout << "state : emp 진행중!!" << endl;
-			return nullptr;
-		}*/
+
 
 		UnitInfo *closestArbiter = INFO.getClosestTypeUnit(E, targetUnit->getPosition(), Protoss_Arbiter, 20 * TILE_SIZE);
 
-		/*int dangerPoint = 0;
-		UnitInfo *dangerUnit = getDangerUnitNPoint(unit->getPosition(), &dangerPoint, true);*/
+	
 
 		int targetUnitId = 0;
 		int targetEnemyId = 0;
@@ -215,16 +210,14 @@ State *VessleBattleGuideState::action(Unit targetUnit, Unit targetEnemy)
 			targetEnemyId = targetEnemy->getID();
 		}
 
-		bw->drawTextMap(unit->getPosition() + Position(0, 20), "danger : %d, Unit:%d, Enemy: %d", dangerPoint, targetUnitId, targetEnemyId);
 
-		if (unit->getHitPoints() >= unit->getInitialHitPoints() * 0.7) //HP가 많으면 좀 위험해도 그냥 사용
+		if (unit->getHitPoints() >= unit->getInitialHitPoints() * 0.7) 
 		{
 			if (targetEnemy != nullptr && targetEnemy->exists() && S->hasResearched(TechTypes::EMP_Shockwave) && unit->getEnergy() >= 100)
 			{
 				if (unit->getSpellCooldown() == 0 && unit->getDistance(targetEnemy) < 8 * TILE_SIZE)
 				{
-					//cout << unit->getID() << ": EMP사용!! : " << targetEnemy->getID() << endl;
-					//target = targetEnemy;
+	
 					unit->useTech(TechTypes::EMP_Shockwave, INFO.getUnitInfo(targetEnemy, E)->vPos());
 				}
 				else
@@ -236,7 +229,7 @@ State *VessleBattleGuideState::action(Unit targetUnit, Unit targetEnemy)
 			}
 		}
 
-		if (dangerUnit != nullptr && dangerPoint < 4 * TILE_SIZE) //위험에 처한 경우
+		if (dangerUnit != nullptr && dangerPoint < 4 * TILE_SIZE) 
 		{
 			if (dangerUnit->type().isFlyer())
 			{
@@ -277,14 +270,13 @@ State *VessleBattleGuideState::action(Unit targetUnit, Unit targetEnemy)
 
 			return nullptr;
 		}
-		else //안전한 경우
+		else 
 		{
 			if (targetEnemy != nullptr && targetEnemy->exists() && S->hasResearched(TechTypes::EMP_Shockwave) && unit->getEnergy() >= 100)
 			{
 				if (unit->getSpellCooldown() == 0 && unit->getDistance(targetEnemy) < 10 * TILE_SIZE)
 				{
-					//cout << unit->getID() << ": HP 낮은상태 EMP사용 : " << targetEnemy->getID() << endl;
-					//target = targetEnemy;
+			
 					unit->useTech(TechTypes::EMP_Shockwave, INFO.getUnitInfo(targetEnemy, E)->vPos());
 				}
 				else
@@ -297,7 +289,7 @@ State *VessleBattleGuideState::action(Unit targetUnit, Unit targetEnemy)
 
 			if (S->hasResearched(TechTypes::EMP_Shockwave) && unit->getEnergy() > 100 && closestArbiter != nullptr && INFO.getTypeUnitsInRadius(Terran_Science_Vessel, S, closestArbiter->pos(), 5 * TILE_SIZE).size() < 1)
 			{
-				//cout << "Arbitor 가까이가기 " << closestArbiter->id() << endl;
+			
 				unit->move(closestArbiter->pos());
 				return nullptr;
 			}
@@ -329,7 +321,7 @@ State *VessleBattleGuideState::action(Unit targetUnit, Unit targetEnemy)
 			}
 		}
 	}
-	else///////////////////////////////////////terran인 경우
+	else
 	{
 		if (unit->getSpellCooldown() == 0 && unit->getLastCommand().getType() == UnitCommandTypes::Use_Tech_Unit && targetEnemy != nullptr && targetEnemy->exists())
 		{
@@ -337,10 +329,9 @@ State *VessleBattleGuideState::action(Unit targetUnit, Unit targetEnemy)
 			return nullptr;
 		}
 
-		/*int dangerPoint = 0;
-		UnitInfo *dangerUnit = getDangerUnitNPoint(unit->getPosition(), &dangerPoint, true);*/
 
-		if (unit->getHitPoints() >= unit->getInitialHitPoints() * 0.5) //HP가 많으면 좀 위험해도 그냥 사용
+
+		if (unit->getHitPoints() >= unit->getInitialHitPoints() * 0.5) 
 		{
 			if (targetEnemy != nullptr && targetEnemy->exists() && S->hasResearched(TechTypes::Defensive_Matrix) && unit->getEnergy() >= 100)
 			{
@@ -353,7 +344,7 @@ State *VessleBattleGuideState::action(Unit targetUnit, Unit targetEnemy)
 			}
 		}
 
-		if (dangerUnit != nullptr && dangerPoint < 5 * TILE_SIZE) //위험에 처한 경우
+		if (dangerUnit != nullptr && dangerPoint < 5 * TILE_SIZE) 
 		{
 			if (dangerUnit->type().isFlyer())
 			{
@@ -394,7 +385,7 @@ State *VessleBattleGuideState::action(Unit targetUnit, Unit targetEnemy)
 
 			return nullptr;
 		}
-		else //안전한 경우
+		else 
 		{
 			if (targetEnemy != nullptr && targetEnemy->exists() && S->hasResearched(TechTypes::Defensive_Matrix) && unit->getEnergy() >= 100)
 			{

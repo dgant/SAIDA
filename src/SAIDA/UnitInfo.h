@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Common.h"
-#include "UnitState\State.h"
+#include "UnitManager\State.h"
 
 namespace MyBot
 {
@@ -102,10 +102,10 @@ namespace MyBot
 			return (int)m_energy;
 		}
 
-		// Attacker가 this unit을 공격할때 Damage를 계산해서 누적해줌
+	
 		void		setDamage(Unit attacker);
 
-		// Building 용
+		
 		void		setLift(bool l) {
 			m_lifted = l;
 		}
@@ -116,7 +116,7 @@ namespace MyBot
 			return m_dangerMine;
 		}
 
-		//enemy 용
+		
 		const bool isHide() const {
 			return m_hide;
 		}
@@ -134,12 +134,12 @@ namespace MyBot
 			return (m_unitID < rhs.m_unitID);
 		}
 
-		// 상태
+	
 		string getState() {
 			return pState->getName();
 		}
 		void setState(State *state);
-		// action 호출 후 state를 변경
+		
 		void changeState(State *state);
 		void action();
 		void action(Unit targetUnit);
@@ -149,7 +149,7 @@ namespace MyBot
 		void action(BWEM::Base *targetPosition);
 		void action(UnitType unitType);
 
-		// Specific Target
+		
 		Unit	getTarget() {
 			return pState->getTargetUnit();
 		}
@@ -159,7 +159,7 @@ namespace MyBot
 
 		PosChange posChange(UnitInfo *uInfo);
 
-		// 클락킹 유닛은 포함되지 않음.
+		
 		vector<Unit> &getEnemiesTargetMe() {
 			return m_enemiesTargetMe;
 		}
@@ -237,10 +237,10 @@ namespace MyBot
 		double							m_energy;
 		int								m_LastCommandFrame;
 
-		int								m_expectedDamage; // 공격 받을 Damage를 예상하기 위함.
+		int								m_expectedDamage; 
 
-		int								m_lastPositionTime; // m_lastPosition 에 처음 도달한 시간
-		Position						m_lastSeenPosition; // m_lastPosition 과 동일하나 Unknown 으로 바껴도 변하지 않음.
+		int								m_lastPositionTime; 
+		Position						m_lastSeenPosition; 
 		Position						m_lastPosition;
 		Position						m_vPosition;
 		bool							m_completed;
@@ -254,28 +254,27 @@ namespace MyBot
 		int								m_completeTime;
 		bool							m_dangerMine;
 		queue<bool>						m_blockedQueue;
-		int								m_blockedCnt; // 120 frame 간 길막을 당한 횟수
-		// burrow 유닛 unknown position 으로 변경시키기 위해 사용.
+		int								m_blockedCnt; 
+		
 		int								m_nearUnitFrameCnt;
 		int								m_lastNearUnitFrame;
 
-		// 건물의 lift 확인
+		
 		bool							m_lifted;
 
-		// 벙커 Marine 확인
+		
 		int							m_marineInBunker;
 
-		// 행동 확인
-		// 일꾼의 경우 실제로 미네랄을 채취하고 있는지 여부 리턴
+		
 		bool							m_isGatheringMinerals;
 
 		vector<Unit>					m_enemiesTargetMe;
 		Position						m_avgEnemyPosition;
 		Unit							m_veryFrontEnemUnit;
-		// 상태
+		
 		State							*pState;
 
-		// For Tank
+		
 		int								m_lastSiegeOrUnsiegeTime;
 
 	};

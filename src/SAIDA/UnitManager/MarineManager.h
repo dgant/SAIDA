@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../UnitState/MarineState.h"
+#include "../UnitManager/MarineState.h"
 #include "TankManager.h"
 #include "../StrategyManager.h"
 
@@ -41,10 +41,10 @@ namespace MyBot
 		}
 		bool isZealotDefenceNeed();
 		void setDefenceMarine(uList &marineList);
-		bool findFirstBarrackAndSupplyPosition(); // 질럿 방어를 위한 서로 붙어 있는 배럭과 서플라이
+		bool findFirstBarrackAndSupplyPosition(); 
 		static MarineManager &Instance();
 		void update();
-		//		void checkKitingMarine(UnitInfo *&m);
+		
 		void setZealotDefenceMarine(uList &marineList);
 		void onUnitDestroyed(Unit u);
 		bool checkZerglingDefenceNeed();

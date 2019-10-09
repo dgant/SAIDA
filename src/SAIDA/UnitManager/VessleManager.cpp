@@ -105,7 +105,7 @@ Unit VessleManager::choiceTarget(UnitInfo *v)
 	UnitInfo *targetEnemy = nullptr;
 	bool keepEnergyMode = false;
 
-	////////////////////////////////////////////////////////Zerg전 !!!!!///////////////////////////////////////////////////////////////////////////
+	
 	if (INFO.enemyRace == Races::Zerg)
 	{
 		if (v->unit()->getEnergy() < 75) return nullptr;
@@ -114,7 +114,7 @@ Unit VessleManager::choiceTarget(UnitInfo *v)
 		{
 			if (choiceUnit != nullptr && choiceUnit->exists() && choiceUnit->getDistance(v->unit()) < TILE_SIZE * 20)
 			{
-				//cout << "choiceUnit: " << choiceUnit->getID() << endl;
+				
 				return choiceUnit;
 			}
 		}
@@ -212,7 +212,7 @@ Unit VessleManager::choiceTarget(UnitInfo *v)
 
 				if (isAlreadyTarget) continue;
 
-				if (INFO.getUnitsInRadius(E, lurker->pos(), 3 * TILE_SIZE).size() > 2 && (!keepEnergyMode || v->unit()->getEnergy() > 150)) //에너지 모아야 하는 상태가 아니거나 에너지가 150 넘는 경우
+				if (INFO.getUnitsInRadius(E, lurker->pos(), 3 * TILE_SIZE).size() > 2 && (!keepEnergyMode || v->unit()->getEnergy() > 150))
 					targetEnemy = lurker;
 
 				break;
@@ -238,7 +238,7 @@ Unit VessleManager::choiceTarget(UnitInfo *v)
 
 				if (isAlreadyTarget) continue;
 
-				if (ultralisk->unit()->getHitPoints() > 100 && (!keepEnergyMode || v->unit()->getEnergy() > 150))//에너지 모아야 하는 상태가 아니거나 에너지가 150 넘는 경우
+				if (ultralisk->unit()->getHitPoints() > 100 && (!keepEnergyMode || v->unit()->getEnergy() > 150))
 				{
 					targetEnemy = ultralisk;
 				}
@@ -266,11 +266,11 @@ Unit VessleManager::choiceTarget(UnitInfo *v)
 
 				if (isAlreadyTarget) continue;
 
-				if (guardian->unit()->getHitPoints() > 100 && INFO.getUnitsInRadius(E, guardian->pos(), 2 * TILE_SIZE).size() > 3 && (!keepEnergyMode || v->unit()->getEnergy() > 150))//에너지 모아야 하는 상태가 아니거나 에너지가 150 넘는 경우
+				if (guardian->unit()->getHitPoints() > 100 && INFO.getUnitsInRadius(E, guardian->pos(), 2 * TILE_SIZE).size() > 3 && (!keepEnergyMode || v->unit()->getEnergy() > 150))
 				{
 					targetEnemy = guardian;
 				}
-				else if (INFO.getTypeUnitsInRadius(Terran_Goliath, S, v->pos(), 12 * TILE_SIZE).empty()) //뮤탈이 있는데, 골리앗이 없는 경우 조건 상관 없이 irradiate그냥 걸기
+				else if (INFO.getTypeUnitsInRadius(Terran_Goliath, S, v->pos(), 12 * TILE_SIZE).empty()) 
 				{
 					targetEnemy = guardian;
 				}
@@ -298,11 +298,11 @@ Unit VessleManager::choiceTarget(UnitInfo *v)
 
 				if (isAlreadyTarget) continue;
 
-				if (mutal->unit()->getHitPoints() > 100 && INFO.getUnitsInRadius(E, mutal->pos(), 2 * TILE_SIZE).size() > 3 && (!keepEnergyMode || v->unit()->getEnergy() > 150))//에너지 모아야 하는 상태가 아니거나 에너지가 150 넘는 경우
+				if (mutal->unit()->getHitPoints() > 100 && INFO.getUnitsInRadius(E, mutal->pos(), 2 * TILE_SIZE).size() > 3 && (!keepEnergyMode || v->unit()->getEnergy() > 150))
 				{
 					targetEnemy = mutal;
 				}
-				else if (INFO.getTypeUnitsInRadius(Terran_Goliath, S, v->pos(), 12 * TILE_SIZE).empty()) //뮤탈이 있는데, 골리앗이 없는 경우 조건 상관 없이 irradiate그냥 걸기
+				else if (INFO.getTypeUnitsInRadius(Terran_Goliath, S, v->pos(), 12 * TILE_SIZE).empty()) 
 				{
 					targetEnemy = mutal;
 				}
@@ -330,14 +330,14 @@ Unit VessleManager::choiceTarget(UnitInfo *v)
 
 				if (isAlreadyTarget) continue;
 
-				if (INFO.getUnitsInRadius(E, hydra->pos(), 2 * TILE_SIZE).size() > 4 && (!keepEnergyMode || v->unit()->getEnergy() > 150))//에너지 모아야 하는 상태가 아니거나 에너지가 150 넘는 경우
+				if (INFO.getUnitsInRadius(E, hydra->pos(), 2 * TILE_SIZE).size() > 4 && (!keepEnergyMode || v->unit()->getEnergy() > 150))
 					targetEnemy = hydra;
 
 				break;
 			}
 		}
 	}
-	////////////////////////////////////////////////////////Protoss전 !!!!!///////////////////////////////////////////////////////////////////////////
+	
 	else if (INFO.enemyRace == Races::Protoss)
 	{
 		if (v->unit()->getEnergy() < 100) return nullptr;
@@ -346,7 +346,7 @@ Unit VessleManager::choiceTarget(UnitInfo *v)
 		{
 			if (choiceUnit != nullptr && choiceUnit->exists() && choiceUnit->getDistance(v->unit()) < TILE_SIZE * 20)
 			{
-				//cout << "choiceUnit: " << choiceUnit->getID() << endl;
+				
 				return choiceUnit;
 			}
 		}
@@ -435,8 +435,8 @@ Unit VessleManager::choiceTarget(UnitInfo *v)
 			}
 		}
 	}
-	////////////////////////////////////////////////////////Terran전 !!!!!///////////////////////////////////////////////////////////////////////////
-	else //Terran전은 Enemy가 아니라 Defensive Matrix 걸어 줄 우리 유닛 찾습니다!
+	
+	else 
 	{
 		if (v->unit()->getEnergy() < 100) return nullptr;
 
@@ -469,11 +469,7 @@ Unit VessleManager::choiceTarget(UnitInfo *v)
 
 			if (closestUnit != nullptr)
 			{
-				/*if (SM.getMainStrategy() == AttackAll)
-				{
-					if (INFO.getUnitsInRadius(E, closestUnit->pos(), 15 * TILE_SIZE, true, true, false).empty())
-						return nullptr;
-				}*/
+				
 
 				bool isAlreadyTarget = false;
 
@@ -494,7 +490,7 @@ Unit VessleManager::choiceTarget(UnitInfo *v)
 		}
 		else if (SM.getMainStrategy() == WaitLine)
 		{
-			//if (v->unit()->getEnergy() < 200) return nullptr;
+			
 
 			Position pos = SM.getWaitLinePosition();
 
@@ -543,7 +539,7 @@ Unit VessleManager::choicePosition(int num)
 	UnitInfo *closestGol = GoliathManager::Instance().getFrontGoliathFromPos(SM.getMainAttackPosition());
 	UnitInfo *closestVul = VultureManager::Instance().getFrontVultureFromPos(SM.getMainAttackPosition());
 
-	//closest 벌쳐가 있는데 혼자 스카우트 상태인 경우엔 따라가지 않도록 하기 위해서 변경
+	
 	if (closestVul != nullptr)
 	{
 		if (INFO.getTypeUnitsInRadius(Terran_Vulture, S, closestVul->pos(), 10 * TILE_SIZE).size() < 3)
@@ -613,7 +609,7 @@ Unit VessleManager::choicePosition(int num)
 				return closestGol->unit();
 		}
 	}
-	else //Terran
+	else 
 	{
 		if (num == 1 || num == 3)
 		{

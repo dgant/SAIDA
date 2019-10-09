@@ -44,7 +44,6 @@ namespace MyBot
 			return idlePos;
 		}
 	protected:
-		// Target¿« Target (Mineral / Refinery / Repair Unit)
 		Position m_targetPos = Positions::None;
 		Unit m_targetUnit = nullptr;
 		TilePosition m_targetTilePos = TilePositions::None;
@@ -76,11 +75,11 @@ namespace MyBot
 	{
 	public:
 		PrisonedState() {
-			prisonedTime = TIME;
+			prisonedTIME = TIME;
 		}
 		virtual string getName() override {
 			return "Prisoned";
 		}
-		int prisonedTime;
+		int prisonedTIME;
 	};
 }

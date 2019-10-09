@@ -2,7 +2,7 @@
 
 namespace BWAPI
 {
-	// NAMES
+	
 	template <>
 	const std::string Type<InitialBuildType, InitialBuildTypes::Enum::UnknownBuild>::typeNames[InitialBuildTypes::Enum::MAX] =
 	{
@@ -74,7 +74,7 @@ namespace BWAPI
 
 	InitialBuildType::InitialBuildType(int id) : Type(id) {}
 
-	// NAMES
+	
 	template <>
 	const std::string Type<MainBuildType, MainBuildTypes::Enum::UnknownMainBuild>::typeNames[MainBuildTypes::Enum::MAX] =
 	{
@@ -146,7 +146,7 @@ namespace BWAPI
 
 	MainBuildType::MainBuildType(int id) : Type(id) {}
 
-	// NAMES
+	
 	template <>
 	const std::string Type<MainStrategyType, MainStrategyTypes::Enum::Eliminate>::typeNames[MainStrategyTypes::Enum::MAX] =
 	{
@@ -172,7 +172,7 @@ namespace BWAPI
 
 	MainStrategyType::MainStrategyType(int id) : Type(id) {}
 
-	// ³» ºôµå
+	
 	template <>
 	const std::string Type<MyBuildType, MyBuildTypes::Enum::Basic>::typeNames[MyBuildTypes::Enum::MAX] =
 	{

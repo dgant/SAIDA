@@ -27,28 +27,22 @@ namespace BWEM
 
 #if BWEM_USE_MAP_PRINTER
 
-		// Prints information about theMap into the file specified in MapPrinter::m_fileName
-		// The printed informations are highly customizable (Cf. mapPrinter.cpp).
 		void printMap(const Map &theMap);
 
 
-		// Prints information about theMap onto the game screen.
-		// The printed informations are highly customizable (Cf. mapDrawer.cpp).
 		void pathExample(const Map &theMap);
 
 #endif
 
 
-		// Demonstrates the use of utils::GridMap.
 		void gridMapExample(const Map &theMap);
 
 
 
-		///////////////    See alse the examples in exampleWall.h    ///////////////
 
 
 	}
-} // namespace BWEM::utils
+} 
 
 
 #endif

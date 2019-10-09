@@ -11,7 +11,7 @@ UnitData::UnitData()
 UnitData::~UnitData()
 {
 }
-///////// get UnitInfo Vector
+
 vector<UnitInfo *> &UnitData::getUnitVector(UnitType uType)
 {
 	if (unitTypeMap.find(uType) == unitTypeMap.end())
@@ -96,7 +96,7 @@ void UnitData::decreaseCreateUnits(UnitType uType)
 
 	allCount[type]--;
 }
-//////// add UnitInfo
+
 bool UnitData::addUnitNBuilding(Unit u)
 {
 	UnitType type = getUnitTypeDB(u->getType());
@@ -116,7 +116,7 @@ bool UnitData::addUnitNBuilding(Unit u)
 	return false;
 }
 
-////////////// remove UnitInfo
+
 void UnitData::removeUnitNBuilding(Unit u)
 {
 	UnitType type = getUnitTypeDB(u->getType());
@@ -140,7 +140,7 @@ void UnitData::removeUnitNBuilding(Unit u)
 		delete unitMap[u];
 		unitMap.erase(u);
 
-		// Count를 -- 해준다.
+		
 		if (u->getPlayer() == S)
 		{
 			if (u->isCompleted())
@@ -161,7 +161,7 @@ void UnitData::initializeAllInfo() {
 		u.second->initFrame();
 }
 
-//////////// update UnitInfo
+
 void UnitData::updateAllInfo()
 {
 	for (auto &u : allUnits)
@@ -173,13 +173,13 @@ void UnitData::updateAllInfo()
 	map<int, pair<int, Position>> &spellMap = getAllSpells();
 
 	for (auto &b : Broodwar->getBullets()) {
-		// 내 SCV 가 미네랄을 캐고 있는 경우
+		
 		if (b->getType() == BulletTypes::Fusion_Cutter_Hit && b->getSource() != nullptr && b->getSource()->getPlayer() == S && b->getTarget() != nullptr && b->getTarget()->isBeingGathered()) {
 			uMap m = getAllUnits();
 			m[b->getSource()]->setGatheringMinerals();
 		}
 
-		// 싸이언스베슬
+		
 		if (b->getType() == BulletTypes::EMP_Missile && b->getSource() && b->getSource()->getPlayer() == S)
 			spellMap[b->getID()] = make_pair(TIME, b->getTargetPosition());
 
@@ -220,7 +220,7 @@ void UnitData::updateAllInfo()
 
 void UnitData::updateNcheckTypeAllInfo()
 {
-	// 전부 돌고 Map에서 지우기 위해 지울 Unit을 저장해 놓는다.
+	
 	vector<Unit> del_units;
 	vector<Unit> del_buildings;
 	vector<int> del_spells;
@@ -238,12 +238,11 @@ void UnitData::updateNcheckTypeAllInfo()
 
 		INFO.setRearched(u.second->unit()->getType());
 
-		if (preType != curType)// 저장된 정보와 새로 얻은 정보 비교
+		if (preType != curType)
 		{
-			if (curType.isBuilding()) // 유닛에서 건물로 변경 Drone -> 해처리
+			if (curType.isBuilding()) 
 			{
-				// 이 경우는 그냥 삭제한다. Only Drone
-				// 건물은 따로 알아서 Event 처리로 들어갔을 꺼다.
+				
 				vector<UnitInfo *> &Drones = (preType == Zerg_Drone ? getUnitVector(Zerg_Drone) :
 											  (preType == Zerg_Larva ? getUnitVector(Zerg_Larva) : getUnitVector(Zerg_Egg)));
 
@@ -264,13 +263,13 @@ void UnitData::updateNcheckTypeAllInfo()
 					cout << "remove for change Unit Error Drone to building - " << unit->getID() << preType << curType << endl;
 				}
 
-				// 계속 시야가 있는 경우 Show도 뜨지 않으므로 일단 넣어준다.
+				
 				addUnitNBuilding(unit);
 				continue;
 			}
-			else // 같은 유닛간의 변경 ( Lucker , Egg , Mutal 등 )
+			else 
 			{
-				// 같은 유닛간에는 UnitMap에 이미 있어서 신규 처리가 안됨. 여기서 삽입도 같이 해줘야 함.
+				
 
 				vector<UnitInfo *> &preUnitVector = getUnitVector(preType);
 				vector<UnitInfo *> &curUnitVector = getUnitVector(curType);
@@ -295,7 +294,7 @@ void UnitData::updateNcheckTypeAllInfo()
 		u.second->Update();
 	}
 
-	for (auto &u : allBuildings)  // 건물은 Type 변환이 필요하지 않다.
+	for (auto &u : allBuildings)  
 	{
 		if (!u.first->exists())
 		{
@@ -306,12 +305,11 @@ void UnitData::updateNcheckTypeAllInfo()
 		UnitType preType = u.second->type();
 		UnitType curType = u.second->unit()->getType();
 
-		if (preType != curType)// 저장된 정보와 새로 얻은 정보 비교
+		if (preType != curType)
 		{
-			if (!curType.isBuilding()) // 건물에서 Unit으로 변경 건설중인 해처리 -> Drone
+			if (!curType.isBuilding()) 
 			{
-				// 이 경우는 그냥 삭제한다.
-				// Drone은 따로 알아서 Event 처리로 들어갔을 꺼다.
+				
 				vector<UnitInfo *> &Buildings = getBuildingVector(preType);
 
 				Unit unit = u.first;
@@ -331,13 +329,13 @@ void UnitData::updateNcheckTypeAllInfo()
 					cout << "remove for change Unit Error building to unit" << endl;
 				}
 
-				//일단 넣어준다.
+				
 				addUnitNBuilding(unit);
 				continue;
 			}
-			else // 같은 유닛간의 변경 ( Colony -> Sunken/Spore, Hatchery -> Lair -> Hive )
+			else 
 			{
-				// 같은 유닛간에는 UnitMap에 이미 있어서 신규 처리가 안됨. 여기서 삽입도 같이 해줘야 함.
+				
 				vector<UnitInfo *> &preBuildingVector = getBuildingVector(preType);
 				vector<UnitInfo *> &curBuildingVector = getBuildingVector(curType);
 
@@ -362,7 +360,7 @@ void UnitData::updateNcheckTypeAllInfo()
 					cout << "remove for change Unit Error building to building" << endl;
 				}
 
-				if (curType != Resource_Vespene_Geyser) // 가스가 터져버린 상태로 변했으면 그냥 지우기만 한다.
+				if (curType != Resource_Vespene_Geyser) 
 					curBuildingVector.push_back(u.second);
 			}
 		}
@@ -370,7 +368,7 @@ void UnitData::updateNcheckTypeAllInfo()
 		u.second->Update();
 	}
 
-	// 삭제하기로 한 Map 삭제
+	
 	for (auto u : del_units)
 		getAllUnits().erase(u);
 
@@ -380,12 +378,12 @@ void UnitData::updateNcheckTypeAllInfo()
 	map<int, pair<int, Position>> &spellMap = getAllSpells();
 
 	for (auto &b : bw->getBullets()) {
-		// 아비터 or 하이템플러
+		
 		if (b->getType() == BulletTypes::Invisible || b->getType() == BulletTypes::Psionic_Storm) {
 			if (spellMap.find(b->getID()) != spellMap.end()) {
 				spellMap[b->getID()] = make_pair(TIME, Positions::None);
 			}
-			// 처음 쓰는 스팰맵인 경우 차감.
+			
 			else if (b->getSource() != nullptr && b->getSource()->getPlayer() == E) {
 				uMap m = getAllUnits();
 				int energy = b->getType() == (b->getSource()->getType() == Protoss_Arbiter && BulletTypes::Invisible) ? 100 : 75;

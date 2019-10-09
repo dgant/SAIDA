@@ -5,7 +5,7 @@
 #include "State.h"
 #include "../TrainManager.h"
 #include "../UnitManager/TankManager.h"
-#include "../TerranConstructionPlaceFinder.h"
+#include "../BuildingStrategy/SelfBuildingPlaceFinder.h"
 
 namespace MyBot
 {

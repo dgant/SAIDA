@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../UnitState/GoliathState.h"
+#include "../UnitManager/GoliathState.h"
 #include "TankManager.h"
 #include "DropshipManager.h"
 
@@ -26,7 +26,7 @@ namespace MyBot
 	public:
 		static GoliathManager &Instance();
 		Position getDefaultMovePosition();
-		// return 0 : nothing, 1 : wait, 2 : move back, 3 : force attack
+		
 		int getWaitOrMoveOrAttack();
 		void update();
 
@@ -52,7 +52,7 @@ namespace MyBot
 
 		void setStateToGoliath(UnitInfo *t, State *state);
 	private :
-		// getDefaultMovePosition 한번만 호출하기 위한 값
+		
 		int defaultMovePositionFrame = 0;
 		int isNeedToWaitAttackFrame = 0;
 		Position firstTankPosition;

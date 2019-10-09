@@ -8,17 +8,13 @@ State *VultureIdleState::action()
 {
 	Position movePosition = (INFO.getSecondChokePosition(S) + INFO.getFirstExpansionLocation(S)->getPosition()) / 2;
 
-	//if (unit->getPosition().getApproxDistance(movePosition) > 6 * TILE_SIZE)
-	//	CommandUtil::move(unit, movePosition);
-	//else
-	// 나중에...
+
 	if (unit->getDistance(movePosition) > 3 * TILE_SIZE)
 	{
 		unit->attack(movePosition);
 		unit->holdPosition(true);
 	}
 
-	//CommandUtil::attackMove(unit, movePosition, true);
 
 	return nullptr;
 }
@@ -82,12 +78,12 @@ State *VultureScoutState::action()
 		return nullptr;
 	}
 
-	//타겟 지점에 이미 상대방 건물이 지어진 경우
+
 	uList eBuildings = INFO.getBuildingsInRadius(E, targetPosition, 10 * TILE_SIZE, true, false, true);
 
 	if (eBuildings.size()) {
 
-		// 지상 방어 Tower가 있는 경우 바로 빼
+		
 		for (auto eb : eBuildings)
 			if (eb->type().groundWeapon().targetsGround())
 			{
@@ -163,7 +159,7 @@ State *VultureDefenceState::action()
 	if (closest != nullptr) {
 		if (S->hasResearched(TechTypes::Spider_Mines) && unit->getSpiderMineCount() > 0)
 		{
-			// Command Center와 근처에 마인 심지 않기 위해
+			
 			if (me->pos().getApproxDistance(MYBASE) > 7 * TILE_SIZE &&
 					me->pos().getApproxDistance(closest->pos()) >= closest->type().groundWeapon().maxRange() + 2 * TILE_SIZE &&
 					me->pos().getApproxDistance(closest->pos()) <= closest->type().groundWeapon().maxRange() + 4 * TILE_SIZE)
@@ -173,17 +169,17 @@ State *VultureDefenceState::action()
 			}
 		}
 
-		///////////////////////////////////////////////////////
+		
 		int dangerPoint = 0;
 		UnitInfo *dangerUnit = getDangerUnitNPoint(me->pos(), &dangerPoint, false);
 
-		if (closest->isBurrowed()) // 러커
+		if (closest->isBurrowed()) 
 		{
 			if (!closest->isHide() && closest->unit()->isDetected())
 			{
 				CommandUtil::attackUnit(unit, closest->unit());
 			}
-			else // 안보이거나 Detection이 안된 상황
+			else
 			{
 				if (INFO.getAvailableScanCount() &&
 						INFO.getCompletedCount(Terran_Goliath, S) + INFO.getCompletedCount(Terran_Vulture, S) + INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) > 3)
@@ -204,8 +200,7 @@ State *VultureDefenceState::action()
 			return nullptr;
 		}
 
-		//럴커 아님
-		if (closest->isHide()) // 시야에서 사라짐
+		if (closest->isHide()) 
 		{
 			CommandUtil::attackMove(unit, closest->pos());
 		}
@@ -213,7 +208,7 @@ State *VultureDefenceState::action()
 		{
 			if (closest->unit()->isDetected())
 			{
-				if (dangerUnit && closest->type() == dangerUnit->type()) // 후속 공격유닛 없음.
+				if (dangerUnit && closest->type() == dangerUnit->type()) 
 				{
 					if (isNeedKitingUnitType(closest->type()))
 					{
@@ -230,18 +225,18 @@ State *VultureDefenceState::action()
 							moveBackPostion(me, closest->pos(), 2 * TILE_SIZE);
 					}
 				}
-				else // 후속 공격 있음.
+				else 
 				{
 					kiting(me, closest, dangerPoint, 3 * TILE_SIZE);
 				}
 			}
-			else // 다템한테 안전하게
+			else 
 			{
 				kiting(me, closest, dangerPoint, 4 * TILE_SIZE);
 			}
 		}
 	}
-	else if (shuttle != nullptr) // 드랍 뱅기가 있을 경우
+	else if (shuttle != nullptr) 
 	{
 		CommandUtil::move(unit, shuttle->pos());
 	}
@@ -315,9 +310,9 @@ State *VultureDiveState::action()
 			}
 		}
 	}
-	else //dangerUnit 있음
+	else 
 	{
-		// danger가 앞마당 유닛이면 일단 본진으로 뛴다.
+	
 		if (!isSameArea(dangerUnit->pos(), target))
 		{
 			if (me->pos().getApproxDistance(target) > 3 * TILE_SIZE)
@@ -335,7 +330,7 @@ State *VultureDiveState::action()
 				if (goWithoutDamage(unit, target, direction) == false)
 					direction *= -1;
 			}
-			else // closest Attacker 존재
+			else
 			{
 				kiting(me, closestAttack, dangerPoint, 3 * TILE_SIZE);
 			}
@@ -347,7 +342,7 @@ State *VultureDiveState::action()
 				if (me->pos().getApproxDistance(target) > 3 * TILE_SIZE)
 					CommandUtil::move(unit, target);
 			}
-			else // closest Attacker 존재
+			else
 			{
 				if (VM.getNeedPcon())
 					pControl(me, closestAttack);
@@ -362,7 +357,7 @@ State *VultureDiveState::action()
 				return nullptr;
 			}
 
-			// 적의 사거리 유닛이 있으면 벌쳐는 그냥 일꾼만 죽여
+			
 			return new VultureKillWorkerFirstState();
 		}
 	}
@@ -401,7 +396,7 @@ State *VultureKillWorkerFirstState::action()
 		}
 
 		kiting(me, w, unit->getDistance(w->unit()), 2 * TILE_SIZE);
-		//CommandUtil::attackUnit(unit, w->unit());
+		
 		return nullptr;
 	}
 

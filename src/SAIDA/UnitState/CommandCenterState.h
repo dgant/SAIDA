@@ -59,7 +59,7 @@ namespace MyBot
 		virtual State *action() override;
 	private :
 		Position targetPosition;
-		int nextLandTime;
+		int nextLandTIME;
 	};
 
 }

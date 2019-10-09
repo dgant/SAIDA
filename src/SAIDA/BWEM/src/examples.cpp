@@ -275,8 +275,6 @@ namespace BWEM {
 											MapPrinter::Get().Point(p, MapPrinter::Color::higherGround);
 								}
 
-						//			if (theMap.GetTile(TilePosition(x, y)).Doodad())
-						//				MapPrinter::Get().Circle(WalkPosition(TilePosition(x, y)) + 2, 4, MapPrinter::Color(255, 255, 255));
 					}
 
 			if (MapPrinter::showAssignedRessources)
@@ -321,9 +319,6 @@ namespace BWEM {
 						MapPrinter::Get().Rectangle(origin, origin + size - 1, MapPrinter::Color::bases, MapPrinter::do_not_fill, dashMode);
 					}
 
-					//			if (area.LowGroundPercentage() > 66)		MapPrinter::Get().Circle(area.Top(), 15, MapPrinter::Color(0, 0, 0), MapPrinter::fill);
-					//			if (area.HighGroundPercentage() > 66)		MapPrinter::Get().Circle(area.Top(), 15, MapPrinter::Color(128, 128, 128), MapPrinter::fill);
-					//			if (area.VeryHighGroundPercentage() > 66)	MapPrinter::Get().Circle(area.Top(), 15, MapPrinter::Color(255, 255, 255), MapPrinter::fill);
 				}
 
 			if (MapPrinter::showChokePoints)
@@ -342,17 +337,7 @@ namespace BWEM {
 					}
 			}
 
-			/*
-			for (int y = 0 ; y < theMap.Size().y ; ++y)
-			for (int x = 0 ; x < theMap.Size().x ; ++x)
-			if (Area::id id = theMap.GetTile(TilePosition(x, y)).AreaId())
-			{
-			WalkPosition origin(TilePosition(x, y));
-			MapPrinter::Color col = (id > 0) ? MapPrinter::Color(255, 255, 255) :
-			(id == -1) ? MapPrinter::Color(128, 128, 128) :MapPrinter::Color(0, 0, 0);
-			MapPrinter::Get().Rectangle(origin, origin + 3, col);
-			}
-			*/
+
 		}
 
 
@@ -369,9 +354,7 @@ namespace BWEM {
 
 			while (b == a) b = WalkPosition(random_element(theMap.StartingLocations()));
 
-			//	Uncomment this to use random positions for a and b:
-			//	a = WalkPosition(theMap.RandomPosition());
-			//	b = WalkPosition(theMap.RandomPosition());
+	
 
 			MapPrinter::Get().Circle(a, 6, col, MapPrinter::fill);
 			MapPrinter::Get().Circle(b, 6, col, MapPrinter::fill);
@@ -383,18 +366,14 @@ namespace BWEM {
 
 			if (Path.empty())						// no ChokePoint between a and b:
 			{
-				// let's verify that a and b are in the same Area:
 				bwem_assert(theMap.GetNearestArea(a) == theMap.GetNearestArea(b));
 
-				// just draw a single line between them:
 				MapPrinter::Get().Line(a, b, col, MapPrinter::dashed);
 			}
 			else									// at least one ChokePoint between a and b:
 			{
-				// let's verify that a and b are not in the same Area:
 				bwem_assert(theMap.GetNearestArea(a) != theMap.GetNearestArea(b));
 
-				// draw a line between each ChokePoint in Path:
 				const ChokePoint *cpPrevious = nullptr;
 
 				for (const ChokePoint *cp : Path)
@@ -472,13 +451,10 @@ namespace BWEM {
 		void gridMapExample(const Map &theMap)
 		{
 
-			// 1) Initialization
 			SimpleGridMap Grid(&theMap);
 
-			//  Note: generally, you will create one instance of GridMap, after calling Map::Instance().Initialize().
 
 
-			// 2) Update (in AIModule::onFrame)
 			for (int j = 0; j < Grid.Height(); ++j)
 				for (int i = 0; i < Grid.Width(); ++i)
 					Grid.GetCell(i, j).Units.clear();
@@ -488,10 +464,8 @@ namespace BWEM {
 					Grid.Add(unit);
 			}
 
-			//  Note: alternatively, you could use the Remove and Add methods only, in the relevant BWAPI::AIModule methods.
 
 
-			// 3) Use
 			TilePosition centerTile(theMap.Center());
 
 			for (Unit unit : Grid.GetUnits(centerTile - 10, centerTile + 10, Broodwar->self()))
@@ -501,7 +475,7 @@ namespace BWEM {
 
 
 	}
-} // namespace BWEM::utils
+} 
 
 
 

@@ -5,7 +5,7 @@ using namespace MyBot;
 
 State *TankIdleState::action()
 {
-	// 탱크 1기 있을때 적절한 idle pos
+
 	if (INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) == 1) {
 		if (INFO.getFirstExpansionLocation(S)
 				&& (INFO.getTypeBuildingsInRadius(Terran_Command_Center, S, INFO.getFirstExpansionLocation(S)->Center(), 5 * TILE_SIZE, true).size() > 0)) {
@@ -24,7 +24,7 @@ State *TankIdleState::action()
 	if (idlePos == INFO.getWaitingPositionAtFirstChoke(5, 8)) {
 		if (INFO.getFirstExpansionLocation(S)
 				&& (INFO.getTypeBuildingsInRadius(Terran_Command_Center, S, INFO.getFirstExpansionLocation(S)->Center(), 8 * TILE_SIZE, true).size() > 0)) {
-			// 가스가 없으면 그냥 기존 로직
+			
 			for (auto g : theMap.GetArea((TilePosition)INFO.getFirstExpansionLocation(S)->Center())->Geysers()) {
 				idlePos = g->Pos();
 				break;
@@ -40,9 +40,9 @@ State *TankIdleState::action()
 			TM.siege(unit);
 			return nullptr;
 		}
-		else // 주변에 적이 없는 경우
+		else
 		{
-			//탱크 idle인데 적 없는 경우 중립물 깨는 로직 추가
+			
 			if (INFO.getAllCount(Terran_Factory, S) > 3)
 			{
 				for (auto n : bw->getStaticNeutralUnits())
@@ -71,7 +71,6 @@ State *TankIdleState::action()
 
 		}
 
-		//bw->drawTextMap(unit->getPosition() + Position(0, 20), "dist : %d, sieze : %s", unit->getPosition().getApproxDistance(idlePos), unit->canUnsiege() ? "true" : "false");
 
 		if (unit->getPosition().getApproxDistance(idlePos) <= 16)
 		{
@@ -110,7 +109,7 @@ State *TankAttackMoveState::action()
 	unitsInMaxRange.insert(unitsInMaxRange.end(), buildings.begin(), buildings.end());
 	uList unitsInMinRange = INFO.getAllInRadius(E, unit->getPosition(), WeaponTypes::Arclite_Shock_Cannon.minRange() + 2 * TILE_SIZE, true, false);
 
-	// 공격할 수 있는 적이 없는 경우
+	
 	if (unitsInMaxRange.size() == 0) {
 		if (unit->isSieged())
 			TM.unsiege(unit, false);
@@ -121,7 +120,7 @@ State *TankAttackMoveState::action()
 	}
 
 	if (unit->isSieged()) {
-		// 시즈 상태인데, 공격 가능한 유닛이 없으면 Unsieged.
+		
 		if (unitsInMaxRange.size() == unitsInMinRange.size()) {
 			TM.unsiege(unit, false);
 
@@ -133,10 +132,10 @@ State *TankAttackMoveState::action()
 	}
 	else {
 
-		// 모든 적이 너무 가까이 있을 때.
+		
 		if (unitsInMaxRange.size() == unitsInMinRange.size()) {
 
-			// target이 유닛이 아니라 포지션으로 주어지면, 가장 가까운 유닛을 찾아야 한다.
+			
 			UnitInfo *closeUnitInfo = INFO.getClosestUnit(E, unit->getPosition(), TypeKind::GroundUnitKind, WeaponTypes::Arclite_Shock_Cannon.maxRange(), false);
 
 			if (closeUnitInfo == nullptr)
@@ -177,10 +176,10 @@ State *TankDefenceState::action()
 		return nullptr;
 	}
 
-	// 너무 밖으로 나간 탱크
+	
 	if (!isInMyArea(unit->getPosition()) && INFO.getBuildings(Terran_Command_Center, S).size() < 3)
 	{
-		if (unit->isSelected()) cout << unit->getID() << "[시즈 행동] 너무 밖으로 나간 탱크" << endl;
+		
 
 		if (unit->isSieged()) {
 			uList eList = INFO.getUnitsInRadius(E, unit->getPosition(), 14 * TILE_SIZE, true, false, false);
@@ -211,7 +210,7 @@ State *TankDefenceState::action()
 
 	}
 
-	// 시즈 모드 업그레이드 전 수비
+
 	if (!S->hasResearched(TechTypes::Tank_Siege_Mode)) {
 
 		if (targetInfo->type().isBuilding()) {
@@ -242,7 +241,7 @@ State *TankDefenceState::action()
 		}
 
 		if (!targetInfo->unit()->isDetected()) {
-			if (unit->isSelected()) cout << unit->getID() << "[시즈 행동] 시즈 모드 업그레이드 전 수비 - 보이지 않는 적" << endl;
+		
 
 			int eWeaponRange = targetInfo->type().groundWeapon().maxRange();
 
@@ -254,7 +253,7 @@ State *TankDefenceState::action()
 			}
 		}
 		else {
-			if (unit->isSelected()) cout << unit->getID() << "[시즈 행동] 시즈 모드 업그레이드 전 수비 - 보이는 적" << endl;
+		
 
 			uList dragoons = INFO.getTypeUnitsInRadius(Protoss_Dragoon, E, unit->getPosition(), 12 * TILE_SIZE, true);
 			uList tanks = INFO.getTypeUnitsInRadius(Terran_Siege_Tank_Tank_Mode, S, unit->getPosition(), 10 * TILE_SIZE, false);
@@ -292,15 +291,15 @@ State *TankDefenceState::action()
 		return nullptr;
 	}
 
-	// 질럿 올인일떄 탱크 수비
+
 	if (TM.getZealotAllinRush()) {
-		if (unit->isSelected()) cout << unit->getID() << "[시즈 행동] 질럿 올인일때 수비" << endl;
+
 
 		if (unit->isSieged()) {
 			TM.unsiege(unit);
 		}
 		else {
-			// 너무 가까이 있으면 카이팅
+			
 			if (unit->getGroundWeaponCooldown() == 0)
 				CommandUtil::attackUnit(unit, targetInfo->unit());
 			else {
@@ -315,11 +314,11 @@ State *TankDefenceState::action()
 
 	}
 
-	// 영역 밖에서 치는 적에 대한 수비
+	
 	if (!isInMyArea(targetInfo)) {
-		if (unit->isSelected()) cout << unit->getID() << "[시즈 행동] 영역 밖에서 치는 적에 대한 수비" << endl;
+	
 
-		// 나와 멀리 떨어져 있음.
+		
 		if (unit->getPosition().getApproxDistance(targetInfo->pos()) > 12 * TILE_SIZE) {
 
 			if (unit->isSieged()) {
@@ -328,15 +327,14 @@ State *TankDefenceState::action()
 					INFO.getClosestUnit(S, targetInfo->pos(), TypeKind::BuildingKind, attackRange + 3 * TILE_SIZE);
 
 				if (closeBuildingFromE) {
-					if (unit->isSelected()) cout << unit->getID() << "[시즈 행동] 적과 가까운 우리 건물 있다." << endl;
+					
 
-					// 어택 레인지 안에 우리편 건물이 있으면
-					//int attakRange = targetInfo->type().groundWeapon().maxRange();
+				
 					UnitInfo *closeTank = INFO.getClosestTypeUnit(S, closeBuildingFromE->pos(), Terran_Siege_Tank_Tank_Mode, 15 * TILE_SIZE);
 
-					// 가장 가까운 탱크가 나라면 내가 수비한다.
+					
 					if (closeTank && closeTank->id() == unit->getID()) {
-						if (unit->isSelected()) cout << unit->getID() << "[시즈 행동] 내가 가까우니까 내가 수비한다." << endl;
+					
 
 						if (unit->isSieged())
 							TM.unsiege(unit);
@@ -351,11 +349,11 @@ State *TankDefenceState::action()
 					}
 					else {
 
-						if (unit->isSelected()) cout << unit->getID() << "[시즈 행동] 난 머니까 스테이." << endl;
+						
 
 						if (unit->getDistance(INFO.getSecondChokePosition(S)) < 15 * TILE_SIZE) {
 							if (unit->isSieged()) {
-								// 길막일 때만 언씨즈
+								
 								if (checkZeroAltitueAroundMe(unit->getPosition(), 6))
 									TM.unsiege(unit);
 							}
@@ -368,7 +366,7 @@ State *TankDefenceState::action()
 
 						}
 						else {
-							// SecondChoke와 너무 멀다. 가까이 가자.
+							
 							if (unit->isSieged())
 								TM.unsiege(unit);
 							else
@@ -380,10 +378,7 @@ State *TankDefenceState::action()
 
 					}
 				}
-				else {
-					if (unit->isSelected()) cout << unit->getID() << "[시즈 행동] 적과 가까운 우리 건물이 없다" << endl;
-
-				}
+		
 			}
 			else
 				CommandUtil::attackMove(unit, targetInfo->pos());
@@ -393,12 +388,12 @@ State *TankDefenceState::action()
 		}
 		else {
 
-			if (unit->isSelected()) cout << unit->getID() << "[시즈 행동] 영역밖의 적과 내가 가까이 있다." << endl;
+			
 
-			// 나와 가까이 있음.
+		
 			if (unit->isSieged()) {
-				// 일반 공격
-				if (unit->isSelected()) cout << unit->getID() << "[시즈 행동] 일반 공격" << endl;
+			
+				
 
 			}
 			else {
@@ -415,16 +410,14 @@ State *TankDefenceState::action()
 		return nullptr;
 	}
 
-	// 보이지 않는 다크 같은 유닛
+
 	if (targetInfo->type() == Protoss_Dark_Templar || targetInfo->type() == Zerg_Lurker) {
-		if (unit->isSelected()) cout << unit->getID() << "[시즈 행동] 보이지 않는 유닛 수비" << endl;
+	
 
 		TM.defenceInvisibleUnit(unit, targetInfo);
 		return nullptr;
 	}
 
-	// 나머지 경우
-	if (unit->isSelected()) cout << unit->getID() << "[시즈 행동] 나머지 경우" << endl;
 
 	TM.commonAttackActionByTank(unit, targetInfo);
 
@@ -455,45 +448,41 @@ State *TankBaseDefenceState::action()
 		return nullptr;
 	}
 
-	// 본진에 들어온 보이지 않는 다크 같은 유닛
+
 	if (closeTarget->type() == Protoss_Dark_Templar || closeTarget->type() == Zerg_Lurker
 			&& isSameArea(MYBASE, closeTarget->pos())) {
-		if (unit->isSelected()) cout << unit->getID() << "[시즈 행동] 보이지 않는 유닛 수비" << endl;
-
+	
 		TM.defenceInvisibleUnit(unit, closeTarget);
 		return nullptr;
 	}
 
 	if (INFO.enemyRace == Races::Protoss) {
-		// 셔틀 리버 수비
+		
 		uList shuttles = INFO.getTypeUnitsInArea(Protoss_Shuttle, E, unit->getPosition(), true);
 		uList reavers = INFO.getTypeUnitsInArea(Protoss_Reaver, E, unit->getPosition(), true);
 
 		if (!shuttles.empty() || !reavers.empty()) {
-			// 셔틀이나 리버가 왔다면,
-			// 한마리는 본진 근처에서 시즈하고
-			// 다른 한마리는 퉁퉁포로 싸운다.
+		
 			uList baseTanks = TM.getBaseDefenceTankSet().getUnits();
 
-			// 2마리 이상이 수비할 경우, 본진 커맨드 근처에서 시즈모드로 수비
+		
 			if (baseTanks.size() > 1 && turret) {
 
-				// 시즈해서 방어해야 하는 애
 				if (unit->getID() == TM.getSiegeModeDefenceTank()) {
 					if (unit->isSieged()) {
 						uList unitsInMaxRange = INFO.getAllInRadius(E, unit->getPosition(), WeaponTypes::Arclite_Shock_Cannon.maxRange(), false, false);
 						uList unitsInMinRange = INFO.getAllInRadius(E, unit->getPosition(), WeaponTypes::Arclite_Shock_Cannon.minRange() + 2 * TILE_SIZE, false, false);
 
-						// 적이 있는데 모든 적이 가까이에 있으면..?
+						
 						if (unitsInMaxRange.size() != 0 && unitsInMaxRange.size() == unitsInMinRange.size()) {
 							TM.unsiege(unit);
 						}
-						// 리버나 보이는 적 공격
+					
 						else if (unitsInMaxRange.size() != unitsInMinRange.size()) {
 							TM.attackFirstTargetOfTank(unit, unitsInMaxRange);
 						}
 						else {
-							// 터렛과 거리가 멀면 가까이 가기 위해 Unsiege 한다.
+							
 							if (unit->getPosition().getApproxDistance(turret->pos()) > 2 * TILE_SIZE)
 								TM.unsiege(unit);
 						}
@@ -503,8 +492,7 @@ State *TankBaseDefenceState::action()
 					}
 					else {
 
-						// Turret 에 가깝게 가서 시즈해야한다.
-						// 한마리의 리버라도 시즈모드 해서 쏴죽일 수 있다면.. 시즈 해보자
+					
 						if (!reavers.empty()) {
 							for (auto r : reavers) {
 								if (r->pos().getApproxDistance(unit->getPosition()) > 10 * TILE_SIZE
@@ -517,19 +505,19 @@ State *TankBaseDefenceState::action()
 							}
 						}
 
-						// 적과 멀면
+						
 						if (unit->getPosition().getApproxDistance(closeTarget->pos()) > 3 * TILE_SIZE) {
-							// Turret 쪽으로 이동한 뒤,
+						
 							if (unit->getPosition().getApproxDistance(turret->pos()) > 2 * TILE_SIZE)
 								CommandUtil::move(unit, turret->pos());
 							else
-								TM.siege(unit); //MYBASE와 적당히 가까워지면 시즈모드한다.
+								TM.siege(unit);
 
 							return nullptr;
 
 						}
 						else {
-							// 적과 너무 가까우면 카이팅
+							
 							if (unit->getGroundWeaponCooldown() == 0 && !closeTarget->unit()->isFlying())
 								CommandUtil::attackMove(unit, closeTarget->pos());
 							else
@@ -541,7 +529,7 @@ State *TankBaseDefenceState::action()
 					}
 				}
 				else {
-					// 퉁퉁포로 방어하는 애
+					
 					if (unit->isSieged()) {
 						uList unitsInMaxRange = INFO.getAllInRadius(E, unit->getPosition(), WeaponTypes::Arclite_Shock_Cannon.maxRange(), true, false);
 						uList unitsInMinRange = INFO.getAllInRadius(E, unit->getPosition(), WeaponTypes::Arclite_Shock_Cannon.minRange() + 3 * TILE_SIZE, true, false);
@@ -565,7 +553,7 @@ State *TankBaseDefenceState::action()
 				}
 			}
 			else {
-				// 탱크가 한마리면 걍 퉁퉁포로 싸움
+				
 				if (unit->isSieged()) {
 
 					uList unitsInMaxRange = INFO.getAllInRadius(E, unit->getPosition(), WeaponTypes::Arclite_Shock_Cannon.maxRange(), true, false);
@@ -710,7 +698,7 @@ State *TankFightState::action()
 	vector<UnitType> types = { Terran_Siege_Tank_Tank_Mode, Terran_Goliath };
 	UnitInfo *myFrontUnit = INFO.getClosestTypeUnit(S, SM.getMainAttackPosition(), types, 0, false, true);
 
-	// 그냥 15 타일을 봐바
+	
 	UnitInfo *closestTank = INFO.getClosestTypeUnit(E, myFrontUnit->pos(), Terran_Siege_Tank_Tank_Mode, 15 * TILE_SIZE, true);
 
 	if (closestTank && SM.getNeedDefenceWithScv())
@@ -779,7 +767,7 @@ State *TankSiegeLineState::action()
 {
 	uList unitsInMaxRange, buildings;
 
-	// DrawLine일 때는 공격적으로 가야 하기 때문에 사거리 책정을 좀 줄인다.
+	
 	if (SM.getMainStrategy() == DrawLine || SM.getMainStrategy() == AttackAll)
 	{
 		unitsInMaxRange = INFO.getUnitsInRadius(E, unit->getPosition(), WeaponTypes::Arclite_Shock_Cannon.maxRange() - 3 * TILE_SIZE, true, false, false);
@@ -795,7 +783,7 @@ State *TankSiegeLineState::action()
 
 	uList unitsInMinRange = INFO.getUnitsInRadius(E, unit->getPosition(), WeaponTypes::Arclite_Shock_Cannon.minRange(), true, false, false);
 
-	//	uList unitsInMinRange = INFO.getAllInRadius(E, unit->getPosition(), WeaponTypes::Arclite_Shock_Cannon.minRange() + TILE_SIZE, true, false);
+
 
 	int dangerPoint = 0;
 	UnitInfo *tankInfo = INFO.getUnitInfo(unit, S);
@@ -825,7 +813,7 @@ State *TankSiegeLineState::action()
 		distToTarget = tankInfo->pos().getApproxDistance(targetPos);
 	}
 
-	// 공격할 수 있는 적이 없는 경우
+
 	if (unitsInMaxRange.size() == 0) {
 
 		int Threshold = 3 * TILE_SIZE;
@@ -865,7 +853,7 @@ State *TankSiegeLineState::action()
 	}
 
 	if (unit->isSieged()) {
-		// 시즈 상태인데, 공격 가능한 유닛이 없으면 Unsieged.
+	
 		if (unitsInMaxRange.size() == unitsInMinRange.size()) {
 			TM.unsiege(unit);
 
@@ -876,10 +864,10 @@ State *TankSiegeLineState::action()
 		return nullptr;
 	}
 	else {
-		// 모든 적이 너무 가까이 있을 때.
+	
 		if (unitsInMaxRange.size() == unitsInMinRange.size()) {
 
-			// target이 유닛이 아니라 포지션으로 주어지면, 가장 가까운 유닛을 찾아야 한다.
+			
 			UnitInfo *closeUnitInfo = INFO.getClosestUnit(E, unit->getPosition(), TypeKind::GroundUnitKind, WeaponTypes::Arclite_Shock_Cannon.maxRange(), false);
 
 			if (closeUnitInfo == nullptr)
@@ -921,7 +909,7 @@ State *TankMultiBreakState::action()
 	uList neerVulture = INFO.getTypeUnitsInRadius(Terran_Vulture, S, unit->getPosition(), 6 * TILE_SIZE, false);
 	uList neerGoliath = INFO.getTypeUnitsInRadius(Terran_Goliath, S, unit->getPosition(), 6 * TILE_SIZE, false);
 
-	if (INFO.enemyRace == Races::Terran) // 테란전은 그냥 멀리서부터 시즈
+	if (INFO.enemyRace == Races::Terran) 
 	{
 		attackUnitsInMaxRange.insert(attackUnitsInMaxRange.end(), buildings.begin(), buildings.end());
 	}
@@ -931,7 +919,7 @@ State *TankMultiBreakState::action()
 		for (auto b : buildings)
 		{
 			if (b->type() == INFO.getAdvancedDefenseBuildingType(INFO.enemyRace)) {
-				// 언덕위에 있는 캐논
+				
 				if (INFO.getAltitudeDifference((TilePosition)b->pos(), unit->getTilePosition()) > 0) {
 					if (b->isHide()) {
 						if (ComsatStationManager::Instance().getAvailableScanCount() > 3) {
@@ -949,11 +937,11 @@ State *TankMultiBreakState::action()
 	}
 
 	if (INFO.enemyRace == Races::Protoss) {
-		// 아비터 만나면 째자.
+		
 		uList arbiters = INFO.getTypeUnitsInRadius(Protoss_Arbiter, E, unit->getPosition(), 15 * TILE_SIZE);
 		uList vessels = INFO.getTypeUnitsInRadius(Terran_Science_Vessel, S, unit->getPosition(), 15 * TILE_SIZE);
 
-		// 아비터가 있어서 빼야 하는경우
+		
 		if (!arbiters.empty() && vessels.empty() && !attackUnitsInMaxRange.empty() && ComsatStationManager::Instance().getAvailableScanCount() < 2) {
 			if (unit->isSieged()) {
 				if (!(unit->getGroundWeaponCooldown() == 0 && TM.attackFirstTargetOfTank(unit, attackUnitsInMaxRange))) {
@@ -972,7 +960,7 @@ State *TankMultiBreakState::action()
 			return nullptr;
 		}
 
-		//적 병력이 너무 많으면 째자
+	
 		uList eList = INFO.getUnitsInRadius(E, unit->getPosition(), 16 * TILE_SIZE, true, false, false);
 		uList mList = INFO.getUnitsInRadius(S, unit->getPosition(), 16 * TILE_SIZE, true, false, false);
 
@@ -993,19 +981,19 @@ State *TankMultiBreakState::action()
 		}
 	}
 
-	// 주변에 아예 적이 없는 경우 공격할 수 있는 적이 없는 경우
+	
 	if (attackUnitsInMaxRange.size() == 0) {
 
 		if (unit->isSieged()) {
 
-			// 매우 근접한 적 일꾼이 있으면 Unsiege 한다.
+			
 			if (!workersInMaxRange.empty() && (workersInMaxRange.size() == workersInMinRange.size())
 					&& (neerVulture.empty() && neerGoliath.empty())) {
 				TM.unsiege(unit);
 				return nullptr;
 			}
 
-			// 적군 커맨드가 보이면 커맨드 공격
+			
 			if (commandBuilding)
 				CommandUtil::attackUnit(unit, commandBuilding->unit());
 			else
@@ -1017,7 +1005,7 @@ State *TankMultiBreakState::action()
 		else
 		{
 
-			// 근처에 일꾼이 있으면 카이팅해서 잡자.
+			
 			if (!workersInMaxRange.empty() && (workersInMaxRange.size() == workersInMinRange.size())
 					&& (neerVulture.empty() && neerGoliath.empty())) {
 
@@ -1044,7 +1032,7 @@ State *TankMultiBreakState::action()
 
 	if (unit->isSieged()) {
 
-		// 시즈 상태인데, 모든 적이 근접한 경우.
+		
 		if (attackUnitsInMaxRange.size() == attackUnitsInMinRange.size())
 			TM.unsiege(unit);
 		else
@@ -1054,10 +1042,10 @@ State *TankMultiBreakState::action()
 
 	}
 	else {
-		// 모든 적이 너무 가까이 있을 때.
+		
 		if (attackUnitsInMaxRange.size() == attackUnitsInMinRange.size()) {
 
-			// target이 유닛이 아니라 포지션으로 주어지면, 가장 가까운 유닛을 찾아야 한다.
+			
 			UnitInfo *closeUnitInfo = INFO.getClosestUnit(E, unit->getPosition(), TypeKind::GroundUnitKind, WeaponTypes::Arclite_Shock_Cannon.maxRange(), false);
 
 			if (closeUnitInfo == nullptr)
@@ -1067,8 +1055,7 @@ State *TankMultiBreakState::action()
 		}
 		else {
 
-			// Multi break는 소수 싸움이 대부분이라
-			// Unsiege 이지만 달려들 수 있는 질럿이나 저글링이 있으면 시즈하지 않는다.
+		
 			if (INFO.getTypeUnitsInRadius(Protoss_Zealot, E, unit->getPosition(), 12 * TILE_SIZE).empty()
 					&& INFO.getTypeUnitsInRadius(Zerg_Zergling, E, unit->getPosition(), 12 * TILE_SIZE).empty())
 				TM.siege(unit);
@@ -1080,7 +1067,7 @@ State *TankMultiBreakState::action()
 
 				attackFirstkiting(INFO.getUnitInfo(unit, S), closeUnitInfo, unit->getPosition().getApproxDistance(closeUnitInfo->pos()), 5 * TILE_SIZE);
 
-				//kiting(me, closeUnitInfo, me->pos().getApproxDistance(closeUnitInfo->pos()), 3 * TILE_SIZE);
+				
 			}
 		}
 	}
@@ -1102,7 +1089,7 @@ State *TankKeepMultiState::action()
 			m_targetPos = INFO.getThirdExpansionLocation(S)->Center();
 	}
 
-	// 목적지에서 그냥 대기
+	
 	if (me->pos().getApproxDistance(m_targetPos) < 3 * TILE_SIZE)
 	{
 		if (!unit->isSieged())
@@ -1122,7 +1109,7 @@ State *TankKeepMultiState::action()
 
 	uList unitsInMinRange = INFO.getUnitsInRadius(E, unit->getPosition(), WeaponTypes::Arclite_Shock_Cannon.minRange() + 2 * TILE_SIZE, true, false, false);
 
-	// 공격할 수 있는 적이 없는 경우
+	
 	if (unitsInMaxRange.size() == 0) {
 		if (unit->isSieged())
 			TM.unsiege(unit);
@@ -1136,7 +1123,7 @@ State *TankKeepMultiState::action()
 	}
 
 	if (unit->isSieged()) {
-		// 시즈 상태인데, 공격 가능한 유닛이 없으면 Unsieged.
+	
 		if (unitsInMaxRange.size() == unitsInMinRange.size()) {
 			TM.unsiege(unit);
 
@@ -1148,10 +1135,10 @@ State *TankKeepMultiState::action()
 		}
 	}
 	else {
-		// 모든 적이 너무 가까이 있을 때.
+		
 		if (unitsInMaxRange.size() == unitsInMinRange.size()) {
 
-			// target이 유닛이 아니라 포지션으로 주어지면, 가장 가까운 유닛을 찾아야 한다.
+			
 			UnitInfo *closeUnitInfo = INFO.getClosestUnit(E, unit->getPosition(), TypeKind::GroundUnitKind, WeaponTypes::Arclite_Shock_Cannon.maxRange() + TILE_SIZE, false);
 
 			if (closeUnitInfo == nullptr)
@@ -1169,7 +1156,7 @@ State *TankKeepMultiState::action()
 
 State *TankDropshipState::action()
 {
-	// 타고 있으면 스킵
+	
 	if (unit->isLoaded())
 	{
 		firstBoard = true;
@@ -1181,13 +1168,13 @@ State *TankDropshipState::action()
 		return new TankIdleState();
 	}
 
-	// 한번도 탄적이 없어
+	
 	if (firstBoard == false)
 	{
 		if (unit->isSieged())
 			unit->unsiege();
 
-		// 드랍쉼 우클릭
+		
 		if (isInMyArea(unit->getPosition()))
 			CommandUtil::rightClick(unit, m_targetUnit);
 		else
@@ -1196,15 +1183,15 @@ State *TankDropshipState::action()
 		return nullptr;
 	}
 
-	// 여기부터 공격
+	
 	if (targetPosition == Positions::Unknown || INFO.getTypeBuildingsInRadius(Terran_Command_Center, E, targetPosition, 8 * TILE_SIZE).size() == 0)
 	{
-		if (timeToClear == 0)
-			timeToClear = TIME;
+		if (TIMEToClear == 0)
+			TIMEToClear = TIME;
 
-		if (timeToClear + 24 * 60 < TIME)
+		if (TIMEToClear + 24 * 60 < TIME)
 		{
-			timeToClear = 0;
+			TIMEToClear = 0;
 
 			Base *nearestBase = nullptr;
 			int dist = INT_MAX;
@@ -1235,9 +1222,9 @@ State *TankDropshipState::action()
 	uList buildings = INFO.getBuildingsInRadius(E, unit->getPosition(), WeaponTypes::Arclite_Shock_Cannon.maxRange() + TILE_SIZE, true, false);
 	unitsInMaxRange.insert(unitsInMaxRange.end(), buildings.begin(), buildings.end());
 
-	if (unitsInMaxRange.size() == 0) // 공격할 대상이 없음.
+	if (unitsInMaxRange.size() == 0) 
 	{
-		if (unit->isSieged() && timeToClear + 24 * 60 < TIME)
+		if (unit->isSieged() && TIMEToClear + 24 * 60 < TIME)
 			unit->unsiege();
 		else
 			CommandUtil::attackMove(unit, targetPosition);
@@ -1271,7 +1258,7 @@ State *TankProtectAdditionalMultiState::action()
 	uList buildings = INFO.getBuildingsInRadius(E, unit->getPosition(), WeaponTypes::Arclite_Shock_Cannon.maxRange() + TILE_SIZE, true, false);
 	unitsInMaxRange.insert(unitsInMaxRange.end(), buildings.begin(), buildings.end());
 
-	if (unitsInMaxRange.size() == 0) // 공격할 대상이 없음.
+	if (unitsInMaxRange.size() == 0) 
 	{
 		if (unit->isSieged())
 			unit->unsiege();

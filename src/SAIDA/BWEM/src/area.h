@@ -193,7 +193,7 @@ namespace BWEM {
 		bool							isNeighbouringArea(const Area *pArea) const;
 
 		//////////////////////////////////////
-		// SAIDA 추가
+
 		bool							isIsland() const {
 			return m_island;
 		}
@@ -239,7 +239,6 @@ namespace BWEM {
 		std::vector<Base>				m_Bases;
 
 		//////////////////////////////////////
-		// SAIDA 추가
 		mutable bool							m_island;
 		mutable std::vector<BWAPI::Position>	m_boundaryVertices;
 	};

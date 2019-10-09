@@ -12,7 +12,7 @@ namespace MyBot
 		SelfArea,
 		EnemyArea,
 		CombatArea
-	}; // 모름(0)/중립(1)/내꺼(2)/적꺼(3)/전투(4) : 둘다 유닛이 있어 전투 발생/진행 가능 지역
+	}; 
 
 	class GridAreaCell
 	{
@@ -131,16 +131,16 @@ namespace MyBot
 			return sArea;
 		}
 
-		// base로 부터 가장 가까운 미점령 Cell을 리턴
+		
 		GridAreaCell getNearestCell(Player p);
 
-		// base로 부터 가장 먼 점령지 Cell을 리턴
+		
 		GridAreaCell getFarthestCell(Player p);
 
-		// base로 부터 radius 반경 경계에 해당하는 GridAreaCell들을 리턴함
+		
 		vector<GridAreaCell *> getBoundary(TilePosition base, int radius);
 
-		// 적이 점령한 지역 경계에 해당하는 GridAreaCell들을 리턴함
+		
 		vector<GridAreaCell *> getEnemyBoundary(int margin = 5);
 
 		GridAreaCell getGridArea(int i, int j) {
@@ -183,6 +183,6 @@ namespace MyBot
 		void update();
 
 	private:
-		bool isMyBaseRight = false; // 내 본진이 중앙에서 어느쪽인지, false = left, true = right
+		bool isMyBaseRight = false; 
 	};
 }

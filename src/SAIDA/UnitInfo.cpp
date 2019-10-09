@@ -2,7 +2,7 @@
 #include "Common.h"
 #include "GameCommander.h"
 #include "UnitInfo.h"
-#include "UnitState\State.h"
+#include "UnitManager\State.h"
 #include "InformationManager.h"
 
 using namespace MyBot;
@@ -56,7 +56,7 @@ UnitInfo::UnitInfo(Unit unit)
 	m_completeTime = m_completed ? TIME : TIME + m_RemainingBuildTime;
 }
 
-// 중립같은 것들에 대해 관리할때 사용.
+
 UnitInfo::UnitInfo(Unit unit, Position pos) {
 	m_unit = unit;
 	m_type = unit->getType();
@@ -106,7 +106,7 @@ void UnitInfo::Update()
 
 		m_hide = false;
 
-		// 공격을 하고 있을때는 블락킹 처리를 하지 않는다.
+		
 		if (m_lastPosition == m_unit->getPosition() && m_vPosition != m_lastPosition && m_unit->getGroundWeaponCooldown() == 0) {
 			m_blockedQueue.push(true);
 			m_blockedCnt++;
@@ -166,7 +166,7 @@ void UnitInfo::Update()
 			m_energy = min((double)E->maxEnergy(m_type), m_energy + 0.03125);
 
 			if (isShowThisFrame) {
-				// 지상유닛이고 주변이 모두 visiable 이고 unload 할 건물 or 유닛이 있으면.
+				
 				if (!m_type.isFlyer() && !m_type.isBuilding()) {
 					bool isUnloaded = true;
 
@@ -184,7 +184,7 @@ void UnitInfo::Update()
 					if (isUnloaded) {
 						UnitInfo *ui = nullptr;
 
-						// unload 할 수 있는 건물 유닛 찾기
+					
 						if (INFO.enemyRace == Races::Zerg)
 							ui = INFO.getClosestTypeUnit(E, m_unit->getPosition(), Zerg_Overlord, 320);
 						else if (INFO.enemyRace == Races::Protoss)
@@ -200,7 +200,7 @@ void UnitInfo::Update()
 							ui->m_spaceRemaining = min(ui->m_spaceRemaining + m_type.spaceRequired(), ui->type().spaceProvided());
 					}
 				}
-				// load 가능한 건물이 나타난 경우 가득 찼다고 가정.
+				
 				else if (m_type == Zerg_Overlord || m_type == Protoss_Shuttle || m_type == Terran_Dropship || m_type == Terran_Bunker)
 					m_spaceRemaining = 0;
 			}
@@ -245,7 +245,7 @@ void UnitInfo::Update()
 			m_lifted = m_unit->isFlying();
 		}
 
-		/// Enemy Bunker 의 Marine Count Clear
+		
 		if (TIME % 12 == 0  && m_unit->getPlayer() != S && m_type == Terran_Bunker)
 		{
 			int gap;
@@ -285,7 +285,6 @@ void UnitInfo::Update()
 			}
 		}
 
-		// TODO 위치 이동. 불필요하게 여러번 세팅될 수 있음.
 		if (!m_enemiesTargetMe.empty())
 		{
 			m_avgEnemyPosition = UnitUtil::GetAveragePosition(m_enemiesTargetMe);
@@ -293,13 +292,13 @@ void UnitInfo::Update()
 		}
 	}
 	else {
-		// 이전 프레임에 보였다가 갑자기 안보이는 경우
+		
 		if (!m_hide) {
-			// 지상유닛이고 주변에 load 할 건물, 유닛이 있으면.
+			
 			if (!m_type.isFlyer() && !m_type.isBuilding()) {
 				UnitInfo *ui = nullptr;
 
-				// load 할 수 있는 건물 유닛 찾기
+				
 				if (INFO.enemyRace == Races::Zerg)
 					ui = INFO.getClosestTypeUnit(E, m_lastPosition, Zerg_Overlord, 100);
 				else if (INFO.enemyRace == Races::Protoss)
@@ -327,10 +326,10 @@ void UnitInfo::Update()
 		m_energy = min((double)E->maxEnergy(m_type), m_energy + 0.03125);
 
 		if (m_lastPosition != Positions::Unknown) {
-			// 저그의 burrow 가능한 유닛들이나 vulture 의 spider mine 동작.
+			
 			if (m_burrowed)
 			{
-				// 터렛, 베슬, 스캔 시야 안인 경우
+				
 				if (ComsatStationManager::Instance().inDetectedArea(m_type, m_lastPosition)
 						|| ComsatStationManager::Instance().inTheScanArea(m_lastPosition)) {
 					if (m_lastNearUnitFrame + 1 == TIME)
@@ -346,7 +345,7 @@ void UnitInfo::Update()
 					}
 				}
 				else {
-					// 럴커 주변에 지상유닛이 있는데도 안보이면 없다고 판단.
+					
 					if (m_type == Zerg_Lurker)
 					{
 						if (INFO.getUnitsInRadius(S, m_lastPosition, 5 * TILE_SIZE, true, false, true).size())
@@ -364,7 +363,7 @@ void UnitInfo::Update()
 							}
 						}
 					}
-					// 벌쳐, 일꾼을 제외한 지상유닛이 근처에 있는데도 안보이면 없어짐.
+					
 					else if (m_type == Terran_Vulture_Spider_Mine) {
 						uList selfUnit = INFO.getUnitsInRadius(S, m_lastPosition, 3 * TILE_SIZE, true, false, false);
 
@@ -390,7 +389,7 @@ void UnitInfo::Update()
 			}
 			else
 			{
-				// Visible 아닌 적이 있는 경우에만 Unknown 처리 한다.
+				
 				if (bw->isVisible(TilePosition(m_lastPosition)) && bw->isVisible(TilePosition(m_vPosition)))
 					m_lastPosition = Positions::Unknown;
 			}
@@ -428,7 +427,7 @@ void UnitInfo::changeState(State *state)
 {
 	if (state != nullptr) {
 		if (this->type() == Terran_SCV) {
-			ScvManager::Instance().setStateToSCV(this, state);
+			SoldierManager::Instance().setStateToSCV(this, state);
 		}
 		else if (this->type() == Terran_Siege_Tank_Tank_Mode || this->type() == Terran_Siege_Tank_Siege_Mode) {
 			TankManager::Instance().setStateToTank(this, state);
@@ -453,17 +452,8 @@ void UnitInfo::action()
 	try {
 		changeState(pState->action());
 	}
-	catch (SAIDA_Exception e) {
-		Logger::error("%s State action Error. (ErrorCode : %x, Eip : %p)\n", pState->getName().c_str(), e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-		throw e;
-	}
-	catch (const exception &e) {
-		Logger::error("%s State action Error. (Error : %s)\n", pState->getName().c_str(), e.what());
-		throw e;
-	}
+
 	catch (...) {
-		Logger::error("%s State action Unknown Error.\n", pState->getName().c_str());
-		throw;
 	}
 }
 
@@ -472,17 +462,7 @@ void UnitInfo::action(Unit unit)
 	try {
 		changeState(pState->action(unit));
 	}
-	catch (SAIDA_Exception e) {
-		Logger::error("%s State action Error. (ErrorCode : %x, Eip : %p)\n", pState->getName().c_str(), e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-		throw e;
-	}
-	catch (const exception &e) {
-		Logger::error("%s State action Error. (Error : %s)\n", pState->getName().c_str(), e.what());
-		throw e;
-	}
 	catch (...) {
-		Logger::error("%s State action Unknown Error.\n", pState->getName().c_str());
-		throw;
 	}
 }
 
@@ -491,17 +471,7 @@ void MyBot::UnitInfo::action(Unit targetUnit, Unit targetUnit2)
 	try {
 		changeState(pState->action(targetUnit, targetUnit2));
 	}
-	catch (SAIDA_Exception e) {
-		Logger::error("%s State action Error. (ErrorCode : %x, Eip : %p)\n", pState->getName().c_str(), e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-		throw e;
-	}
-	catch (const exception &e) {
-		Logger::error("%s State action Error. (Error : %s)\n", pState->getName().c_str(), e.what());
-		throw e;
-	}
 	catch (...) {
-		Logger::error("%s State action Unknown Error.\n", pState->getName().c_str());
-		throw;
 	}
 }
 
@@ -510,17 +480,7 @@ void UnitInfo::action(UnitType unitType)
 	try {
 		changeState(pState->action(unitType));
 	}
-	catch (SAIDA_Exception e) {
-		Logger::error("%s State action Error. (ErrorCode : %x, Eip : %p)\n", pState->getName().c_str(), e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-		throw e;
-	}
-	catch (const exception &e) {
-		Logger::error("%s State action Error. (Error : %s)\n", pState->getName().c_str(), e.what());
-		throw e;
-	}
 	catch (...) {
-		Logger::error("%s State action Unknown Error.\n", pState->getName().c_str());
-		throw;
 	}
 }
 
@@ -529,17 +489,8 @@ void UnitInfo::action(Position targetPosition)
 	try {
 		changeState(pState->action(targetPosition));
 	}
-	catch (SAIDA_Exception e) {
-		Logger::error("%s State action Error. (ErrorCode : %x, Eip : %p)\n", pState->getName().c_str(), e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-		throw e;
-	}
-	catch (const exception &e) {
-		Logger::error("%s State action Error. (Error : %s)\n", pState->getName().c_str(), e.what());
-		throw e;
-	}
+
 	catch (...) {
-		Logger::error("%s State action Unknown Error.\n", pState->getName().c_str());
-		throw;
 	}
 }
 
@@ -548,17 +499,7 @@ void UnitInfo::action(TilePosition targetPosition)
 	try {
 		changeState(pState->action(targetPosition));
 	}
-	catch (SAIDA_Exception e) {
-		Logger::error("%s State action Error. (ErrorCode : %x, Eip : %p)\n", pState->getName().c_str(), e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-		throw e;
-	}
-	catch (const exception &e) {
-		Logger::error("%s State action Error. (Error : %s)\n", pState->getName().c_str(), e.what());
-		throw e;
-	}
 	catch (...) {
-		Logger::error("%s State action Unknown Error.\n", pState->getName().c_str());
-		throw;
 	}
 }
 
@@ -567,17 +508,7 @@ void UnitInfo::action(Base *targetPosition)
 	try {
 		changeState(pState->action(targetPosition));
 	}
-	catch (SAIDA_Exception e) {
-		Logger::error("%s State action Error. (ErrorCode : %x, Eip : %p)\n", pState->getName().c_str(), e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-		throw e;
-	}
-	catch (const exception &e) {
-		Logger::error("%s State action Error. (Error : %s)\n", pState->getName().c_str(), e.what());
-		throw e;
-	}
 	catch (...) {
-		Logger::error("%s State action Unknown Error.\n", pState->getName().c_str());
-		throw;
 	}
 }
 

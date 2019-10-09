@@ -34,7 +34,7 @@ namespace BWEM
 #define BWEM_USE_WINUTILS 1		// enable(1) or disable(0) the compilation of winutils.cpp
 	// winutils.h provides optional utils that require the windows headers.
 
-#define BWEM_USE_MAP_PRINTER 1	// enable(1) or disable(0) the compilation of mapPrinter.cpp
+#define BWEM_USE_MAP_PRINTER 0	// enable(1) or disable(0) the compilation of mapPrinter.cpp
 	// mapPrinter.h provides optional utils that require the EasyBMP Library (windows).
 
 

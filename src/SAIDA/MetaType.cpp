@@ -17,7 +17,7 @@ MetaType::MetaType(const string &name)
 
 	for (const UnitType &unitType : UnitTypes::allUnitTypes())
 	{
-		// check to see if the names match exactly
+		
 		string typeName = unitType.getName();
 		replace(typeName.begin(), typeName.end(), '_', ' ');
 
@@ -27,7 +27,7 @@ MetaType::MetaType(const string &name)
 			return;
 		}
 
-		// check to see if the names match without the race prefix
+		
 		const string &raceName = unitType.getRace().getName();
 
 		if ((typeName.length() > raceName.length()) && (typeName.compare(raceName.length() + 1, typeName.length(), inputName) == 0))
@@ -61,7 +61,7 @@ MetaType::MetaType(const string &name)
 		}
 	}
 
-	//UAB_ASSERT_WARNING(false, "Could not find MetaType with name: %s", name.c_str());
+
 }
 
 MetaType::MetaType (UnitType t)

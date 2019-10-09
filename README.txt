@@ -1,33 +1,21 @@
-*******************************************************************************
-        SAIDA (Samsung Artificial Intelligence & Data Analytics)
-*******************************************************************************
+﻿EntryName                                    : Stormbreaker
+Contact Person Name (First, Last)            : Mingqiang Li
+Contact Person Email Address:                : li_mingqiang_ok@aliyun.com
+Affiliation                                  : Independent
+Race (in full game)                          : Terran
+DLL or ProxyBot                              : DLL
+BWAPI Version (3.7.4 or 4.X)                 : 4.1.2
+GPU compute required? (GTX 1080ti)           : NO
+Compile info                                 : Stormbreaker.sln in visual studio 2013 with visual studio 2013 compiler。compile the Stormbreaker project.
 
-Environment Setup :
-- Visual Studio 2013
-- Uses Windows environment variable BWAPI_DIR which points to BWAPI 4.1.2
-  (ex : BWAPI_DIR = C:\StarCraft\bwlibrary\BWAPI412)
-To Compile :
-- Open src/SAIDA.sln in VS2013
-- Select Release_Server_DLL mode
-- Build the SAIDA project
-- Output will go to src/Release_Server_DLL/SAIDA/SAIDA.dll
 
-Tournament Setup :
-- Copy SAIDA.dll to the tournament SAIDA/AI folder
+To Compile:
+- Bwapi 4.1.2 & BWTA (set environment viariables with names BWAPI_DIR & BWTA_DIR)
+- Open src/Stormbreaker.sln in VS2013
+- Select Release mode
+- Build the Stormbreaker project
+- Output will go to src/Release_DLL/dll/Stormbreaker.dll
 
-References :
-UAlberta Bot (Thanks to Author : David Churchill)
-BWEM (Map Analyzer, Thanks to Author : Igor Dimitrijevic)
-
-Brief Strategy : 
-SAIDA is able to change battle strategies and various combinations of units dynamically 
-according to the enemy strategy to get higher probabilities for winning the game. 
-Also it has high performance in gathering resources. 
-Finally it does powerful attack at appropriate time that is decided by our ML model.
-
-###########################################################
-SAIDA team of Samsung SDS from South Korea
-Team Members : Changhyeon Bae(Leader), Daehun Jun, Iljoo Yoon, Junseung Lee, 
-               Hyunjae Lee, Hyunjin Choi, Uk Jo, Yonghyun Jeong
-Leader Contact : charlie.bae@samsung.com, mathto@naver.com
-About Samsung SDS : http://www.samsungsds.com/global/en/index.html
+Tournament Setup:
+- Copy Stormbreaker.dll、DLmodel_stateValue、DLmodel_policy (or the files in dll directory) to the tournament Stormbreaker/AI folder
+- Set bots: {"BotName": "Stormbreaker", "Race": "Terran", "BotType": "dll", "BWAPIVersion": "BWAPI_412"}

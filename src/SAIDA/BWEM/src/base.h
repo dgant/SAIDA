@@ -26,7 +26,6 @@ namespace BWEM {
 	class Area;
 	class Map;
 
-	//[현진] base관리를 위한 멤버 변수 추가
 	enum baseOccupiedInfo { emptyBase, myBase, enemyBase, shareBase };
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,7 +114,6 @@ namespace BWEM {
 		void							OnMineralDestroyed(const Mineral *pMineral);
 
 		////////////////////////////////////////////////////////////////////////////
-		// SAIDA 추가
 		bool							isIsland() const;
 		// (starting point only) 미네랄 뒤쪽에 공간이 있으면 true
 		bool							isExistBackYard() const {
@@ -195,7 +193,6 @@ namespace BWEM {
 			m_bottomMineral = mineral;
 		}
 
-		// 미네랄과 베이스의 중심 지점을 가져온다.
 		BWAPI::Position					getMineralBaseCenter() const {
 			return m_mineral_center;
 		}
@@ -314,7 +311,6 @@ namespace BWEM {
 		void							SetLastVisitedTime(int visitTime) const {
 			m_lastVisitedTime = visitTime;
 		}
-		// creep 은 초반 정찰을 위해서만 사용이 됨. (event 가 발생하지 않기 때문에 매 프레임 체크하는것은 비효율적이기 때문)
 		int								GetLastCreepFoundTime() const {
 			return m_lastCreepFoundTime;
 		}
@@ -377,7 +373,6 @@ namespace BWEM {
 		std::vector<Mineral *>			m_BlockingMinerals;
 		bool							m_starting = false;
 
-		// SAIDA 추가
 		mutable std::pair<BWAPI::Unit, BWAPI::Unit>	m_edgeMinerals;
 
 		// 미네랄 뒤쪽에 공간이 있으면 true

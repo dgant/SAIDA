@@ -1,448 +1,469 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="SAIDA\dllmain.cpp">
-      <Filter>BotClient</Filter>
+    <ClCompile Include="Stormbreaker\CommandUtil.cpp">
+      <Filter>Stormbreaker</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\main.cpp">
-      <Filter>BotClient</Filter>
+    <ClCompile Include="Stormbreaker\GameCommander.cpp">
+      <Filter>Stormbreaker</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\MyBotModule.cpp">
-      <Filter>BotClient</Filter>
+    <ClCompile Include="Stormbreaker\StrategyManager.cpp">
+      <Filter>Stormbreaker</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\BuildManager.cpp">
-      <Filter>BotSource</Filter>
-    </ClCompile>
-    <ClCompile Include="SAIDA\CommandUtil.cpp">
-      <Filter>BotSource</Filter>
-    </ClCompile>
-    <ClCompile Include="SAIDA\ConstructionManager.cpp">
-      <Filter>BotSource</Filter>
-    </ClCompile>
-    <ClCompile Include="SAIDA\ConstructionPlaceFinder.cpp">
-      <Filter>BotSource</Filter>
-    </ClCompile>
-    <ClCompile Include="SAIDA\GameCommander.cpp">
-      <Filter>BotSource</Filter>
-    </ClCompile>
-    <ClCompile Include="SAIDA\InformationManager.cpp">
-      <Filter>BotSource</Filter>
-    </ClCompile>
-    <ClCompile Include="SAIDA\ScoutManager.cpp">
-      <Filter>BotSource</Filter>
-    </ClCompile>
-    <ClCompile Include="SAIDA\StrategyManager.cpp">
-      <Filter>BotSource</Filter>
-    </ClCompile>
-    <ClCompile Include="SAIDA\UXManager.cpp">
-      <Filter>BotSource</Filter>
-    </ClCompile>
-    <ClCompile Include="SAIDA\MetaType.cpp">
-      <Filter>BotSource\DataStructure</Filter>
-    </ClCompile>
-    <ClCompile Include="SAIDA\UnitData.cpp">
-      <Filter>BotSource\DataStructure</Filter>
-    </ClCompile>
-    <ClCompile Include="SAIDA\ConstructionTask.cpp">
-      <Filter>BotSource\DataStructure</Filter>
-    </ClCompile>
-    <ClCompile Include="SAIDA\BuildOrderQueue.cpp">
-      <Filter>BotSource\DataStructure</Filter>
-    </ClCompile>
-    <ClCompile Include="SAIDA\Common.cpp">
-      <Filter>BotSource\CommonUtil</Filter>
-    </ClCompile>
-    <ClCompile Include="SAIDA\Config.cpp">
-      <Filter>BotSource\CommonUtil</Filter>
-    </ClCompile>
-    <ClCompile Include="SAIDA\BWEM\src\area.cpp">
+    <ClCompile Include="Stormbreaker\BWEM\src\area.cpp">
       <Filter>BWEM\src</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\BWEM\src\base.cpp">
+    <ClCompile Include="Stormbreaker\BWEM\src\base.cpp">
       <Filter>BWEM\src</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\BWEM\src\bwapiExt.cpp">
+    <ClCompile Include="Stormbreaker\BWEM\src\bwapiExt.cpp">
       <Filter>BWEM\src</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\BWEM\src\bwem.cpp">
+    <ClCompile Include="Stormbreaker\BWEM\src\bwem.cpp">
       <Filter>BWEM\src</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\BWEM\src\cp.cpp">
+    <ClCompile Include="Stormbreaker\BWEM\src\cp.cpp">
       <Filter>BWEM\src</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\BWEM\src\examples.cpp">
+    <ClCompile Include="Stormbreaker\BWEM\src\examples.cpp">
       <Filter>BWEM\src</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\BWEM\src\exampleWall.cpp">
+    <ClCompile Include="Stormbreaker\BWEM\src\exampleWall.cpp">
       <Filter>BWEM\src</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\BWEM\src\graph.cpp">
+    <ClCompile Include="Stormbreaker\BWEM\src\graph.cpp">
       <Filter>BWEM\src</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\BWEM\src\gridMap.cpp">
+    <ClCompile Include="Stormbreaker\BWEM\src\gridMap.cpp">
       <Filter>BWEM\src</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\BWEM\src\map.cpp">
+    <ClCompile Include="Stormbreaker\BWEM\src\map.cpp">
       <Filter>BWEM\src</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\BWEM\src\mapDrawer.cpp">
+    <ClCompile Include="Stormbreaker\BWEM\src\mapDrawer.cpp">
       <Filter>BWEM\src</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\BWEM\src\mapImpl.cpp">
+    <ClCompile Include="Stormbreaker\BWEM\src\mapImpl.cpp">
       <Filter>BWEM\src</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\BWEM\src\mapPrinter.cpp">
+    <ClCompile Include="Stormbreaker\BWEM\src\mapPrinter.cpp">
       <Filter>BWEM\src</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\BWEM\src\neutral.cpp">
+    <ClCompile Include="Stormbreaker\BWEM\src\neutral.cpp">
       <Filter>BWEM\src</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\BWEM\src\tiles.cpp">
+    <ClCompile Include="Stormbreaker\BWEM\src\tiles.cpp">
       <Filter>BWEM\src</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\BWEM\src\utils.cpp">
+    <ClCompile Include="Stormbreaker\BWEM\src\utils.cpp">
       <Filter>BWEM\src</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\BWEM\src\winutils.cpp">
+    <ClCompile Include="Stormbreaker\BWEM\src\winutils.cpp">
       <Filter>BWEM\src</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\BWEM\EasyBMP_1.06\EasyBMP.cpp">
+    <ClCompile Include="Stormbreaker\BWEM\EasyBMP_1.06\EasyBMP.cpp">
       <Filter>BWEM\EasyBMP</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitManager\MarineManager.cpp">
-      <Filter>BotSource\UnitManager</Filter>
+    <ClCompile Include="Stormbreaker\GridArea.cpp">
+      <Filter>Stormbreaker</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitState\MarineState.cpp">
-      <Filter>BotSource\UnitState</Filter>
+    <ClCompile Include="Stormbreaker\ReserveBuilding.cpp">
+      <Filter>Stormbreaker</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\BasicBuildStrategy.cpp">
-      <Filter>BotSource</Filter>
+    <ClCompile Include="Stormbreaker\dllmain.cpp">
+      <Filter>Stormbreaker</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitInfo.cpp">
-      <Filter>BotSource\DataStructure</Filter>
+    <ClCompile Include="Stormbreaker\Stormbreaker.cpp">
+      <Filter>Stormbreaker</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitState\TankState.cpp">
-      <Filter>BotSource\UnitState</Filter>
+    <ClCompile Include="Stormbreaker\StormbreakerUtil.cpp">
+      <Filter>Stormbreaker</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitManager\TankManager.cpp">
-      <Filter>BotSource\UnitManager</Filter>
+    <ClCompile Include="Stormbreaker\DeepLearningTools\LinearRegression.cpp">
+      <Filter>Stormbreaker\DeepLearningTools</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitManager\ScvManager.cpp">
-      <Filter>BotSource\UnitManager</Filter>
+    <ClCompile Include="Stormbreaker\DeepLearningTools\network.cpp">
+      <Filter>Stormbreaker\DeepLearningTools</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitState\ScvState.cpp">
-      <Filter>BotSource\UnitState</Filter>
+    <ClCompile Include="Stormbreaker\DeepLearningTools\neuron.cpp">
+      <Filter>Stormbreaker\DeepLearningTools</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitManager\VultureManager.cpp">
-      <Filter>BotSource\UnitManager</Filter>
+    <ClCompile Include="Stormbreaker\DeepLearningTools\SumTree.cpp">
+      <Filter>Stormbreaker\DeepLearningTools</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitManager\WraithManager.cpp">
-      <Filter>BotSource\UnitManager</Filter>
+    <ClCompile Include="Stormbreaker\ActorCriticForProductionStrategy.cpp">
+      <Filter>Stormbreaker</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitState\VultureState.cpp">
-      <Filter>BotSource\UnitState</Filter>
+    <ClCompile Include="Stormbreaker\Common.cpp">
+      <Filter>Stormbreaker</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitState\WraithState.cpp">
-      <Filter>BotSource\UnitState</Filter>
+    <ClCompile Include="Stormbreaker\InformationManager.cpp">
+      <Filter>Stormbreaker\InFoManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\EnemyStrategyManager.cpp">
-      <Filter>BotSource</Filter>
+    <ClCompile Include="Stormbreaker\MetaType.cpp">
+      <Filter>Stormbreaker\InFoManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitState\FactoryState.cpp">
-      <Filter>BotSource\UnitState</Filter>
+    <ClCompile Include="Stormbreaker\UnitInfo.cpp">
+      <Filter>Stormbreaker\InFoManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitState\BarrackState.cpp">
-      <Filter>BotSource\UnitState</Filter>
+    <ClCompile Include="Stormbreaker\UnitData.cpp">
+      <Filter>Stormbreaker\InFoManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\TrainManager.cpp">
-      <Filter>BotSource</Filter>
+    <ClCompile Include="Stormbreaker\UnitManager\ComsatStationManager.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitState\GoliathState.cpp">
-      <Filter>BotSource\UnitState</Filter>
+    <ClCompile Include="Stormbreaker\UnitManager\DropshipManager.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitManager\GoliathManager.cpp">
-      <Filter>BotSource\UnitManager</Filter>
+    <ClCompile Include="Stormbreaker\UnitManager\EngineeringBayManager.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitState\CommandCenterState.cpp">
-      <Filter>BotSource\UnitState</Filter>
+    <ClCompile Include="Stormbreaker\UnitManager\GoliathManager.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitState\ComsatStationState.cpp">
-      <Filter>BotSource\UnitState</Filter>
+    <ClCompile Include="Stormbreaker\UnitManager\MarineManager.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitManager\ComsatStationManager.cpp">
-      <Filter>BotSource\UnitManager</Filter>
+    <ClCompile Include="Stormbreaker\UnitManager\TankManager.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\GridArea.cpp">
-      <Filter>BotSource</Filter>
+    <ClCompile Include="Stormbreaker\UnitManager\VessleManager.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\ReserveBuilding.cpp">
-      <Filter>BotSource</Filter>
+    <ClCompile Include="Stormbreaker\UnitManager\VultureManager.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitState\StarportState.cpp">
-      <Filter>BotSource\UnitState</Filter>
+    <ClCompile Include="Stormbreaker\UnitManager\WraithManager.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\TerranConstructionPlaceFinder.cpp">
-      <Filter>BotSource</Filter>
+    <ClCompile Include="Stormbreaker\UnitManager\BarrackState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\SaidaUtil.cpp">
-      <Filter>BotSource</Filter>
+    <ClCompile Include="Stormbreaker\UnitManager\CommandCenterState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitState\EngineeringBayState.cpp">
-      <Filter>BotSource\UnitState</Filter>
+    <ClCompile Include="Stormbreaker\UnitManager\ComsatStationState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitManager\EngineeringBayManager.cpp">
-      <Filter>BotSource\UnitManager</Filter>
+    <ClCompile Include="Stormbreaker\UnitManager\DropshipState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitState\VessleState.cpp">
-      <Filter>BotSource\UnitState</Filter>
+    <ClCompile Include="Stormbreaker\UnitManager\EngineeringBayState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitManager\VessleManager.cpp">
-      <Filter>BotSource\UnitManager</Filter>
+    <ClCompile Include="Stormbreaker\UnitManager\FactoryState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\BuildType.cpp">
-      <Filter>BotSource\DataStructure</Filter>
+    <ClCompile Include="Stormbreaker\UnitManager\GoliathState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitState\DropshipState.cpp">
-      <Filter>BotSource\UnitState</Filter>
+    <ClCompile Include="Stormbreaker\UnitManager\MarineState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\UnitManager\DropshipManager.cpp">
-      <Filter>BotSource\UnitManager</Filter>
+    <ClCompile Include="Stormbreaker\UnitManager\ScvState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\DeepLearning\SharedMemoryManager.cpp">
-      <Filter>DeepLearning</Filter>
+    <ClCompile Include="Stormbreaker\UnitManager\StarportState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClCompile>
-    <ClCompile Include="SAIDA\DeepLearning\Supervised.cpp">
-      <Filter>DeepLearning</Filter>
+    <ClCompile Include="Stormbreaker\UnitManager\TankState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\VessleState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\VultureState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\WraithState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\HostileManager.cpp">
+      <Filter>Stormbreaker</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\MetaStrategy.cpp">
+      <Filter>Stormbreaker</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BuildingStrategy\BuildingPlaceFinder.cpp">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BuildingStrategy\BuildManager.cpp">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BuildingStrategy\BuildOrderManager.cpp">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BuildingStrategy\BuildStrategy.cpp">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BuildingStrategy\BuildType.cpp">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BuildingStrategy\ConstructionManager.cpp">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BuildingStrategy\ConstructionTask.cpp">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\TrainManager.cpp">
+      <Filter>Stormbreaker</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\TimeOut\TimerManager.cpp">
+      <Filter>Stormbreaker\TimeOut</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BuildingStrategy\SelfBuildingPlaceFinder.cpp">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\ExploreManager.cpp">
+      <Filter>Stormbreaker</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\SoldierManager.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\CombatCommander.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\MicroManager.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SAIDA\MyBotModule.h">
-      <Filter>BotClient</Filter>
+    <ClInclude Include="Stormbreaker\CommandUtil.h">
+      <Filter>Stormbreaker</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\BuildManager.h">
-      <Filter>BotSource</Filter>
+    <ClInclude Include="Stormbreaker\GameCommander.h">
+      <Filter>Stormbreaker</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\CommandUtil.h">
-      <Filter>BotSource</Filter>
+    <ClInclude Include="Stormbreaker\StrategyManager.h">
+      <Filter>Stormbreaker</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\ConstructionManager.h">
-      <Filter>BotSource</Filter>
-    </ClInclude>
-    <ClInclude Include="SAIDA\ConstructionPlaceFinder.h">
-      <Filter>BotSource</Filter>
-    </ClInclude>
-    <ClInclude Include="SAIDA\GameCommander.h">
-      <Filter>BotSource</Filter>
-    </ClInclude>
-    <ClInclude Include="SAIDA\InformationManager.h">
-      <Filter>BotSource</Filter>
-    </ClInclude>
-    <ClInclude Include="SAIDA\ScoutManager.h">
-      <Filter>BotSource</Filter>
-    </ClInclude>
-    <ClInclude Include="SAIDA\StrategyManager.h">
-      <Filter>BotSource</Filter>
-    </ClInclude>
-    <ClInclude Include="SAIDA\UXManager.h">
-      <Filter>BotSource</Filter>
-    </ClInclude>
-    <ClInclude Include="SAIDA\MetaType.h">
-      <Filter>BotSource\DataStructure</Filter>
-    </ClInclude>
-    <ClInclude Include="SAIDA\UnitData.h">
-      <Filter>BotSource\DataStructure</Filter>
-    </ClInclude>
-    <ClInclude Include="SAIDA\ConstructionTask.h">
-      <Filter>BotSource\DataStructure</Filter>
-    </ClInclude>
-    <ClInclude Include="SAIDA\BuildOrderQueue.h">
-      <Filter>BotSource\DataStructure</Filter>
-    </ClInclude>
-    <ClInclude Include="SAIDA\Common.h">
-      <Filter>BotSource\CommonUtil</Filter>
-    </ClInclude>
-    <ClInclude Include="SAIDA\Config.h">
-      <Filter>BotSource\CommonUtil</Filter>
-    </ClInclude>
-    <ClInclude Include="SAIDA\BWEM\src\area.h">
+    <ClInclude Include="Stormbreaker\BWEM\src\area.h">
       <Filter>BWEM\src</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\BWEM\src\base.h">
+    <ClInclude Include="Stormbreaker\BWEM\src\base.h">
       <Filter>BWEM\src</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\BWEM\src\bwapiExt.h">
+    <ClInclude Include="Stormbreaker\BWEM\src\bwapiExt.h">
       <Filter>BWEM\src</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\BWEM\src\bwem.h">
+    <ClInclude Include="Stormbreaker\BWEM\src\bwem.h">
       <Filter>BWEM\src</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\BWEM\src\cp.h">
+    <ClInclude Include="Stormbreaker\BWEM\src\cp.h">
       <Filter>BWEM\src</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\BWEM\src\defs.h">
+    <ClInclude Include="Stormbreaker\BWEM\src\defs.h">
       <Filter>BWEM\src</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\BWEM\src\examples.h">
+    <ClInclude Include="Stormbreaker\BWEM\src\examples.h">
       <Filter>BWEM\src</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\BWEM\src\exampleWall.h">
+    <ClInclude Include="Stormbreaker\BWEM\src\exampleWall.h">
       <Filter>BWEM\src</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\BWEM\src\graph.h">
+    <ClInclude Include="Stormbreaker\BWEM\src\graph.h">
       <Filter>BWEM\src</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\BWEM\src\gridMap.h">
+    <ClInclude Include="Stormbreaker\BWEM\src\gridMap.h">
       <Filter>BWEM\src</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\BWEM\src\map.h">
+    <ClInclude Include="Stormbreaker\BWEM\src\map.h">
       <Filter>BWEM\src</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\BWEM\src\mapDrawer.h">
+    <ClInclude Include="Stormbreaker\BWEM\src\mapDrawer.h">
       <Filter>BWEM\src</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\BWEM\src\mapImpl.h">
+    <ClInclude Include="Stormbreaker\BWEM\src\mapImpl.h">
       <Filter>BWEM\src</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\BWEM\src\mapPrinter.h">
+    <ClInclude Include="Stormbreaker\BWEM\src\mapPrinter.h">
       <Filter>BWEM\src</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\BWEM\src\neutral.h">
+    <ClInclude Include="Stormbreaker\BWEM\src\neutral.h">
       <Filter>BWEM\src</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\BWEM\src\tiles.h">
+    <ClInclude Include="Stormbreaker\BWEM\src\tiles.h">
       <Filter>BWEM\src</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\BWEM\src\utils.h">
+    <ClInclude Include="Stormbreaker\BWEM\src\utils.h">
       <Filter>BWEM\src</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\BWEM\src\winutils.h">
+    <ClInclude Include="Stormbreaker\BWEM\src\winutils.h">
       <Filter>BWEM\src</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\BWEM\EasyBMP_1.06\EasyBMP.h">
+    <ClInclude Include="Stormbreaker\BWEM\EasyBMP_1.06\EasyBMP.h">
       <Filter>BWEM\EasyBMP</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitManager\MarineManager.h">
-      <Filter>BotSource\UnitManager</Filter>
+    <ClInclude Include="Stormbreaker\GridArea.h">
+      <Filter>Stormbreaker</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitState\MarineState.h">
-      <Filter>BotSource\UnitState</Filter>
+    <ClInclude Include="Stormbreaker\ReserveBuilding.h">
+      <Filter>Stormbreaker</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitState\State.h">
-      <Filter>BotSource\UnitState</Filter>
+    <ClInclude Include="Stormbreaker\Stormbreaker.h">
+      <Filter>Stormbreaker</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\BasicBuildStrategy.h">
-      <Filter>BotSource</Filter>
+    <ClInclude Include="Stormbreaker\StormbreakerUtil.h">
+      <Filter>Stormbreaker</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitInfo.h">
-      <Filter>BotSource\DataStructure</Filter>
+    <ClInclude Include="Stormbreaker\DeepLearningTools\LinearRegression.h">
+      <Filter>Stormbreaker\DeepLearningTools</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitState\TankState.h">
-      <Filter>BotSource\UnitState</Filter>
+    <ClInclude Include="Stormbreaker\DeepLearningTools\network.h">
+      <Filter>Stormbreaker\DeepLearningTools</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitManager\TankManager.h">
-      <Filter>BotSource\UnitManager</Filter>
+    <ClInclude Include="Stormbreaker\DeepLearningTools\neuron.h">
+      <Filter>Stormbreaker\DeepLearningTools</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitManager\ScvManager.h">
-      <Filter>BotSource\UnitManager</Filter>
+    <ClInclude Include="Stormbreaker\DeepLearningTools\SumTree.h">
+      <Filter>Stormbreaker\DeepLearningTools</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitState\ScvState.h">
-      <Filter>BotSource\UnitState</Filter>
+    <ClInclude Include="Stormbreaker\ActorCriticForProductionStrategy.h">
+      <Filter>Stormbreaker</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitManager\WraithManager.h">
-      <Filter>BotSource\UnitManager</Filter>
+    <ClInclude Include="Stormbreaker\ACUnitType.h">
+      <Filter>Stormbreaker</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitState\VultureState.h">
-      <Filter>BotSource\UnitState</Filter>
+    <ClInclude Include="Stormbreaker\Common.h">
+      <Filter>Stormbreaker</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitState\WraithState.h">
-      <Filter>BotSource\UnitState</Filter>
+    <ClInclude Include="Stormbreaker\InformationManager.h">
+      <Filter>Stormbreaker\InFoManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitManager\VultureManager.h">
-      <Filter>BotSource\UnitManager</Filter>
+    <ClInclude Include="Stormbreaker\MetaType.h">
+      <Filter>Stormbreaker\InFoManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\EnemyStrategyManager.h">
-      <Filter>BotSource</Filter>
+    <ClInclude Include="Stormbreaker\UnitInfo.h">
+      <Filter>Stormbreaker\InFoManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitState\FactoryState.h">
-      <Filter>BotSource\UnitState</Filter>
+    <ClInclude Include="Stormbreaker\UnitData.h">
+      <Filter>Stormbreaker\InFoManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitState\BarrackState.h">
-      <Filter>BotSource\UnitState</Filter>
+    <ClInclude Include="Stormbreaker\UnitManager\ComsatStationManager.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\TrainManager.h">
-      <Filter>BotSource</Filter>
+    <ClInclude Include="Stormbreaker\UnitManager\DropshipManager.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitState\GoliathState.h">
-      <Filter>BotSource\UnitState</Filter>
+    <ClInclude Include="Stormbreaker\UnitManager\EngineeringBayManager.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitManager\GoliathManager.h">
-      <Filter>BotSource\UnitManager</Filter>
+    <ClInclude Include="Stormbreaker\UnitManager\GoliathManager.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitState\CommandCenterState.h">
-      <Filter>BotSource\UnitState</Filter>
+    <ClInclude Include="Stormbreaker\UnitManager\MarineManager.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitState\ComsatStationState.h">
-      <Filter>BotSource\UnitState</Filter>
+    <ClInclude Include="Stormbreaker\UnitManager\TankManager.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitManager\ComsatStationManager.h">
-      <Filter>BotSource\UnitManager</Filter>
+    <ClInclude Include="Stormbreaker\UnitManager\VessleManager.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\GridArea.h">
-      <Filter>BotSource</Filter>
+    <ClInclude Include="Stormbreaker\UnitManager\VultureManager.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\ReserveBuilding.h">
-      <Filter>BotSource</Filter>
+    <ClInclude Include="Stormbreaker\UnitManager\WraithManager.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitState\StarportState.h">
-      <Filter>BotSource\UnitState</Filter>
+    <ClInclude Include="Stormbreaker\UnitManager\BarrackState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\TerranConstructionPlaceFinder.h">
-      <Filter>BotSource</Filter>
+    <ClInclude Include="Stormbreaker\UnitManager\CommandCenterState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\SaidaUtil.h">
-      <Filter>BotSource</Filter>
+    <ClInclude Include="Stormbreaker\UnitManager\ComsatStationState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitState\EngineeringBayState.h">
-      <Filter>BotSource\UnitState</Filter>
+    <ClInclude Include="Stormbreaker\UnitManager\DropshipState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitManager\EngineeringBayManager.h">
-      <Filter>BotSource\UnitManager</Filter>
+    <ClInclude Include="Stormbreaker\UnitManager\EngineeringBayState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitState\VessleState.h">
-      <Filter>BotSource\UnitState</Filter>
+    <ClInclude Include="Stormbreaker\UnitManager\FactoryState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitManager\VessleManager.h">
-      <Filter>BotSource\UnitManager</Filter>
+    <ClInclude Include="Stormbreaker\UnitManager\GoliathState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\BuildType.h">
-      <Filter>BotSource\DataStructure</Filter>
+    <ClInclude Include="Stormbreaker\UnitManager\MarineState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitState\DropshipState.h">
-      <Filter>BotSource\UnitState</Filter>
+    <ClInclude Include="Stormbreaker\UnitManager\ScvState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\UnitManager\DropshipManager.h">
-      <Filter>BotSource\UnitManager</Filter>
+    <ClInclude Include="Stormbreaker\UnitManager\StarportState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\DeepLearning\SharedMemoryManager.h">
-      <Filter>DeepLearning</Filter>
+    <ClInclude Include="Stormbreaker\UnitManager\State.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClInclude>
-    <ClInclude Include="SAIDA\DeepLearning\Supervised.h">
-      <Filter>DeepLearning</Filter>
+    <ClInclude Include="Stormbreaker\UnitManager\TankState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\VessleState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\VultureState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\WraithState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\HostileManager.h">
+      <Filter>Stormbreaker</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\MetaStrategy.h">
+      <Filter>Stormbreaker</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BuildingStrategy\BuildingPlaceFinder.h">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BuildingStrategy\BuildManager.h">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BuildingStrategy\BuildOrderManager.h">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BuildingStrategy\BuildStrategy.h">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BuildingStrategy\BuildType.h">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BuildingStrategy\ConstructionManager.h">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BuildingStrategy\ConstructionTask.h">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\TrainManager.h">
+      <Filter>Stormbreaker</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\TimeOut\Timer.hpp">
+      <Filter>Stormbreaker\TimeOut</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\TimeOut\TimerManager.h">
+      <Filter>Stormbreaker\TimeOut</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BuildingStrategy\SelfBuildingPlaceFinder.h">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\ExploreManager.h">
+      <Filter>Stormbreaker</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\SoldierManager.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\CombatCommander.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\MicroManager.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="BotSource">
-      <UniqueIdentifier>{295ff9ca-e7f5-4de0-ba47-19bbf0421850}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="BotSource\CommonUtil">
-      <UniqueIdentifier>{41c4e5e4-ae7a-4210-b97c-af7eb92ab673}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="BotSource\DataStructure">
-      <UniqueIdentifier>{2a115475-fe41-43d7-9253-35be6a33749a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="BotClient">
-      <UniqueIdentifier>{c8cb4e54-d671-49ab-96cc-8408316ab2bf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="BWEM">
       <UniqueIdentifier>{dde37e20-e1a9-47d5-a545-7c468f8272ed}</UniqueIdentifier>
     </Filter>
@@ -458,79 +479,88 @@
     <Filter Include="BWEM\EasyBMP">
       <UniqueIdentifier>{16556d8f-be1e-4934-ba24-153ec0755465}</UniqueIdentifier>
     </Filter>
-    <Filter Include="BotSource\UnitState">
-      <UniqueIdentifier>{fc01b4d9-9424-44a9-bf4a-d3c84f04cc28}</UniqueIdentifier>
+    <Filter Include="Stormbreaker">
+      <UniqueIdentifier>{295ff9ca-e7f5-4de0-ba47-19bbf0421850}</UniqueIdentifier>
     </Filter>
-    <Filter Include="BotSource\UnitManager">
+    <Filter Include="Stormbreaker\DeepLearningTools">
+      <UniqueIdentifier>{d7b34015-1278-456d-b84f-ae5588fe7ecb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Stormbreaker\UnitManager">
       <UniqueIdentifier>{3a59ae9f-ffa5-496a-9d91-d0ba470d4bec}</UniqueIdentifier>
     </Filter>
-    <Filter Include="DeepLearning">
-      <UniqueIdentifier>{2cd95668-5d75-4ddd-8ee4-360a40583d4d}</UniqueIdentifier>
+    <Filter Include="Stormbreaker\BuildingStrategy">
+      <UniqueIdentifier>{48f4ff54-9ca3-4735-a377-bc821f10e9a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Stormbreaker\TimeOut">
+      <UniqueIdentifier>{a0e357c8-039f-4f66-b316-4fb7f4baacad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Stormbreaker\InFoManager">
+      <UniqueIdentifier>{33bd948b-551d-445c-bc41-0d4800f16080}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="SAIDA\BWEM\LICENSE.txt">
+    <Text Include="Stormbreaker\BWEM\LICENSE.txt">
       <Filter>BWEM</Filter>
     </Text>
-    <Text Include="SAIDA\BWEM\README.txt">
+    <Text Include="Stormbreaker\BWEM\README.txt">
       <Filter>BWEM</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="SAIDA\BWEM\doc\html\about.html">
+    <None Include="Stormbreaker\BWEM\doc\html\about.html">
       <Filter>BWEM\doc\html</Filter>
     </None>
-    <None Include="SAIDA\BWEM\doc\html\download.html">
+    <None Include="Stormbreaker\BWEM\doc\html\download.html">
       <Filter>BWEM\doc\html</Filter>
     </None>
-    <None Include="SAIDA\BWEM\doc\html\faq.html">
+    <None Include="Stormbreaker\BWEM\doc\html\faq.html">
       <Filter>BWEM\doc\html</Filter>
     </None>
-    <None Include="SAIDA\BWEM\doc\html\features.html">
+    <None Include="Stormbreaker\BWEM\doc\html\features.html">
       <Filter>BWEM\doc\html</Filter>
     </None>
-    <None Include="SAIDA\BWEM\doc\html\help.html">
+    <None Include="Stormbreaker\BWEM\doc\html\help.html">
       <Filter>BWEM\doc\html</Filter>
     </None>
-    <None Include="SAIDA\BWEM\doc\html\index.html">
+    <None Include="Stormbreaker\BWEM\doc\html\index.html">
       <Filter>BWEM\doc\html</Filter>
     </None>
-    <None Include="SAIDA\BWEM\doc\html\interactiveIron.html">
+    <None Include="Stormbreaker\BWEM\doc\html\interactiveIron.html">
       <Filter>BWEM\doc\html</Filter>
     </None>
-    <None Include="SAIDA\BWEM\doc\html\Iron.html">
+    <None Include="Stormbreaker\BWEM\doc\html\Iron.html">
       <Filter>BWEM\doc\html</Filter>
     </None>
-    <None Include="SAIDA\BWEM\doc\html\start.html">
+    <None Include="Stormbreaker\BWEM\doc\html\start.html">
       <Filter>BWEM\doc\html</Filter>
     </None>
-    <None Include="SAIDA\BWEM\doc\html\Stone.html">
+    <None Include="Stormbreaker\BWEM\doc\html\Stone.html">
       <Filter>BWEM\doc\html</Filter>
     </None>
-    <None Include="SAIDA\BWEM\doc\html\style.css">
+    <None Include="Stormbreaker\BWEM\doc\html\style.css">
       <Filter>BWEM\doc\html</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="SAIDA\BWEM\doc\html\Andromeda.png">
+    <Image Include="Stormbreaker\BWEM\doc\html\Andromeda.png">
       <Filter>BWEM\doc\html</Filter>
     </Image>
-    <Image Include="SAIDA\BWEM\doc\html\Baby Steps.png">
+    <Image Include="Stormbreaker\BWEM\doc\html\Baby Steps.png">
       <Filter>BWEM\doc\html</Filter>
     </Image>
-    <Image Include="SAIDA\BWEM\doc\html\Great Barrier Reef.png">
+    <Image Include="Stormbreaker\BWEM\doc\html\Great Barrier Reef.png">
       <Filter>BWEM\doc\html</Filter>
     </Image>
-    <Image Include="SAIDA\BWEM\doc\html\Heartbreak Ridge.png">
+    <Image Include="Stormbreaker\BWEM\doc\html\Heartbreak Ridge.png">
       <Filter>BWEM\doc\html</Filter>
     </Image>
-    <Image Include="SAIDA\BWEM\doc\html\Iron.jpg">
+    <Image Include="Stormbreaker\BWEM\doc\html\Iron.jpg">
       <Filter>BWEM\doc\html</Filter>
     </Image>
-    <Image Include="SAIDA\BWEM\doc\html\Ride of Valkyries.png">
+    <Image Include="Stormbreaker\BWEM\doc\html\Ride of Valkyries.png">
       <Filter>BWEM\doc\html</Filter>
     </Image>
-    <Image Include="SAIDA\BWEM\doc\html\Stone.jpg">
+    <Image Include="Stormbreaker\BWEM\doc\html\Stone.jpg">
       <Filter>BWEM\doc\html</Filter>
     </Image>
   </ItemGroup>

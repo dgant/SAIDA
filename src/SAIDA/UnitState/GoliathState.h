@@ -160,6 +160,6 @@ namespace MyBot
 	private :
 		bool firstBoard = false;
 		Position targetPosition = Positions::Unknown;
-		int timeToClear = 0;
+		int TIMEToClear = 0;
 	};
 }

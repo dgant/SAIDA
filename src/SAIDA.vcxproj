@@ -1,20 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug_DLL|Win32">
+      <Configuration>Debug_DLL</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release_Server_DLL|Win32">
-      <Configuration>Release_Server_DLL</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release_Server|Win32">
-      <Configuration>Release_Server</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release_with_logging|Win32">
-      <Configuration>Release_with_logging</Configuration>
+    <ProjectConfiguration Include="Release_DLL|Win32">
+      <Configuration>Release_DLL</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
@@ -24,9 +20,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{AE3B9DC4-5FBB-4B57-8AB4-0D84D8649D78}</ProjectGuid>
-    <RootNamespace>SAIDA</RootNamespace>
+    <RootNamespace>Stormbreaker</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <ProjectName>SAIDA</ProjectName>
+    <ProjectName>Stormbreaker</ProjectName>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -35,18 +31,13 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Server|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v120</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Server_DLL|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_DLL|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_with_logging|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DLL|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
@@ -61,13 +52,10 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_Server|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_DLL|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_Server_DLL|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_with_logging|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DLL|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
@@ -78,9 +66,8 @@
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release_Server|Win32'">false</LinkIncremental>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release_Server_DLL|Win32'">false</LinkIncremental>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release_with_logging|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release_DLL|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug_DLL|Win32'">false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\$(ProjectName)\</OutDir>
@@ -88,23 +75,18 @@
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(BWAPI_DIR)/include</IncludePath>
     <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(BWAPI_DIR)/lib</LibraryPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Server|Win32'">
-    <OutDir>$(SolutionDir)$(Configuration)\$(ProjectName)\</OutDir>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_DLL|Win32'">
+    <OutDir>$(Configuration)\dll\</OutDir>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(BWAPI_DIR)/include</IncludePath>
     <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(BWAPI_DIR)/lib</LibraryPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Server_DLL|Win32'">
-    <OutDir>$(SolutionDir)$(Configuration)\$(ProjectName)\</OutDir>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DLL|Win32'">
+    <OutDir>$(Configuration)\dll\</OutDir>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(BWAPI_DIR)/include</IncludePath>
     <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(BWAPI_DIR)/lib</LibraryPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_with_logging|Win32'">
-    <OutDir>$(SolutionDir)$(Configuration)\$(ProjectName)\</OutDir>
-    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(BWAPI_DIR)/include</IncludePath>
-    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(BWAPI_DIR)/lib</LibraryPath>
+    <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(BWAPI_DIR)/include</IncludePath>
@@ -157,12 +139,12 @@
       <AdditionalDependencies>Advapi32.lib;ws2_32.lib;BWAPI.lib;BWAPIClient.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_Server|Win32'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_DLL|Win32'">
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>SERVERLOG;NOMINMAX;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(BWTA_DIR)/include;$(BWAPI_DIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>
@@ -182,12 +164,12 @@
       <AdditionalDependencies>Advapi32.lib;ws2_32.lib;BWAPI.lib;BWAPIClient.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_Server_DLL|Win32'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DLL|Win32'">
     <ClCompile>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>SERVERLOG;SERVERLOGDLL;NOMINMAX;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(BWTA_DIR)/include;$(BWAPI_DIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>
@@ -204,208 +186,191 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>Advapi32.lib;ws2_32.lib;BWAPI.lib;BWAPIClient.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_with_logging|Win32'">
-    <ClCompile>
-      <Optimization>MaxSpeed</Optimization>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_LOGGING;NOMINMAX;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <ExceptionHandling>Async</ExceptionHandling>
-    </ClCompile>
-    <PreLinkEvent />
-    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
-      <OptimizeReferences>true</OptimizeReferences>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>Advapi32.lib;ws2_32.lib;BWAPI.lib;BWAPIClient.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Advapi32.lib;ws2_32.lib;BWAPId.lib;BWAPIClientd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="SAIDA\BuildType.cpp" />
-    <ClCompile Include="SAIDA\DeepLearning\SharedMemoryManager.cpp" />
-    <ClCompile Include="SAIDA\DeepLearning\Supervised.cpp" />
-    <ClCompile Include="SAIDA\ReserveBuilding.cpp" />
-    <ClCompile Include="SAIDA\BasicBuildStrategy.cpp" />
-    <ClCompile Include="SAIDA\BWEM\EasyBMP_1.06\EasyBMP.cpp" />
-    <ClCompile Include="SAIDA\BWEM\src\area.cpp" />
-    <ClCompile Include="SAIDA\BWEM\src\base.cpp" />
-    <ClCompile Include="SAIDA\BWEM\src\bwapiExt.cpp" />
-    <ClCompile Include="SAIDA\BWEM\src\bwem.cpp" />
-    <ClCompile Include="SAIDA\BWEM\src\cp.cpp" />
-    <ClCompile Include="SAIDA\BWEM\src\examples.cpp" />
-    <ClCompile Include="SAIDA\BWEM\src\exampleWall.cpp" />
-    <ClCompile Include="SAIDA\BWEM\src\graph.cpp" />
-    <ClCompile Include="SAIDA\BWEM\src\gridMap.cpp" />
-    <ClCompile Include="SAIDA\BWEM\src\map.cpp" />
-    <ClCompile Include="SAIDA\BWEM\src\mapDrawer.cpp" />
-    <ClCompile Include="SAIDA\BWEM\src\mapImpl.cpp" />
-    <ClCompile Include="SAIDA\BWEM\src\mapPrinter.cpp" />
-    <ClCompile Include="SAIDA\BWEM\src\neutral.cpp" />
-    <ClCompile Include="SAIDA\BWEM\src\tiles.cpp" />
-    <ClCompile Include="SAIDA\BWEM\src\utils.cpp" />
-    <ClCompile Include="SAIDA\BWEM\src\winutils.cpp" />
-    <ClCompile Include="SAIDA\ConstructionTask.cpp" />
-    <ClCompile Include="SAIDA\ConstructionManager.cpp" />
-    <ClCompile Include="SAIDA\ConstructionPlaceFinder.cpp" />
-    <ClCompile Include="SAIDA\BuildOrderQueue.cpp" />
-    <ClCompile Include="SAIDA\Common.cpp" />
-    <ClCompile Include="SAIDA\Config.cpp" />
-    <ClCompile Include="SAIDA\EnemyStrategyManager.cpp" />
-    <ClCompile Include="SAIDA\GameCommander.cpp" />
-    <ClCompile Include="SAIDA\InformationManager.cpp" />
-    <ClCompile Include="SAIDA\GridArea.cpp" />
-    <ClCompile Include="SAIDA\MetaType.cpp" />
-    <ClCompile Include="SAIDA\CommandUtil.cpp" />
-    <ClCompile Include="SAIDA\MyBotModule.cpp" />
-    <ClCompile Include="SAIDA\dllmain.cpp" />
-    <ClCompile Include="SAIDA\main.cpp" />
-    <ClCompile Include="SAIDA\BuildManager.cpp" />
-    <ClCompile Include="SAIDA\SaidaUtil.cpp" />
-    <ClCompile Include="SAIDA\ScoutManager.cpp" />
-    <ClCompile Include="SAIDA\StrategyManager.cpp" />
-    <ClCompile Include="SAIDA\TrainManager.cpp" />
-    <ClCompile Include="SAIDA\UnitData.cpp" />
-    <ClCompile Include="SAIDA\UnitInfo.cpp" />
-    <ClCompile Include="SAIDA\UnitManager\ComsatStationManager.cpp" />
-    <ClCompile Include="SAIDA\UnitManager\DropshipManager.cpp" />
-    <ClCompile Include="SAIDA\UnitManager\EngineeringBayManager.cpp" />
-    <ClCompile Include="SAIDA\UnitManager\GoliathManager.cpp" />
-    <ClCompile Include="SAIDA\UnitManager\MarineManager.cpp" />
-    <ClCompile Include="SAIDA\UnitManager\ScvManager.cpp" />
-    <ClCompile Include="SAIDA\UnitManager\TankManager.cpp" />
-    <ClCompile Include="SAIDA\UnitManager\VessleManager.cpp" />
-    <ClCompile Include="SAIDA\UnitManager\VultureManager.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="SAIDA\UnitManager\WraithManager.cpp" />
-    <ClCompile Include="SAIDA\UnitState\BarrackState.cpp" />
-    <ClCompile Include="SAIDA\UnitState\CommandCenterState.cpp" />
-    <ClCompile Include="SAIDA\UnitState\ComsatStationState.cpp" />
-    <ClCompile Include="SAIDA\UnitState\DropshipState.cpp" />
-    <ClCompile Include="SAIDA\UnitState\EngineeringBayState.cpp" />
-    <ClCompile Include="SAIDA\UnitState\FactoryState.cpp" />
-    <ClCompile Include="SAIDA\UnitState\GoliathState.cpp" />
-    <ClCompile Include="SAIDA\UnitState\MarineState.cpp" />
-    <ClCompile Include="SAIDA\UnitState\ScvState.cpp" />
-    <ClCompile Include="SAIDA\UnitState\StarportState.cpp" />
-    <ClCompile Include="SAIDA\UnitState\TankState.cpp" />
-    <ClCompile Include="SAIDA\UnitState\VessleState.cpp" />
-    <ClCompile Include="SAIDA\UnitState\VultureState.cpp" />
-    <ClCompile Include="SAIDA\UnitState\WraithState.cpp" />
-    <ClCompile Include="SAIDA\UXManager.cpp" />
-    <ClCompile Include="SAIDA\TerranConstructionPlaceFinder.cpp" />
+    <ClCompile Include="Stormbreaker\ActorCriticForProductionStrategy.cpp" />
+    <ClCompile Include="Stormbreaker\BuildingStrategy\BuildingPlaceFinder.cpp" />
+    <ClCompile Include="Stormbreaker\BuildingStrategy\BuildManager.cpp" />
+    <ClCompile Include="Stormbreaker\BuildingStrategy\BuildOrderManager.cpp" />
+    <ClCompile Include="Stormbreaker\BuildingStrategy\BuildStrategy.cpp" />
+    <ClCompile Include="Stormbreaker\BuildingStrategy\BuildType.cpp" />
+    <ClCompile Include="Stormbreaker\BuildingStrategy\ConstructionManager.cpp" />
+    <ClCompile Include="Stormbreaker\BuildingStrategy\ConstructionTask.cpp" />
+    <ClCompile Include="Stormbreaker\BuildingStrategy\SelfBuildingPlaceFinder.cpp" />
+    <ClCompile Include="Stormbreaker\DeepLearningTools\LinearRegression.cpp" />
+    <ClCompile Include="Stormbreaker\DeepLearningTools\network.cpp" />
+    <ClCompile Include="Stormbreaker\DeepLearningTools\neuron.cpp" />
+    <ClCompile Include="Stormbreaker\DeepLearningTools\SumTree.cpp" />
+    <ClCompile Include="Stormbreaker\ExploreManager.cpp" />
+    <ClCompile Include="Stormbreaker\MetaStrategy.cpp" />
+    <ClCompile Include="Stormbreaker\ReserveBuilding.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\EasyBMP_1.06\EasyBMP.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\area.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\base.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\bwapiExt.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\bwem.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\cp.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\examples.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\exampleWall.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\graph.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\gridMap.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\map.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\mapDrawer.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\mapImpl.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\mapPrinter.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\neutral.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\tiles.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\utils.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\winutils.cpp" />
+    <ClCompile Include="Stormbreaker\Common.cpp" />
+    <ClCompile Include="Stormbreaker\HostileManager.cpp" />
+    <ClCompile Include="Stormbreaker\GameCommander.cpp" />
+    <ClCompile Include="Stormbreaker\InformationManager.cpp" />
+    <ClCompile Include="Stormbreaker\GridArea.cpp" />
+    <ClCompile Include="Stormbreaker\MetaType.cpp" />
+    <ClCompile Include="Stormbreaker\CommandUtil.cpp" />
+    <ClCompile Include="Stormbreaker\Stormbreaker.cpp" />
+    <ClCompile Include="Stormbreaker\dllmain.cpp" />
+    <ClCompile Include="Stormbreaker\StormbreakerUtil.cpp" />
+    <ClCompile Include="Stormbreaker\StrategyManager.cpp" />
+    <ClCompile Include="Stormbreaker\TimeOut\TimerManager.cpp" />
+    <ClCompile Include="Stormbreaker\TrainManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitData.cpp" />
+    <ClCompile Include="Stormbreaker\UnitInfo.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\BarrackState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\CombatCommander.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\CommandCenterState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\ComsatStationManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\ComsatStationState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\DropshipManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\DropshipState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\EngineeringBayManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\EngineeringBayState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\FactoryState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\GoliathManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\GoliathState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\MarineManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\MarineState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\MicroManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\ScvState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\SoldierManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\StarportState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\TankManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\TankState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\VessleManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\VessleState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\VultureManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\VultureState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\WraithManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\WraithState.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SAIDA\BuildType.h" />
-    <ClInclude Include="SAIDA\DeepLearning\SharedMemoryManager.h" />
-    <ClInclude Include="SAIDA\DeepLearning\Supervised.h" />
-    <ClInclude Include="SAIDA\ReserveBuilding.h" />
-    <ClInclude Include="SAIDA\BasicBuildStrategy.h" />
-    <ClInclude Include="SAIDA\BWEM\EasyBMP_1.06\EasyBMP.h" />
-    <ClInclude Include="SAIDA\BWEM\src\area.h" />
-    <ClInclude Include="SAIDA\BWEM\src\base.h" />
-    <ClInclude Include="SAIDA\BWEM\src\bwapiExt.h" />
-    <ClInclude Include="SAIDA\BWEM\src\bwem.h" />
-    <ClInclude Include="SAIDA\BWEM\src\cp.h" />
-    <ClInclude Include="SAIDA\BWEM\src\defs.h" />
-    <ClInclude Include="SAIDA\BWEM\src\examples.h" />
-    <ClInclude Include="SAIDA\BWEM\src\exampleWall.h" />
-    <ClInclude Include="SAIDA\BWEM\src\graph.h" />
-    <ClInclude Include="SAIDA\BWEM\src\gridMap.h" />
-    <ClInclude Include="SAIDA\BWEM\src\map.h" />
-    <ClInclude Include="SAIDA\BWEM\src\mapDrawer.h" />
-    <ClInclude Include="SAIDA\BWEM\src\mapImpl.h" />
-    <ClInclude Include="SAIDA\BWEM\src\mapPrinter.h" />
-    <ClInclude Include="SAIDA\BWEM\src\neutral.h" />
-    <ClInclude Include="SAIDA\BWEM\src\tiles.h" />
-    <ClInclude Include="SAIDA\BWEM\src\utils.h" />
-    <ClInclude Include="SAIDA\BWEM\src\winutils.h" />
-    <ClInclude Include="SAIDA\ConstructionTask.h" />
-    <ClInclude Include="SAIDA\ConstructionManager.h" />
-    <ClInclude Include="SAIDA\ConstructionPlaceFinder.h" />
-    <ClInclude Include="SAIDA\BuildOrderQueue.h" />
-    <ClInclude Include="SAIDA\Common.h" />
-    <ClInclude Include="SAIDA\Config.h" />
-    <ClInclude Include="SAIDA\EnemyStrategyManager.h" />
-    <ClInclude Include="SAIDA\GameCommander.h" />
-    <ClInclude Include="SAIDA\InformationManager.h" />
-    <ClInclude Include="SAIDA\GridArea.h" />
-    <ClInclude Include="SAIDA\MetaType.h" />
-    <ClInclude Include="SAIDA\CommandUtil.h" />
-    <ClInclude Include="SAIDA\MyBotModule.h" />
-    <ClInclude Include="SAIDA\BuildManager.h" />
-    <ClInclude Include="SAIDA\SaidaUtil.h" />
-    <ClInclude Include="SAIDA\ScoutManager.h" />
-    <ClInclude Include="SAIDA\StrategyManager.h" />
-    <ClInclude Include="SAIDA\TrainManager.h" />
-    <ClInclude Include="SAIDA\UnitData.h" />
-    <ClInclude Include="SAIDA\UnitInfo.h" />
-    <ClInclude Include="SAIDA\UnitManager\ComsatStationManager.h" />
-    <ClInclude Include="SAIDA\UnitManager\DropshipManager.h" />
-    <ClInclude Include="SAIDA\UnitManager\EngineeringBayManager.h" />
-    <ClInclude Include="SAIDA\UnitManager\GoliathManager.h" />
-    <ClInclude Include="SAIDA\UnitManager\MarineManager.h" />
-    <ClInclude Include="SAIDA\UnitManager\ScvManager.h" />
-    <ClInclude Include="SAIDA\UnitManager\TankManager.h" />
-    <ClInclude Include="SAIDA\UnitManager\VessleManager.h" />
-    <ClInclude Include="SAIDA\UnitManager\VultureManager.h" />
-    <ClInclude Include="SAIDA\UnitManager\WraithManager.h" />
-    <ClInclude Include="SAIDA\UnitState\BarrackState.h" />
-    <ClInclude Include="SAIDA\UnitState\CommandCenterState.h" />
-    <ClInclude Include="SAIDA\UnitState\ComsatStationState.h" />
-    <ClInclude Include="SAIDA\UnitState\DropshipState.h" />
-    <ClInclude Include="SAIDA\UnitState\EngineeringBayState.h" />
-    <ClInclude Include="SAIDA\UnitState\FactoryState.h" />
-    <ClInclude Include="SAIDA\UnitState\GoliathState.h" />
-    <ClInclude Include="SAIDA\UnitState\MarineState.h" />
-    <ClInclude Include="SAIDA\UnitState\ScvState.h" />
-    <ClInclude Include="SAIDA\UnitState\StarportState.h" />
-    <ClInclude Include="SAIDA\UnitState\State.h" />
-    <ClInclude Include="SAIDA\UnitState\TankState.h" />
-    <ClInclude Include="SAIDA\UnitState\VessleState.h" />
-    <ClInclude Include="SAIDA\UnitState\VultureState.h" />
-    <ClInclude Include="SAIDA\UnitState\WraithState.h" />
-    <ClInclude Include="SAIDA\UXManager.h" />
-    <ClInclude Include="SAIDA\TerranConstructionPlaceFinder.h" />
+    <ClInclude Include="Stormbreaker\ActorCriticForProductionStrategy.h" />
+    <ClInclude Include="Stormbreaker\BuildingStrategy\BuildingPlaceFinder.h" />
+    <ClInclude Include="Stormbreaker\BuildingStrategy\BuildManager.h" />
+    <ClInclude Include="Stormbreaker\BuildingStrategy\BuildOrderManager.h" />
+    <ClInclude Include="Stormbreaker\BuildingStrategy\BuildStrategy.h" />
+    <ClInclude Include="Stormbreaker\BuildingStrategy\BuildType.h" />
+    <ClInclude Include="Stormbreaker\BuildingStrategy\ConstructionManager.h" />
+    <ClInclude Include="Stormbreaker\BuildingStrategy\ConstructionTask.h" />
+    <ClInclude Include="Stormbreaker\BuildingStrategy\SelfBuildingPlaceFinder.h" />
+    <ClInclude Include="Stormbreaker\DeepLearningTools\LinearRegression.h" />
+    <ClInclude Include="Stormbreaker\DeepLearningTools\network.h" />
+    <ClInclude Include="Stormbreaker\DeepLearningTools\neuron.h" />
+    <ClInclude Include="Stormbreaker\DeepLearningTools\SumTree.h" />
+    <ClInclude Include="Stormbreaker\ACUnitType.h" />
+    <ClInclude Include="Stormbreaker\ExploreManager.h" />
+    <ClInclude Include="Stormbreaker\MetaStrategy.h" />
+    <ClInclude Include="Stormbreaker\ReserveBuilding.h" />
+    <ClInclude Include="Stormbreaker\BWEM\EasyBMP_1.06\EasyBMP.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\area.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\base.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\bwapiExt.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\bwem.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\cp.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\defs.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\examples.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\exampleWall.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\graph.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\gridMap.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\map.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\mapDrawer.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\mapImpl.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\mapPrinter.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\neutral.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\tiles.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\utils.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\winutils.h" />
+    <ClInclude Include="Stormbreaker\Common.h" />
+    <ClInclude Include="Stormbreaker\HostileManager.h" />
+    <ClInclude Include="Stormbreaker\GameCommander.h" />
+    <ClInclude Include="Stormbreaker\InformationManager.h" />
+    <ClInclude Include="Stormbreaker\GridArea.h" />
+    <ClInclude Include="Stormbreaker\MetaType.h" />
+    <ClInclude Include="Stormbreaker\CommandUtil.h" />
+    <ClInclude Include="Stormbreaker\Stormbreaker.h" />
+    <ClInclude Include="Stormbreaker\StormbreakerUtil.h" />
+    <ClInclude Include="Stormbreaker\StrategyManager.h" />
+    <ClInclude Include="Stormbreaker\TimeOut\Timer.hpp" />
+    <ClInclude Include="Stormbreaker\TimeOut\TimerManager.h" />
+    <ClInclude Include="Stormbreaker\TrainManager.h" />
+    <ClInclude Include="Stormbreaker\UnitData.h" />
+    <ClInclude Include="Stormbreaker\UnitInfo.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\BarrackState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\CombatCommander.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\CommandCenterState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\ComsatStationManager.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\ComsatStationState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\DropshipManager.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\DropshipState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\EngineeringBayManager.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\EngineeringBayState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\FactoryState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\GoliathManager.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\GoliathState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\MarineManager.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\MarineState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\MicroManager.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\ScvState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\SoldierManager.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\StarportState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\State.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\TankManager.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\TankState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\VessleManager.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\VessleState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\VultureManager.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\VultureState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\WraithManager.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\WraithState.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="SAIDA\BWEM\LICENSE.txt" />
-    <Text Include="SAIDA\BWEM\README.txt" />
+    <Text Include="Stormbreaker\BWEM\LICENSE.txt" />
+    <Text Include="Stormbreaker\BWEM\README.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="SAIDA\BWEM\doc\html\about.html" />
-    <None Include="SAIDA\BWEM\doc\html\download.html" />
-    <None Include="SAIDA\BWEM\doc\html\faq.html" />
-    <None Include="SAIDA\BWEM\doc\html\features.html" />
-    <None Include="SAIDA\BWEM\doc\html\help.html" />
-    <None Include="SAIDA\BWEM\doc\html\index.html" />
-    <None Include="SAIDA\BWEM\doc\html\interactiveIron.html" />
-    <None Include="SAIDA\BWEM\doc\html\Iron.html" />
-    <None Include="SAIDA\BWEM\doc\html\start.html" />
-    <None Include="SAIDA\BWEM\doc\html\Stone.html" />
-    <None Include="SAIDA\BWEM\doc\html\style.css" />
+    <None Include="Stormbreaker\BWEM\doc\html\about.html" />
+    <None Include="Stormbreaker\BWEM\doc\html\download.html" />
+    <None Include="Stormbreaker\BWEM\doc\html\faq.html" />
+    <None Include="Stormbreaker\BWEM\doc\html\features.html" />
+    <None Include="Stormbreaker\BWEM\doc\html\help.html" />
+    <None Include="Stormbreaker\BWEM\doc\html\index.html" />
+    <None Include="Stormbreaker\BWEM\doc\html\interactiveIron.html" />
+    <None Include="Stormbreaker\BWEM\doc\html\Iron.html" />
+    <None Include="Stormbreaker\BWEM\doc\html\start.html" />
+    <None Include="Stormbreaker\BWEM\doc\html\Stone.html" />
+    <None Include="Stormbreaker\BWEM\doc\html\style.css" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="SAIDA\BWEM\doc\html\Andromeda.png" />
-    <Image Include="SAIDA\BWEM\doc\html\Baby Steps.png" />
-    <Image Include="SAIDA\BWEM\doc\html\Great Barrier Reef.png" />
-    <Image Include="SAIDA\BWEM\doc\html\Heartbreak Ridge.png" />
-    <Image Include="SAIDA\BWEM\doc\html\Iron.jpg" />
-    <Image Include="SAIDA\BWEM\doc\html\Ride of Valkyries.png" />
-    <Image Include="SAIDA\BWEM\doc\html\Stone.jpg" />
+    <Image Include="Stormbreaker\BWEM\doc\html\Andromeda.png" />
+    <Image Include="Stormbreaker\BWEM\doc\html\Baby Steps.png" />
+    <Image Include="Stormbreaker\BWEM\doc\html\Great Barrier Reef.png" />
+    <Image Include="Stormbreaker\BWEM\doc\html\Heartbreak Ridge.png" />
+    <Image Include="Stormbreaker\BWEM\doc\html\Iron.jpg" />
+    <Image Include="Stormbreaker\BWEM\doc\html\Ride of Valkyries.png" />
+    <Image Include="Stormbreaker\BWEM\doc\html\Stone.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

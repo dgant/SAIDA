@@ -4,7 +4,7 @@
 
 namespace MyBot
 {
-	/// BuildManager 등에서 UnitType, TechType, UpgradeType 구분없이 동일한 Method 로 실행할 수 있게 하기 위해 만든 Wrapper class
+	
 	namespace MetaTypes
 	{
 		enum {
@@ -15,7 +15,7 @@ namespace MyBot
 		};
 	}
 
-	/// BuildManager 등에서 UnitType, TechType, UpgradeType 구분없이 동일한 Method 로 실행할 수 있게 하기 위해 만든 Wrapper class
+	
 	class MetaType
 	{
 		size_t                  _type;

@@ -3,10 +3,7 @@
 using namespace MyBot;
 
 
-// TODO 시작 시점에 attach 가능한 건물인 경우 reserve 함.
-// onCreate 시점에 attach 가능한 건물인 경우 reserve 함.
-// 건물 landing (onComplete?) 시점에 attach 가능한 건물인 경우 reserve 함.
-// 건물 lifting 시점에 attach 예약 해제함.
+
 
 Building::Building(int order, TilePosition pos, TilePosition tileSize, ReserveTypes reserveType) {
 	this->order = order;
@@ -47,7 +44,7 @@ bool Building::canAssignToType(UnitType type, bool checkAlreadySet) const {
 	else if (reserveType == ReserveTypes::UNIT_TYPE) {
 		for (UnitType ut : possibleList) {
 			if (ut == type) {
-				// 다른 건물이 존재하면 넘어간다.
+			
 				bool canBuild = true;
 
 				for (int x = pos.x; x < pos.x + ut.tileWidth() && canBuild; x++) {
@@ -68,11 +65,9 @@ bool Building::canAssignToType(UnitType type, bool checkAlreadySet) const {
 		return false;
 	}
 	else if (reserveType == ReserveTypes::MINERALS || reserveType == ReserveTypes::GAS) {
-		// TODO 터렛은 가능?
 		return false;
 	}
 	else {
-		cout << "나오면 안됨." << pos << ", " << tileSize << ", " << possibleList.empty() << endl;
 	}
 
 	return false;
@@ -104,24 +99,24 @@ ReserveBuilding::ReserveBuilding() {
 	_reserveMap = vector< vector<short> >(bw->mapWidth(), vector<short>(bw->mapHeight(), 0));
 	_avoidMap = vector< vector<bool> >(bw->mapWidth(), vector<bool>(bw->mapHeight(), 0));
 
-	// unbuildable 위치 예약
+
 	for (int i = 0; i < bw->mapWidth(); i++) {
 		for (int j = 0; j < bw->mapHeight(); j++) {
 			if (!bw->isBuildable(i, j)) {
 				_avoidMap[i][j] = true;
-				// _avoidList.emplace_back(0, TilePosition(i, j), TilePosition(1, 1), ReserveTypes::UNBUILDABLE);
+		
 			}
 		}
 	}
 
 	if (INFO.selfRace == Races::Terran) {
-		// 컴셋 위치 예약
+
 		TilePosition base = INFO.getMainBaseLocation(S)->getTilePosition();
 
 		reserveTiles(base + TilePosition(Terran_Command_Center.tileWidth(), 1), { Terran_Comsat_Station }, 0, 0, 0, 0);
 
-		// 서플라이 위치 예약
-		TerranConstructionPlaceFinder::Instance();
+	
+		SelfBuildingPlaceFinder::Instance();
 	}
 }
 
@@ -130,9 +125,9 @@ ReserveBuilding &ReserveBuilding::Instance() {
 	return instance;
 }
 
-// private
+
 bool ReserveBuilding::reserveTiles(Building &building, TilePosition position, int width, int height, int topSpace, int leftSpace, int rightSpace, int bottomSpace, bool canBuildAddon, bool forceReserve) {
-	// 예약된 공간은 예약할 수 없음.
+
 	if (!forceReserve && !canReserveHere(position, building.getUnitTypes().empty() ? UnitTypes::None : building.getUnitTypes().front(), width, height, topSpace, leftSpace, rightSpace, bottomSpace, canBuildAddon))
 		return false;
 
@@ -203,7 +198,7 @@ bool ReserveBuilding::reserveTiles(TilePosition position, vector<UnitType> unitT
 
 	bool success = reserveTiles(b, position, type.tileWidth(), type.tileHeight(), topSpace, leftSpace, rightSpace, bottomSpace, canBuildAddon);
 
-	// 이미 예약된 경우 false
+
 	if (success) {
 		reserveOrder++;
 
@@ -246,7 +241,7 @@ bool ReserveBuilding::reserveTilesFirst(TilePosition position, vector<UnitType> 
 
 	bool success = reserveTiles(b, position, type.tileWidth(), type.tileHeight(), topSpace, leftSpace, rightSpace, bottomSpace, canBuildAddon);
 
-	// 이미 예약된 경우 false
+
 	if (success) {
 		_reserveList.insert(_reserveList.begin(), b);
 
@@ -268,7 +263,7 @@ void ReserveBuilding::forceReserveTilesFirst(TilePosition position, vector<UnitT
 	_reserveList.insert(_reserveList.begin(), b);
 }
 
-// private 상위에서 _reserveList 삭제 체크를 항상 해준다.
+
 void ReserveBuilding::freeTiles(int width, int height, TilePosition position) {
 	int rwidth = position.x + width;
 	int rheight = position.y + height;
@@ -336,16 +331,16 @@ bool ReserveBuilding::canReserveHere(TilePosition position, UnitType unitType, i
 	int rwidth = position.x + width + rightSpace + (canBuildAddon ? 2 : 0);
 	int rheight = position.y + height + bottomSpace;
 
-	// 유효성 체크
+
 	if (!strPosition.isValid() || rwidth > (int)_reserveMap.size() || rheight > (int)_reserveMap[0].size()) {
 		return false;
 	}
 
-	// addon 이 가능한 건물인 경우 addon 공간까지 확인
+
 	if (canBuildAddon) {
 		bool needToCheck = true;
 
-		// 이미 addon 건물이 있는 경우는 체크하지 않는다.
+	
 		for (auto u : bw->getUnitsOnTile(position + TilePosition(width, 1))) {
 			if (u->getTilePosition() == position + TilePosition(width, 1) && u->getType().isAddon() && u->getType().whatBuilds().first == unitType) {
 				needToCheck = false;
@@ -372,9 +367,9 @@ bool ReserveBuilding::canReserveHere(TilePosition position, UnitType unitType, i
 
 	for (int x = strPosition.x; x < rwidth; x++) {
 		for (int y = strPosition.y; y < rheight; y++) {
-			// space 와 avoid 가 겹치는 경우 정상판단.
+		
 			if (position.x > x || (position.y > y && x <= position.x + width) || (position.x + width <= x && position.y == y) || (buildingWidth <= x && position.y <= y) || buildingHeight <= y) {
-				// 커멘드 센터의 경우 터렛과 avoid 가 겹칠 수 있음.
+			
 				if (unitType == Terran_Command_Center) {
 					for (auto unit : bw->getUnitsInRectangle(x * 32 + 1, y * 32 + 1, x * 32 + 31, y * 32 + 31)) {
 						if (unit->getType() != Terran_Missile_Turret && unit->getType() != Terran_Bunker) {
@@ -393,10 +388,10 @@ bool ReserveBuilding::canReserveHere(TilePosition position, UnitType unitType, i
 					}
 				}
 			}
-			// 실제 건물 짓는 구간은 avoid 맵까지 체크
+
 			else {
 				if (_reserveMap[x][y] || !bw->isBuildable(x, y, true) || (_avoidMap[x][y] && unitType != Terran_Bunker && unitType != Terran_Missile_Turret)) {
-					// addon 인 경우 addon 윗 공간은 검사하지 않는다.
+					
 					if (canBuildAddon && y < position.y && x >= position.x + width)
 						continue;
 
@@ -414,17 +409,17 @@ void ReserveBuilding::debugCanReserveHere(TilePosition position, UnitType unitTy
 	int rwidth = position.x + width + rightSpace + (canBuildAddon ? 2 : 0);
 	int rheight = position.y + height + bottomSpace;
 
-	// 유효성 체크
+
 	if (!strPosition.isValid() || rwidth > (int)_reserveMap.size() || rheight > (int)_reserveMap[0].size()) {
 		cout << "validation fail." << strPosition << " " << rwidth << ", " << rheight << endl;
 		return;
 	}
 
-	// addon 이 가능한 건물인 경우 addon 공간까지 확인
+
 	if (canBuildAddon) {
 		bool needToCheck = true;
 
-		// 이미 addon 건물이 있는 경우는 체크하지 않는다.
+		
 		for (auto u : bw->getUnitsOnTile(position + TilePosition(width, 1))) {
 			if (u->getTilePosition() == position + TilePosition(width, 1) && u->getType().isAddon() && u->getType().whatBuilds().first == unitType) {
 				needToCheck = false;
@@ -453,9 +448,9 @@ void ReserveBuilding::debugCanReserveHere(TilePosition position, UnitType unitTy
 
 	for (int x = strPosition.x; x < rwidth; x++) {
 		for (int y = strPosition.y; y < rheight; y++) {
-			// space 와 avoid 가 겹치는 경우 정상판단.
+		
 			if (position.x > x || (position.y > y && x <= position.x + width) || (position.x + width <= x && position.y == y) || (buildingWidth <= x && position.y <= y) || buildingHeight <= y) {
-				// 커멘드 센터의 경우 터렛과 avoid 가 겹칠 수 있음.
+				
 				if (unitType == Terran_Command_Center) {
 					for (auto unit : bw->getUnitsInRectangle(x * 32 + 1, y * 32 + 1, x * 32 + 31, y * 32 + 31)) {
 						if (unit->getType() != Terran_Missile_Turret && unit->getType() != Terran_Bunker) {
@@ -488,10 +483,10 @@ void ReserveBuilding::debugCanReserveHere(TilePosition position, UnitType unitTy
 					}
 				}
 			}
-			// 실제 건물 짓는 구간은 avoid 맵까지 체크
+		
 			else {
 				if (_reserveMap[x][y] || !bw->isBuildable(x, y, true) || (_avoidMap[x][y] && unitType != Terran_Bunker && unitType != Terran_Missile_Turret)) {
-					// addon 인 경우 addon 윗 공간은 검사하지 않는다.
+					
 					if (canBuildAddon && y < position.y && x >= position.x + width)
 						continue;
 

@@ -5,9 +5,7 @@
 
 namespace BWAPI
 {
-	// ### 순서를 절대 바꾸지 마세요. ###
-	// 추가되는 전략은 가장 아래로(UnknownBuild 위로)
-	// 글자수가 너무 길어 화면에 뿌려지는 글자 이상이 되면 오류 발생
+	
 	namespace InitialBuildTypes
 	{
 		namespace Enum
@@ -25,14 +23,14 @@ namespace BWAPI
 				Zerg_12_Ap,
 				Zerg_sunken_rush,
 				Zerg_4_Drone_Real,
-				Toss_1g_dragoon,// 1게이트 드라군 8
-				Toss_2g_zealot, // 2게이트 질럿 10
-				Toss_2g_dragoon, // 2게이트 드라군 9
-				Toss_1g_forward,// 전진 1게이트 11
-				Toss_2g_forward,// 전진 2게이트 12
-				Toss_1g_double,// 1게이트 더블
-				Toss_pure_double,// 쌩더블
-				Toss_forge,// 포지 더블
+				Toss_1g_dragoon,
+				Toss_2g_zealot, 
+				Toss_2g_dragoon, 
+				Toss_1g_forward,
+				Toss_2g_forward,
+				Toss_1g_double,
+				Toss_pure_double,
+				Toss_forge,
 				Toss_4probes,
 				Toss_cannon_rush,
 				Terran_2b,
@@ -104,17 +102,17 @@ namespace BWAPI
 				Zerg_main_hydra_mutal,
 				Zerg_main_queen_hydra,
 				Toss_range_up_dra_push,
-				Toss_2gate_dra_push, // 15투 or 2게이트 드라군
+				Toss_2gate_dra_push, 
 				Toss_pure_tripple,
-				Toss_drop, // 질럿, 드라군 드랍
+				Toss_drop, 
 				Toss_reaver_drop,
-				Toss_dark, // 9
+				Toss_dark,
 				Toss_dark_drop,
-				Toss_1base_fast_zealot, // 앞마당 안먹고 올인
-				Toss_2base_zealot_dra,  // 앞마당 먹고 질럿드라군 올인
+				Toss_1base_fast_zealot, 
+				Toss_2base_zealot_dra, 
 				Toss_mass_production,
 				Toss_Scout,
-				Toss_fast_carrier, //0
+				Toss_fast_carrier,
 				Toss_arbiter,
 				Toss_arbiter_carrier,
 				Terran_1fac_double,
@@ -174,12 +172,12 @@ namespace BWAPI
 	{
 		namespace Enum {
 			enum Enum {
-				WaitToBase,						/// 본진 상태
-				WaitToFirstExpansion,			/// 앞마당 상태
-				AttackAll,						/// 적진으로 공격
-				BackAll,						/// 후퇴
-				DrawLine,                       /// 선긋기
-				WaitLine,                       /// 선긋고 대기
+				WaitToBase,						
+				WaitToFirstExpansion,			
+				AttackAll,						
+				BackAll,						
+				DrawLine,                       
+				WaitLine,                       
 				Eliminate,
 				MAX
 			};

@@ -13,13 +13,7 @@ namespace MyBot
 			return "Idle";
 		}
 	};
-	/*class EngineeringBayLiftState : public State
-	{
-	public:
-		virtual string getName() override {
-			return "Lift";
-		}
-	};*/
+
 
 	class EngineeringBayLiftAndMoveState : public State
 	{
@@ -29,10 +23,10 @@ namespace MyBot
 			return "LiftAndMove";
 		}
 		virtual State *action() override;
-		//virtual State *action(Position targetPosition) override;
+		
 	private:
 		bool firstMoved = false;
-		//Position *movePosition;
+	
 	};
 
 	class EngineeringBayBarricadeState : public State

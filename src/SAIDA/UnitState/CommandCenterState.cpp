@@ -50,7 +50,7 @@ MyBot::CommandCenterLiftAndMoveState::CommandCenterLiftAndMoveState(TilePosition
 
 State *CommandCenterLiftAndMoveState::action()
 {
-	// 가려는 위치에 내 마인 있으면 제거
+	
 	if (targetPosition.isValid())
 	{
 		uList delMine = INFO.getTypeUnitsInRadius(Terran_Vulture_Spider_Mine, S, (Position)targetPosition, 5 * TILE_SIZE);
@@ -67,7 +67,7 @@ State *CommandCenterLiftAndMoveState::action()
 
 	Position pos = (Position)targetPosition;
 
-	// 내가 가고 있는 위치가 이미 나/적 에게 점령된 상태면 위치 리셋
+
 	auto targetMyBase = find_if(INFO.getOccupiedBaseLocations(S).begin(), INFO.getOccupiedBaseLocations(S).end(), [pos](const Base * base) {
 		return pos == base->getPosition();
 	});
@@ -88,7 +88,7 @@ State *CommandCenterLiftAndMoveState::action()
 				break;
 		}
 
-		// 멀티 할 수 있는 위치 있으면
+		
 		if (multiBase)
 		{
 			targetPosition = multiBase->getTilePosition();
@@ -128,14 +128,14 @@ State *CommandCenterLiftAndMoveState::action()
 MyBot::CommandLandingState::CommandLandingState(Position p)
 {
 	targetPosition = p;
-	nextLandTime = TIME;
+	nextLandTIME = TIME;
 }
 
 State *CommandLandingState::action()
 {
-	// 이미 내린상태
+	
 	if (!unit->isLifted() && unit->canLift()) {
-		// 지금 위치가 본진, 앞마당, Second/Third Expansion 이 아닌 경우 추가 멀티에 추가
+		
 		Base *multiBase = nullptr;
 
 		for (Base *baseLocation : INFO.getBaseLocations())
@@ -170,10 +170,10 @@ State *CommandLandingState::action()
 	}
 	else {
 		if (unit->canLand() && bw->canBuildHere((TilePosition)targetPosition, Terran_Command_Center)) {
-			if (TIME >= nextLandTime)
+			if (TIME >= nextLandTIME)
 			{
 				unit->land((TilePosition)targetPosition);
-				nextLandTime += 5 * 24;
+				nextLandTIME += 5 * 24;
 			}
 		}
 	}

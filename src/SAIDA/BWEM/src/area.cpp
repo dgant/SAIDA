@@ -105,8 +105,6 @@ namespace BWEM {
 		if (iMineral != m_Minerals.end())
 			fast_erase(m_Minerals, distance(m_Minerals.begin(), iMineral));
 
-		// let's examine the bases even if pMineral was not found in this Area,
-		// which could arise if Minerals were allowed to be assigned to neighbouring Areas.
 		for (Base &base : Bases())
 			base.OnMineralDestroyed(pMineral);
 	}
@@ -151,8 +149,7 @@ namespace BWEM {
 	}
 
 
-	// Returns Distances such that Distances[i] == ground_distance(start, Targets[i]) in pixels
-	// Note: same algorithm than Graph::ComputeDistances (derived from Dijkstra)
+
 	vector<int> Area::ComputeDistances(TilePosition start, const vector<TilePosition> &Targets) const
 	{
 		const Map *pMap = GetMap();
@@ -160,7 +157,7 @@ namespace BWEM {
 
 		Tile::UnmarkAll();
 
-		multimap<int, TilePosition> ToVisit;	// a priority queue holding the tiles to visit ordered by their distance to start.
+		multimap<int, TilePosition> ToVisit;	
 		ToVisit.emplace(0, start);
 
 		int remainingTargets = Targets.size();
@@ -172,7 +169,7 @@ namespace BWEM {
 			const Tile &currentTile = pMap->GetTile(current, check_t::no_check);
 			bwem_assert(currentTile.InternalData() == currentDist);
 			ToVisit.erase(ToVisit.begin());
-			currentTile.SetInternalData(0);										// resets Tile::m_internalData for future usage
+			currentTile.SetInternalData(0);										
 			currentTile.SetMarked();
 
 			for (int i = 0 ; i < (int)Targets.size() ; ++i)
@@ -201,10 +198,10 @@ namespace BWEM {
 
 					if (!nextTile.Marked())
 					{
-						if (nextTile.InternalData())	// next already in ToVisit
+						if (nextTile.InternalData())	
 						{
-							if (newNextDist < nextTile.InternalData())		// nextNewDist < nextOldDist
-							{	// To update next's distance, we need to remove-insert it from ToVisit:
+							if (newNextDist < nextTile.InternalData())		
+							{	
 								auto range = ToVisit.equal_range(nextTile.InternalData());
 								auto iNext = find_if(range.first, range.second, [next]
 								(const pair<int, TilePosition> &e) {
@@ -214,14 +211,12 @@ namespace BWEM {
 
 								ToVisit.erase(iNext);
 								nextTile.SetInternalData(newNextDist);
-								//	nextTile.SetPtr(const_cast<Tile *>(&currentTile));		// note: we won't use this backward trace
 								ToVisit.emplace(newNextDist, next);
 							}
 						}
 						else if ((nextTile.AreaId() == Id()) || (nextTile.AreaId() == -1))
 						{
 							nextTile.SetInternalData(newNextDist);
-							//	nextTile.SetPtr(const_cast<Tile *>(&currentTile));			// note: we won't use this backward trace
 							ToVisit.emplace(newNextDist, next);
 						}
 					}
@@ -231,7 +226,6 @@ namespace BWEM {
 
 		bwem_assert(!remainingTargets);
 
-		// Reset Tile::m_internalData for future usage
 		for (auto e : ToVisit)
 			pMap->GetTile(e.second, check_t::no_check).SetInternalData(0);
 
@@ -251,7 +245,6 @@ namespace BWEM {
 	}
 
 
-	// Called for each tile t of this Area
 	void Area::AddTileInformation(const BWAPI::TilePosition t, const Tile &tile)
 	{
 		++m_tiles;
@@ -272,18 +265,13 @@ namespace BWEM {
 	}
 
 
-	// Called after AddTileInformation(t) has been called for each tile t of this Area
 	void Area::PostCollectInformation()
 	{
 	}
 
 
 
-	// Calculates the score >= 0 corresponding to the placement of a Base Command Center at 'location'.
-	// The more there are ressources nearby, the higher the score is.
-	// The function assumes the distance to the nearby ressources has already been computed (in InternalData()) for each tile around.
-	// The job is therefore made easier : just need to sum the InternalData() values.
-	// Returns -1 if the location is impossible.
+
 
 	int Area::ComputeBaseLocationScore(TilePosition location) const
 	{
@@ -299,9 +287,8 @@ namespace BWEM {
 
 				if (!tile.Buildable()) return -1;
 
-				if (tile.InternalData() == -1) return -1;		// The special value InternalData() == -1 means there is some ressource at maximum 3 tiles, which Starcraft rules forbid.
+				if (tile.InternalData() == -1) return -1;		
 
-				// Unfortunately, this is guaranteed only for the ressources in this Area, which is the very reason of ValidateBaseLocation
 				if (tile.AreaId() != Id()) return -1;
 
 				if (tile.GetNeutral() && tile.GetNeutral()->IsStaticBuilding()) return -1;
@@ -313,11 +300,7 @@ namespace BWEM {
 	}
 
 
-	// Checks if 'location' is a valid location for the placement of a Base Command Center.
-	// If the location is valid except for the presence of Mineral patches of less than 9 (see Andromeda.scx),
-	// the function returns true, and these Minerals are reported in BlockingMinerals
-	// The function is intended to be called after ComputeBaseLocationScore, as it is more expensive.
-	// See also the comments inside ComputeBaseLocationScore.
+
 	bool Area::ValidateBaseLocation(TilePosition location, vector<Mineral *> &BlockingMinerals) const
 	{
 		const Map *pMap = GetMap();
@@ -345,7 +328,6 @@ namespace BWEM {
 				}
 			}
 
-		// checks the distance to the Bases already created:
 		for (const Base &base : Bases())
 			if (roundedDist(base.Location(), location) < min_tiles_between_Bases) return false;
 
@@ -353,18 +335,13 @@ namespace BWEM {
 	}
 
 
-	// Fills in m_Bases with good locations in this Area.
-	// The algorithm repeatedly searches the best possible location L (near ressources)
-	// When it finds one, the nearby ressources are assigned to L, which makes the remaining ressources decrease.
-	// This causes the algorithm to always terminate due to the lack of remaining ressources.
-	// To efficiently compute the distances to the ressources, with use Potiential Fields in the InternalData() value of the Tiles.
 	void Area::CreateBases()
 	{
 		const TilePosition dimCC = UnitType(Terran_Command_Center).tileSize();
 		const Map *pMap = GetMap();
 
 
-		// Initialize the RemainingRessources with all the Minerals and Geysers in this Area satisfying some conditions:
+
 		vector<Ressource *> RemainingRessources;
 
 		for (Mineral *m : Minerals())	if ((m->InitialAmount() >= 40) && !m->Blocking()) RemainingRessources.push_back(m);
@@ -375,7 +352,6 @@ namespace BWEM {
 
 		while (!RemainingRessources.empty())
 		{
-			// 1) Calculate the SearchBoundingBox (needless to search too far from the RemainingRessources):
 
 			TilePosition topLeftRessources     = {numeric_limits<int>::max(), numeric_limits<int>::max()};
 			TilePosition bottomRightRessources = {numeric_limits<int>::min(), numeric_limits<int>::min()};
@@ -391,7 +367,6 @@ namespace BWEM {
 			makePointFitToBoundingBox(topLeftSearchBoundingBox, TopLeft(), BottomRight() - dimCC + 1);
 			makePointFitToBoundingBox(bottomRightSearchBoundingBox, TopLeft(), BottomRight() - dimCC + 1);
 
-			// 2) Mark the Tiles with their distances from each remaining Ressource (Potential Fields >= 0)
 			for (const Ressource *r : RemainingRessources)
 				for (int dy = -dimCC.y - max_tiles_between_CommandCenter_and_ressources ; dy < r->Size().y + dimCC.y + max_tiles_between_CommandCenter_and_ressources ; ++dy)
 					for (int dx = -dimCC.x - max_tiles_between_CommandCenter_and_ressources ; dx < r->Size().x + dimCC.x + max_tiles_between_CommandCenter_and_ressources ; ++dx)
@@ -404,13 +379,12 @@ namespace BWEM {
 							int dist = (distToRectangle(center(t), r->TopLeft(), r->Size()) + 16) / 32;
 							int score = max(max_tiles_between_CommandCenter_and_ressources + 3 - dist, 0);
 
-							if (r->IsGeyser()) score *= 3;		// somewhat compensates for Geyser alone vs the several Minerals
+							if (r->IsGeyser()) score *= 3;		
 
-							if (tile.AreaId() == Id()) tile.SetInternalData(tile.InternalData() + score);	// note the additive effect (assume tile.InternalData() is 0 at the begining)
+							if (tile.AreaId() == Id()) tile.SetInternalData(tile.InternalData() + score);	
 						}
 					}
 
-			// 3) Invalidate the 7 x 7 Tiles around each remaining Ressource (Starcraft rule)
 			for (const Ressource *r : RemainingRessources)
 				for (int dy = -3 ; dy < r->Size().y + 3 ; ++dy)
 					for (int dx = -3 ; dx < r->Size().x + 3 ; ++dx)
@@ -422,7 +396,6 @@ namespace BWEM {
 					}
 
 
-			// 4) Search the best location inside the SearchBoundingBox:
 			TilePosition bestLocation;
 			int bestScore = 0;
 			vector<Mineral *> BlockingMinerals;
@@ -440,7 +413,6 @@ namespace BWEM {
 						}
 				}
 
-			// 5) Clear Tile::m_internalData (required due to our use of Potential Fields: see comments in 2))
 			for (const Ressource *r : RemainingRessources)
 				for (int dy = -dimCC.y - max_tiles_between_CommandCenter_and_ressources ; dy < r->Size().y + dimCC.y + max_tiles_between_CommandCenter_and_ressources ; ++dy)
 					for (int dx = -dimCC.x - max_tiles_between_CommandCenter_and_ressources ; dx < r->Size().x + dimCC.x + max_tiles_between_CommandCenter_and_ressources ; ++dx)
@@ -452,7 +424,6 @@ namespace BWEM {
 
 			if (!bestScore) break;
 
-			// 6) Create a new Base at bestLocation, assign to it the relevant ressources and remove them from RemainingRessources:
 			vector<Ressource *> AssignedRessources;
 
 			for (Ressource *r : RemainingRessources)
@@ -474,7 +445,6 @@ namespace BWEM {
 	}
 
 	////////////////////////////////////////////////
-	// SAIDA 추가
 	void Area::calcBoundaryVertices() const
 	{
 		set<Position> unsortedVertices;
@@ -494,9 +464,6 @@ namespace BWEM {
 				TilePosition t3(tp.x - 1, tp.y);
 				TilePosition t4(tp.x, tp.y - 1);
 
-				// a tile is 'surrounded' if
-				// 1) in all 4 directions there's a tile position in the current region
-				// 2) in all 4 directions there's a buildable tile
 				bool surrounded = true;
 
 				if (tp.x == 0 || tp.y == 0
@@ -508,15 +475,12 @@ namespace BWEM {
 					surrounded = false;
 				}
 
-				// Area의 가장자리 타일들 (surrounded 되지 않은 타일들)만 추가한다
-				// push the tiles that aren't surrounded
 				if (!surrounded && Broodwar->isBuildable(tp))
 				{
 					unsortedVertices.insert(Position(tp) + Position(16, 16));
 				}
 			}
 
-		//printf("Area ID = %d, # of unsortedVertices = %d\n", Id(), unsortedVertices.size());
 
 		if (unsortedVertices.empty()) {
 			return;
@@ -528,7 +492,6 @@ namespace BWEM {
 		sortedVertices.push_back(current);
 		unsortedVertices.erase(current);
 
-		// while we still have unsorted vertices left, find the closest one remaining to current
 		while (!unsortedVertices.empty())
 		{
 			double bestDist = 1000000;
@@ -550,23 +513,19 @@ namespace BWEM {
 			unsortedVertices.erase(bestPos);
 		}
 
-		// let's close loops on a threshold, eliminating death grooves
 		int distanceThreshold = 10;
 
 		while (true)
 		{
-			// find the largest index difference whose distance is less than the threshold
 			int maxFarthest = 0;
 			int maxFarthestStart = 0;
 			int maxFarthestEnd = 0;
 
-			// for each starting vertex
 			for (int i(0); i < (int)sortedVertices.size(); ++i)
 			{
 				int farthest = 0;
 				int farthestIndex = 0;
 
-				// only test half way around because we'll find the other one on the way back
 				for (size_t j(1); j < sortedVertices.size() / 2; ++j)
 				{
 					int jindex = (i + j) % sortedVertices.size();
@@ -586,7 +545,6 @@ namespace BWEM {
 				}
 			}
 
-			// stop when we have no long chains within the threshold
 			if (maxFarthest < 4)
 			{
 				break;
@@ -606,4 +564,4 @@ namespace BWEM {
 
 		m_boundaryVertices = sortedVertices;
 	}
-} // namespace BWEM
+} 

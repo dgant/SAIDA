@@ -108,14 +108,12 @@ namespace BWEM {
 	}
 
 
-	// Assumes pBlocking->RemoveFromTiles() has been called
 	void ChokePoint::OnBlockingNeutralDestroyed(const Neutral *pBlocking)
 	{
 		bwem_assert(pBlocking && pBlocking->Blocking());
 
 		if (m_pBlockingNeutral == pBlocking)
 		{
-			// Ensures that in the case where several neutrals are stacked, m_pBlockingNeutral points to the bottom one:
 			m_pBlockingNeutral = GetMap()->GetTile(m_pBlockingNeutral->TopLeft()).GetNeutral();
 
 			if (!m_pBlockingNeutral)
@@ -126,7 +124,7 @@ namespace BWEM {
 	}
 
 
-} // namespace BWEM
+} 
 
 
 

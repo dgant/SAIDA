@@ -4,32 +4,30 @@ using namespace MyBot;
 
 InformationManager::InformationManager()
 {
-	mapPlayerLimit = bw->getStartLocations().size();
+	mapPlayerLimit = bw->getStartLocations().size();//地图游戏人数限制
 
 	selfPlayer = S;
 	enemyPlayer = E;
 
-	selfRace = S->getRace();
-	enemyRace = E->getRace();
-	enemySelectRace = E->getRace();
+	selfRace = S->getRace();//己方种族
+	enemyRace = E->getRace();//敌方种族
 
-	_unitData[S] = UnitData();
+	_unitData[S] = UnitData();//存放敌我双方单位数据
 	_unitData[E] = UnitData();
 
-	// 시작 및 모든 베이스 정보 구성
-	updateStartAndBaseLocation();
+	updateStartAndBaseLocation(); //判断base是否在开局视野范围内，若是则将其加入到StartBaseLocations当中, 将Bases加入_allBaseLocations
 
-	_mainBaseLocations[S] = INFO.getStartLocation(S);
+	_mainBaseLocations[S] = INFO.getStartLocation(S);//我方基地位置
 	_mainBaseLocationChanged[S] = true;
 	_occupiedBaseLocations[S] = list<const Base *>();
-	_occupiedBaseLocations[S].push_back(_mainBaseLocations[S]);
+	_occupiedBaseLocations[S].push_back(_mainBaseLocations[S]);//获取曾经占据的基地位置
 
-	_mainBaseLocations[E] = getNextSearchBase();
+	_mainBaseLocations[E] = getNextSearchBase();//敌方基地位置
 	_mainBaseLocationChanged[E] = true;
 
 	_occupiedBaseLocations[E] = list<const Base *>();
 
-	_firstChokePoint[S] = nullptr;
+	_firstChokePoint[S] = nullptr;//敌我双方第一、二个要塞地点以及第一、二、三扩展Location
 	_firstChokePoint[E] = nullptr;
 	_secondChokePoint[S] = nullptr;
 	_secondChokePoint[E] = nullptr;
@@ -45,13 +43,13 @@ InformationManager::InformationManager()
 	isEnemyScanResearched = false;
 	availableScanCount = 0;
 
-	// BaseLocation 정보를 업데이트
+	
 	updateBaseLocationInfo();
 
 	updateChangedMainBaseInfo(S);
 	updateChangedMainBaseInfo(E);
 
-	// 스타팅 포인트와 앞마당 매핑.
+	
 	_firstExpansionOfAllStartposition = map<Base *, Base *>();
 	_mainBaseAreaPair = map<const Area *, const Area *>();
 	updateAllFirstExpansions();
@@ -59,10 +57,8 @@ InformationManager::InformationManager()
 	activationMineralBaseCount = 0;
 	activationGasBaseCount = 0;
 
-	// Center Area  정보 업데이트
-	//	updateCenterGridArea();
 
-	// 모든 Area의 가장자리 정보 업데이트
+	
 	for (auto &area : theMap.Areas())
 		area.calcBoundaryVertices();
 }
@@ -75,194 +71,77 @@ InformationManager::~InformationManager()
 void InformationManager::update()
 {
 	try {
-		updateUnitsInfo();
-	}
-	catch (SAIDA_Exception e) {
-		Logger::error("updateUnitsInfo Error. (ErrorCode : %x, Eip : %p)\n", e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-		throw e;
-	}
-	catch (const exception &e) {
-		Logger::error("updateUnitsInfo Error. (Error : %s)\n", e.what());
-		throw e;
+		updateUnitsInfo();//跟新单位信息
 	}
 	catch (...) {
-		Logger::error("updateUnitsInfo Unknown Error.\n");
-		throw;
 	}
-
-	//try {
-	//	updateCenterGridArea();
-	//}
-	//catch (SAIDA_Exception e) {
-	//	Logger::error("updateCenterGridArea Error. (ErrorCode : %x, Eip : %p)\n", e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-	//	throw e;
-	//}
-	//catch (const exception &e) {
-	//	Logger::error("updateCenterGridArea Error. (Error : %s)\n", e.what());
-	//	throw e;
-	//}
-	//catch (...) {
-	//	Logger::error("updateCenterGridArea Unknown Error.\n");
-	//	throw;
-	//}
-
 	try {
 		updateBaseInfo();
 	}
-	catch (SAIDA_Exception e) {
-		Logger::error("updateBaseInfo Error. (ErrorCode : %x, Eip : %p)\n", e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-		throw e;
-	}
-	catch (const exception &e) {
-		Logger::error("updateBaseInfo Error. (Error : %s)\n", e.what());
-		throw e;
-	}
+	
 	catch (...) {
-		Logger::error("updateBaseInfo Unknown Error.\n");
-		throw;
 	}
 
 	try {
 		updateChokePointInfo();
 	}
-	catch (SAIDA_Exception e) {
-		Logger::error("updateChokePointInfo Error. (ErrorCode : %x, Eip : %p)\n", e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-		throw e;
-	}
-	catch (const exception &e) {
-		Logger::error("updateChokePointInfo Error. (Error : %s)\n", e.what());
-		throw e;
-	}
+	
 	catch (...) {
-		Logger::error("updateChokePointInfo Unknown Error.\n");
-		throw;
 	}
 
-	//예약된 마인 수를 리셋해줍니다 (2분에 한 번)
-	//if (TIME % (1 * 60 * 24) == 0)
-	//	initReservedMineCount();
 
 	try {
-		// FirstWaitLinePosition 설정
+
 		setFirstWaitLinePosition();
 	}
-	catch (SAIDA_Exception e) {
-		Logger::error("setFirstWaitLinePosition Error. (ErrorCode : %x, Eip : %p)\n", e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-		throw e;
-	}
-	catch (const exception &e) {
-		Logger::error("setFirstWaitLinePosition Error. (Error : %s)\n", e.what());
-		throw e;
-	}
+	
 	catch (...) {
-		Logger::error("setFirstWaitLinePosition Unknown Error.\n");
-		throw;
 	}
 
 	try {
-		// SecondExpansionLocation 설정
+		
 		updateSecondExpansion();
 	}
-	catch (SAIDA_Exception e) {
-		Logger::error("updateSecondExpansion Error. (ErrorCode : %x, Eip : %p)\n", e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-		throw e;
-	}
-	catch (const exception &e) {
-		Logger::error("updateSecondExpansion Error. (Error : %s)\n", e.what());
-		throw e;
-	}
 	catch (...) {
-		Logger::error("updateSecondExpansion Unknown Error.\n");
-		throw;
 	}
 
 	try {
 		updateSecondExpansionForEnemy();
 	}
-	catch (SAIDA_Exception e) {
-		Logger::error("updateSecondExpansionForEnemy Error. (ErrorCode : %x, Eip : %p)\n", e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-		throw e;
-	}
-	catch (const exception &e) {
-		Logger::error("updateSecondExpansionForEnemy Error. (Error : %s)\n", e.what());
-		throw e;
-	}
+	
 	catch (...) {
-		Logger::error("updateSecondExpansionForEnemy Unknown Error.\n");
-		throw;
 	}
 
 
 	try {
-		// ThirdExpansionLocation 설정
+		
 		updateThirdExpansion();
 	}
-	catch (SAIDA_Exception e) {
-		Logger::error("updateThirdExpansion Error. (ErrorCode : %x, Eip : %p)\n", e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-		throw e;
-	}
-	catch (const exception &e) {
-		Logger::error("updateThirdExpansion Error. (Error : %s)\n", e.what());
-		throw e;
-	}
+	
 	catch (...) {
-		Logger::error("updateThirdExpansion Unknown Error.\n");
-		throw;
 	}
 
 	try {
-		// IslandExpansionLocation 설정
+	
 		updateIslandExpansion();
 	}
-	catch (SAIDA_Exception e) {
-		Logger::error("updateIslandExpansion Error. (ErrorCode : %x, Eip : %p)\n", e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-		throw e;
-	}
-	catch (const exception &e) {
-		Logger::error("updateIslandExpansion Error. (Error : %s)\n", e.what());
-		throw e;
-	}
+	
 	catch (...) {
-		Logger::error("updateIslandExpansion Unknown Error.\n");
-		throw;
 	}
 
 	try {
-		// 활성화된 멀티 개수 체크
+	
 		checkActivationBaseCount();
 	}
-	catch (SAIDA_Exception e) {
-		Logger::error("checkActivationBaseCount Error. (ErrorCode : %x, Eip : %p)\n", e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-		throw e;
-	}
-	catch (const exception &e) {
-		Logger::error("checkActivationBaseCount Error. (Error : %s)\n", e.what());
-		throw e;
-	}
+	
 	catch (...) {
-		Logger::error("checkActivationBaseCount Unknown Error.\n");
-		throw;
 	}
 
-	// EnemyInMyArea 미리 계산
+	
 	checkEnemyInMyArea();
 	checkMoveInside();
 
-	/*if (!isEnemyScanResearched)
-	{
-	checkEnemyScan();
-	}*/
-	/*
-	for (auto &area : theMap.Areas())
-	{
-		int idx = 1;
 
-		for (auto p : area.getBoundaryVertices())
-		{
-			bw->drawTextMap(p, "%d", idx++);
-		}
-	}
-	*/
 }
 
 void InformationManager::checkEnemyInMyArea()
@@ -293,9 +172,9 @@ void InformationManager::updateStartAndBaseLocation()
 	{
 		for (auto &base : area.Bases())
 		{
-			//printf("Base (%d, %d) center at (%d, %d) %s\n", base.Location().x, base.Location().y, base.Center().x, base.Center().y, base.Starting() ? "Starting" : "");
+			
 
-			if (base.Starting())
+			if (base.Starting())//判断base是否在开局视野范围内，若是则将其加入到StartBaseLocations当中,将Bases加入_allBaseLocations
 			{
 				_startBaseLocations.push_back((Base *)&base);
 			}
@@ -304,11 +183,11 @@ void InformationManager::updateStartAndBaseLocation()
 		}
 	}
 
-	// 2인용 맵은 정렬 필요 없음
+
 	if (_startBaseLocations.size() <= 2)		return;
 
 	if (enemyRace == Races::Protoss) {
-		// 내 베이스 기준 거리 순으로 재 정렬
+	
 		sort(_startBaseLocations.begin(), _startBaseLocations.end(), [](Base * a, Base * b)
 		{
 			TilePosition mybase = INFO.getStartLocation(S)->Location();
@@ -316,15 +195,10 @@ void InformationManager::updateStartAndBaseLocation()
 			return mybase.getApproxDistance(a->Location()) < mybase.getApproxDistance(b->Location());
 		});
 
-		//printf("vs Protoss : sort by distance from mybase\n");
 
-		//for (auto base : bases)
-		//{
-		//	printf("Base (%d, %d)\n", base->Location().x, base->Location().y);
-		//}
 	}
 	else {
-		// 시계방향(맵중앙 기준)으로 정렬
+		
 		sort(_startBaseLocations.begin(), _startBaseLocations.end(), [](Base * a, Base * b)
 		{
 			TilePosition C = TilePosition(theMap.Center());
@@ -343,11 +217,6 @@ void InformationManager::updateStartAndBaseLocation()
 
 			return ang1 < ang2 || (ang1 == ang2 && d1 < d2);
 		});
-	}
-
-	for (auto base : _startBaseLocations)
-	{
-		printf("Base (%d, %d) center at (%d, %d) %s\n", base->Location().x, base->Location().y, base->Center().x, base->Center().y, base->Location() == S->getStartLocation() ? "<-- My Base" : "");
 	}
 }
 
@@ -391,7 +260,7 @@ Base *InformationManager::getNearestBaseLocation(Position pos, bool groundDist)
 	return (Base *)ret;
 }
 
-//나중에..
+
 set<ChokePoint *> InformationManager::getMineChokePoints()
 {
 	set<ChokePoint *> cps;
@@ -408,20 +277,13 @@ set<ChokePoint *> InformationManager::getMineChokePoints()
 		}
 	}
 
-	//theMap.GetAllChokePoints()
-	/*if (!isEnemyBaseFound) return nullptr;
 
-	for (auto cps : theMap.GetPath(getFirstExpansionLocation(S)->getPosition(), getFirstExpansionLocation(E)->getPosition()))
-	{
-		if (cps->Center() == pos)
-			return (ChokePoint *)cps;
-	}*/
 
 	return cps;
 }
 
-//
-////예약된 마인 수를 리셋해줍니다 (2분에 한 번)
+
+
 void InformationManager::initReservedMineCount()
 {
 	for (auto base : getBaseLocations())
@@ -430,7 +292,7 @@ void InformationManager::initReservedMineCount()
 	for (auto cp : theMap.GetAllChokePoints())
 		cp->SetReservedMineCount(0);
 
-	//	centerGridArea->initReservedMineCount();
+
 }
 
 void InformationManager::checkEnemyScan()
@@ -440,21 +302,7 @@ void InformationManager::checkEnemyScan()
 		isEnemyScanResearched = true;
 	}
 }
-//
-//void InformationManager::updateCenterGridArea()
-//{
-//	if (centerGridArea == nullptr)
-//	{
-//		const Area *wholeArea = theMap.GetNearestArea(TilePosition(theMap.Center()));
-//		centerGridArea = new GridArea(wholeArea, 16);
-//	}
-//	else
-//	{
-//		centerGridArea->update();
-//	}
-//}
 
-// base 의 정보를 업데이트 하고 _mainBaseLocations 를 수정한다.
 void InformationManager::updateBaseInfo() {
 	bool isChangedOccupyInfo = false;
 
@@ -471,12 +319,7 @@ void InformationManager::updateBaseInfo() {
 
 		for (auto &base : area.Bases())
 		{
-			// 1. 해당 지역의 점령 상태 판별 (undefined, myBase, enemyBase)
-			// [조건] INFO에서 빌딩을 가져와서 우리빌딩이 있으면 myBase, 적 빌딩 있으면 enemyBase, 둘다 있거나 없으면 undefined
-			// Basic Resource Depot 있으면 무조건 점령지
-			// 2. 예상 멀티 순위 판별(my, enemy) -> updateExpectedMultiBases()
-			// [조건] MainBase를 찾은 후 / 점령지 상태가 바뀔때만 해줌
-			// Turret만 있는 경우는 내 본진으로 보지않는다. 그냥 지은것들이기 때문에
+
 
 			uList sBuildings, eBuildings;
 			uList sBuildings_, eBuildings_;
@@ -510,7 +353,7 @@ void InformationManager::updateBaseInfo() {
 				}
 			}
 
-			// 내건물과 상대 건물이 동시에 있는 경우 -> undefined
+
 			if ( sBuildings.size() && eBuildings.size() )
 			{
 				if (base.GetOccupiedInfo() != shareBase)
@@ -522,7 +365,7 @@ void InformationManager::updateBaseInfo() {
 				_occupiedBaseLocations[S].push_back(&base);
 				_occupiedBaseLocations[E].push_back(&base);
 			}
-			else if ( sBuildings.size() ) //내 건물이 있는 경우
+			else if ( sBuildings.size() ) 
 			{
 				if (base.GetOccupiedInfo() != myBase)
 				{
@@ -532,7 +375,7 @@ void InformationManager::updateBaseInfo() {
 
 				_occupiedBaseLocations[S].push_back(&base);
 			}
-			else if ( eBuildings.size() ) //상대 건물이 있는 경우
+			else if ( eBuildings.size() ) 
 			{
 				if (base.GetOccupiedInfo() != enemyBase)
 				{
@@ -542,7 +385,7 @@ void InformationManager::updateBaseInfo() {
 
 				_occupiedBaseLocations[E].push_back(&base);
 			}
-			else //그 외의 경우
+			else 
 			{
 				if (base.GetOccupiedInfo() != emptyBase)
 				{
@@ -551,15 +394,14 @@ void InformationManager::updateBaseInfo() {
 				}
 			}
 
-			// 3. base의 내 mine 수
 			base.SetMineCount(INFO.getTypeUnitsInRadius(Terran_Vulture_Spider_Mine, S, base.Center(), TILE_SIZE * 12, false).size());
 
 			int workerCount = 0;
 			int enemyAirDefenseUnitCount = 0;
 			int enemyGroundDefenseUnitCount = 0;
 
-			int airUnitInMyBase = 0; //적 유닛이 내 베이스에 잇는지 체크
-			int groundUnitInMyBase = 0; //적 유닛이 내 베이스에 있는지 체크
+			int airUnitInMyBase = 0; 
+			int groundUnitInMyBase = 0; 
 
 			uList sUnits, eUnits;
 
@@ -572,7 +414,7 @@ void InformationManager::updateBaseInfo() {
 				eUnits = INFO.getUnitsInArea(E, base.Center(), true, true, true, true);
 			}
 
-			//상대 유닛체크
+	
 			for (auto u : eUnits)
 			{
 				if (u->type().isWorker() && base.GetOccupiedInfo() == enemyBase)
@@ -607,7 +449,7 @@ void InformationManager::updateBaseInfo() {
 			int selfAirDefenseUnitCount = 0;
 			int selfGroundDefenseUnitCount = 0;
 
-			//내 유닛 체크
+		
 			for (auto u : sUnits)
 			{
 				if (u->type().isWorker() && base.GetOccupiedInfo() == myBase)
@@ -631,9 +473,6 @@ void InformationManager::updateBaseInfo() {
 			int enemyGroundDefenseBuildingCount = 0;
 			int enemyBunkerCount = 0;
 
-			/*if (base.GetOccupiedInfo() != myBase)
-			{*/
-			//상대 빌딩 체크
 			for (auto u : eBuildings)
 			{
 				if (u->type().airWeapon().targetsAir() && u->isComplete())
@@ -657,9 +496,7 @@ void InformationManager::updateBaseInfo() {
 			int selfAirDefenseBuildingCount = 0;
 			int selfGroundDefenseBuildingCount = 0;
 
-			/*if (base.GetOccupiedInfo() != enemyBase)
-			{*/
-			//내 빌딩 체크
+
 			for (auto u : sBuildings)
 			{
 				if (u->type().airWeapon().targetsAir())
@@ -673,30 +510,30 @@ void InformationManager::updateBaseInfo() {
 				}
 			}
 
-			/*}*/
+		
 
-			// base에 상대 airAttack Unit 수
+			
 			base.SetEnemyAirDefenseUnitCount(enemyAirDefenseUnitCount);
-			// base에 상대 groundAttack Unit 수
+	
 			base.SetEnemyGroundDefenseUnitCount(enemyGroundDefenseUnitCount);
-			// base에 내 airAttack Unit 수
+		
 			base.SetSelfAirDefenseUnitCount(selfAirDefenseUnitCount);
-			// base에 내 groundAttack Unit 수
+			
 			base.SetSelfGroundDefenseUnitCount(selfGroundDefenseUnitCount);
-			// base에 상대 airAttack building 몇개?
+		
 			base.SetEnemyAirDefenseBuildingCount(enemyAirDefenseBuildingCount);
-			// base에 상대 groundAttack building 몇개?
+			
 			base.SetEnemyGroundDefenseBuildingCount(enemyGroundDefenseBuildingCount);
-			// base에 내 airAttack building 몇개?
+		
 			base.SetSelfAirDefenseBuildingCount(selfAirDefenseBuildingCount);
-			// base에 내 groundAttack building 몇개?
+			
 			base.SetSelfGroundDefenseBuildingCount(selfGroundDefenseBuildingCount);
-			// base에 Worker 몇 마리인가
+			
 			base.SetWorkerCount(workerCount);
-			// base에 Bunker 몇 개?
+			
 			base.SetEnemyBunkerCount(enemyBunkerCount);
 
-			// 9. 적군이 근처에 있거나, Worker에게 위험한 지역인지 판단
+			
 			if (base.GetOccupiedInfo() == myBase)
 			{
 				bool isDangerousBaseForWorkers = false;
@@ -719,30 +556,30 @@ void InformationManager::updateBaseInfo() {
 					}
 				}
 
-				if (isDangerousBaseForWorkers) //일꾼이나 커맨드가 공격받고 있다면
+				if (isDangerousBaseForWorkers) 
 				{
-					if (airUnitInMyBase && groundUnitInMyBase)//공중 지상 유닛 둘 다 있는 경우
+					if (airUnitInMyBase && groundUnitInMyBase)
 					{
 						if (selfAirDefenseBuildingCount + selfAirDefenseUnitCount > 0 && selfGroundDefenseBuildingCount + selfGroundDefenseUnitCount > 0)
 						{
 							isDangerousBaseForWorkers = false;
 						}
 					}
-					else if (airUnitInMyBase && !groundUnitInMyBase) //공중 유닛만 있는 경우
+					else if (airUnitInMyBase && !groundUnitInMyBase) 
 					{
-						if (selfAirDefenseBuildingCount + selfAirDefenseUnitCount > 0 || airUnitInMyBase < 3) // 공중유닛 2개는 그냥 무시하고 Defence 기다린다.(무탈, 레이쓰, 스카우트..)
+						if (selfAirDefenseBuildingCount + selfAirDefenseUnitCount > 0 || airUnitInMyBase < 3) 
 						{
 							isDangerousBaseForWorkers = false;
 						}
 					}
-					else if (!airUnitInMyBase && groundUnitInMyBase) //지상 유닛만 있는 경우
+					else if (!airUnitInMyBase && groundUnitInMyBase) 
 					{
 						if (selfGroundDefenseBuildingCount + selfGroundDefenseUnitCount > 0)
 						{
 							isDangerousBaseForWorkers = false;
 						}
 					}
-					else //아무것도 없는 경우
+					else 
 					{
 						isDangerousBaseForWorkers = false;
 					}
@@ -768,20 +605,20 @@ void InformationManager::updateBaseInfo() {
 					base.SetDangerousAreaForWorkers(false);
 			}
 
-			// 커맨드 근처에 적이 있는지 체크
+			
 			uList eList = INFO.getUnitsInRadius(E, base.getMineralBaseCenter(), 12 * TILE_SIZE, true, true, false);
 
 			int damage = 0;
 			Position avgPos = Position(0, 0);
 
 			for (auto e : eList) {
-				// 범위 공격이면서 사거리가 긴 유닛이 있는 경우 일꾼 전체가 대피해야한다.
+				
 				if (e->type() == Protoss_Reaver || e->type() == Protoss_Scarab || e->type() == Terran_Siege_Tank_Tank_Mode || e->type() == Protoss_High_Templar) {
 					base.SetDangerousAreaForWorkers(true);
 					damage = 0;
 					break;
 				}
-				// 럴커가 7타일 이내에 있어도 대피.
+				
 				else if (e->type() == Zerg_Lurker && base.getMineralBaseCenter().getApproxDistance(e->pos()) < 7 * TILE_SIZE) {
 					base.SetDangerousAreaForWorkers(true);
 					damage = 0;
@@ -793,7 +630,7 @@ void InformationManager::updateBaseInfo() {
 				damage += e->type() == Protoss_Zealot ? d * 2 : d;
 			}
 
-			//핵의 위협이 있는지 체크
+			
 
 			if (!INFO.getTypeUnitsInRadius(Terran_Nuclear_Missile, E, base.getMineralBaseCenter(), 15 * TILE_SIZE).empty()) {
 				base.SetDangerousAreaForWorkers(true);
@@ -823,14 +660,14 @@ void InformationManager::updateBaseInfo() {
 				}
 			}
 
-			// base 방문 시점 선택
+		
 			if (INFO.enemyRace == Races::Zerg && base.GetLastVisitedTime() == 0 && !isEnemyBaseFound) {
 				TilePosition upsize = base.getTilePosition() - TilePosition(1, 5);
 				TilePosition leftsize = base.getTilePosition() - TilePosition(5, 1);
 				TilePosition rightsize = base.getTilePosition() + TilePosition(8, -1);
 				TilePosition downsize = base.getTilePosition() + TilePosition(-1, 7);
 
-				// 최초 스타팅 위치에는 크립이 있기 때문에 5타일 전후만 봐도 TIME 을 업데이트 시켜준다.
+				
 				for (int x = 0; x < 6; x++) {
 					TilePosition u = TilePosition(upsize.x + x, upsize.y);
 					TilePosition d = TilePosition(downsize.x + x, downsize.y);
@@ -858,7 +695,7 @@ void InformationManager::updateBaseInfo() {
 
 				for (int x = base.getTilePosition().x; x <= rightBottomBase.x; x++) {
 					for (int y = base.getTilePosition().y; y <= rightBottomBase.y; y++) {
-						// 테두리만 확인한다.
+					
 						if (x == base.getTilePosition().x || x == rightBottomBase.x || y == base.getTilePosition().y || y == rightBottomBase.y) {
 							if (bw->isVisible(x, y)) {
 								base.SetLastVisitedTime(TIME);
@@ -874,10 +711,7 @@ void InformationManager::updateBaseInfo() {
 		}
 	}
 
-	//base정보 테스트용
-	//if (Broodwar->getFrameCount() % 360 == 0) {
-	// base.toScreen();
-	//}
+
 
 	try {
 		updateBaseLocationInfo();
@@ -886,17 +720,8 @@ void InformationManager::updateBaseInfo() {
 			updateExpectedMultiBases();
 		}
 	}
-	catch (SAIDA_Exception e) {
-		Logger::error("updateBaseLocationInfo Error. (ErrorCode : %x, Eip : %p)\n", e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-		throw e;
-	}
-	catch (const exception &e) {
-		Logger::error("updateBaseLocationInfo Error. (Error : %s)\n", e.what());
-		throw e;
-	}
+	
 	catch (...) {
-		Logger::error("updateBaseLocationInfo Unknown Error.\n");
-		throw;
 	}
 }
 
@@ -918,7 +743,7 @@ Unit InformationManager::getSafestMineral(Unit scv) {
 		}
 	}
 
-	// nullptr 인 경우 없어야 함.
+	
 	if (closestBase)
 		if (baseSafeMineralMap.find(closestBase->getTilePosition()) != baseSafeMineralMap.end())
 			return baseSafeMineralMap[closestBase->getTilePosition()];
@@ -937,20 +762,15 @@ void InformationManager::updateChokePointInfo()
 	for (auto cps : theMap.GetPath(getFirstExpansionLocation(S)->getPosition(), getFirstExpansionLocation(E)->getPosition()))
 	{
 
-		// 1. 해당 지역의 점령 상태 판별 (undefined, myBase, enemyBase)
-		// [조건] INFO에서 빌딩을 가져와서 우리빌딩이 있으면 myBase, 적 빌딩 있으면 enemyBase, 둘다 있거나 없으면 undefined
-		// Basic Resource Depot 있으면 무조건 점령지
-		// 2. 예상 멀티 순위 판별(my, enemy) -> updateExpectedMultiBases()
-		// [조건] MainBase를 찾은 후 / 점령지 상태가 바뀔때만 해줌
 
 
-		// 3. base의 내 mine 수
+
 		cps->SetMineCount(getTypeUnitsInRadius(Terran_Vulture_Spider_Mine, S, Position(cps->Center()), TILE_SIZE * 6).size());
 
 		int enemyAirDefenseUnitCount = 0;
 		int enemyGroundDefenseUnitCount = 0;
 
-		//상대 유닛체크
+	
 		for (auto u : INFO.getUnitsInRadius(E, Position(cps->Center()), TILE_SIZE * 6, true, true, true, true))
 		{
 			if (u->type().airWeapon().targetsAir())
@@ -967,7 +787,7 @@ void InformationManager::updateChokePointInfo()
 		int selfAirDefenseUnitCount = 0;
 		int selfGroundDefenseUnitCount = 0;
 
-		//내 유닛 체크
+
 		for (auto u : INFO.getUnitsInRadius(S, Position(cps->Center()), TILE_SIZE * 6, true, true, true, true))
 		{
 			if (u->type().airWeapon().targetsAir())
@@ -981,36 +801,34 @@ void InformationManager::updateChokePointInfo()
 			}
 		}
 
-		// 건물 일단 Skip...나중에 업데이트
+	
 		int enemyAirDefenseBuildingCount = 0;
 		int enemyGroundDefenseBuildingCount = 0;
 
 		int selfAirDefenseBuildingCount = 0;
 		int selfGroundDefenseBuildingCount = 0;
 
-		// base에 상대 airAttack Unit 수
+	
 		cps->SetEnemyAirDefenseUnitCount(enemyAirDefenseUnitCount);
-		// base에 상대 groundAttack Unit 수
+
 		cps->SetEnemyGroundDefenseUnitCount(enemyGroundDefenseUnitCount);
-		// base에 내 airAttack Unit 수
+	
 		cps->SetSelfAirDefenseUnitCount(selfAirDefenseUnitCount);
-		// base에 내 groundAttack Unit 수
+	
 		cps->SetSelfGroundDefenseUnitCount(selfGroundDefenseUnitCount);
-		// base에 상대 airAttack building 몇개?
+		
 		cps->SetEnemyAirDefenseBuildingCount(enemyAirDefenseBuildingCount);
-		// base에 상대 groundAttack building 몇개?
+		
 		cps->SetEnemyGroundDefenseBuildingCount(enemyGroundDefenseBuildingCount);
-		// base에 내 airAttack building 몇개?
+	
 		cps->SetSelfAirDefenseBuildingCount(selfAirDefenseBuildingCount);
-		// base에 내 groundAttack building 몇개?
+		
 		cps->SetSelfGroundDefenseBuildingCount(selfGroundDefenseBuildingCount);
 
-		// 9. 적군이 근처에 있거나, Worker에게 위험한 지역인지 판단
+		
 		cps->SetIsEnemyAround(enemyAirDefenseUnitCount || enemyGroundDefenseUnitCount);
 
-		/*if (Broodwar->getFrameCount() % 120 == 0) {
-			cps->toScreen();
-		}*/
+
 	}
 }
 
@@ -1026,7 +844,7 @@ void InformationManager::onUnitCreate(Unit unit)
 	if (unit->getType().isNeutral())
 		return;
 
-	// 건물은 Create 시점부터 DB에 저장
+
 	if (unit->getType().isBuilding())
 		_unitData[S].addUnitNBuilding(unit);
 
@@ -1048,39 +866,39 @@ void InformationManager::onUnitComplete(Unit unit)
 
 	if (unit->getPlayer() == S)
 	{
-		if (_unitData[S].addUnitNBuilding(unit)) // 새로 추가되는 경우만
+		if (_unitData[S].addUnitNBuilding(unit)) 
 			_unitData[S].increaseCompleteUnits(unit->getType());
-		else if (unit->getType().isBuilding()) { // 건물은 Create 후 추가되므로 1번만 호출됨
+		else if (unit->getType().isBuilding()) { 
 			_unitData[S].increaseCompleteUnits(unit->getType());
-			// 건물이 완성되는 경우 reserve map 에서 해제해준다.
+			
 			ReserveBuilding::Instance().freeTiles(unit->getTilePosition(), unit->getType());
 		}
 
 		if (unit->getType() == Terran_Command_Center)
 			addAdditionalExpansion(unit);
 	}
-	else if (unit->getPlayer() == E) // 적군의 경우 Show에서 추가 되었는지 안된지를 알수 없음.
+	else if (unit->getPlayer() == E) 
 	{
 		_unitData[E].addUnitNBuilding(unit);
 
 		if (enemyRace == Races::Unknown) {
 			enemyRace = unit->getType().getRace();
 
-			// 내 종족이 테란이고 상대 종족이 프로토스가 아닌 경우 서플라이 디팟 예약 해제
+			
 			if (selfRace == Races::Terran && enemyRace != Races::Protoss) {
-				TerranConstructionPlaceFinder::Instance().freeSecondSupplyDepot();
+				SelfBuildingPlaceFinder::Instance().freeSecondSupplyDepot();
 			}
 		}
 	}
 }
 
-// 유닛이 파괴/사망한 경우, 해당 유닛 정보를 삭제한다
+
 void InformationManager::onUnitDestroy(Unit unit)
 {
 	if (unit->getType().isNeutral())
 		return;
 
-	if (unit->getType().isAddon()) // Add On은 중립건물 처리됨.
+	if (unit->getType().isAddon()) 
 	{
 		_unitData[S].removeUnitNBuilding(unit);
 		_unitData[E].removeUnitNBuilding(unit);
@@ -1095,7 +913,7 @@ void InformationManager::onUnitDestroy(Unit unit)
 
 bool InformationManager::isCombatUnitType(UnitType type) const
 {
-	// check for various types of combat units
+
 	if (type.canAttack() ||
 			type == Terran_Medic ||
 			type == Protoss_Observer ||
@@ -1126,35 +944,25 @@ InformationManager &InformationManager::Instance()
 
 
 void InformationManager::updateBaseLocationInfo() {
-	// 나의 BaseLocation 정보를 업데이트 한다.
+
 	updateSelfBaseLocationInfo();
 
 	try {
-		// 적의 BaseLocation 정보를 업데이트 한다.
+	
 		updateEnemyBaseLocationInfo();
 	}
-	catch (SAIDA_Exception e) {
-		Logger::error("updateEnemyBaseLocationInfo Error. (ErrorCode : %x, Eip : %p)\n", e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-		throw e;
-	}
-	catch (const exception &e) {
-		Logger::error("updateEnemyBaseLocationInfo Error. (Error : %s)\n", e.what());
-		throw e;
-	}
 	catch (...) {
-		Logger::error("updateEnemyBaseLocationInfo Unknown Error.\n");
-		throw;
 	}
 
 
-	// for each enemy building unit we know about
+	
 	updateOccupiedAreas(enemyPlayer);
 	updateOccupiedAreas(selfPlayer);
 	updateChangedMainBaseInfo(selfPlayer);
 	updateChangedMainBaseInfo(enemyPlayer);
 }
 
-// 나의 mainBaseLocations에 대해, 그곳에 있는 건물이 모두 파괴된 경우 _occupiedBaseLocations 중에서 _mainBaseLocations 를 선정한다
+
 void InformationManager::updateSelfBaseLocationInfo() {
 	if (!existsPlayerBuildingInArea(theMap.GetArea(_mainBaseLocations[S]->Location()), S)) {
 		for (list<const Base *>::const_iterator iterator = _occupiedBaseLocations[S].begin(), end = _occupiedBaseLocations[S].end(); iterator != end; ++iterator) {
@@ -1168,11 +976,9 @@ void InformationManager::updateSelfBaseLocationInfo() {
 }
 
 void InformationManager::updateEnemyBaseLocationInfo() {
-	// 적의 기지를 아는 경우 적진 건물이 모두 부서지면 새로운 베이스를 선택한다.
+	
 	if (isEnemyBaseFound) {
-		// 적군의 빠른 앞마당 건물 건설 + 아군의 가장 마지막 정찰 방문의 경우,
-		// enemy의 mainBaseLocations를 방문안한 상태에서는 건물이 하나도 없다고 판단하여 mainBaseLocation 을 변경하는 현상이 발생해서
-		// enemy의 mainBaseLocations을 실제 방문했었던 적이 한번은 있어야 한다라는 조건 추가.
+	
 		if (_mainBaseLocations[E]->GetLastVisitedTime() > 0
 				&& !existsPlayerBuildingInArea(_mainBaseLocations[E]->GetArea(), E)
 				&& INFO.getAllCount(Spell_Scanner_Sweep, S) == 0
@@ -1202,15 +1008,13 @@ void InformationManager::updateEnemyBaseLocationInfo() {
 			}
 
 
-			// 적이 점령한 base area 가 없는 경우 다른 base 를 탐색. (종족별 탐방 순서 이후, 탐방 오래된 순서)
+		
 			isEnemyBaseFound = false;
 		}
 	}
 
-	// enemy 의 startLocation을 아직 모르는 경우
 	if (!isEnemyBaseFound) {
-		// 적 베이스로 지정된 곳에 => 저그의 경우 정찰일꾼이 두마리 출발하기 때문에 (혹은 이후에도 다른 정찰로 MainBaseLocation 이외의 곳에서 기지를 발견할 수 있음) 추가 체크를 해준다.
-		// 적 건물이 보이면 찾은것으로 간주. 저그인 경우 크립이 있으면 찾은것으로 간주
+	
 		for (auto &b : getStartLocations()) {
 			if (b == _mainBaseLocations[S])
 				continue;
@@ -1225,16 +1029,15 @@ void InformationManager::updateEnemyBaseLocationInfo() {
 
 				cout << "enemy base found" << endl;
 				isEnemyBaseFound = true;
-				// creep 존재 여부를 clear. 이후 해당 base 에서는 creep 관련 체크는 하지 않는다.
+				
 				b->ClearHasCreepAroundBase();
 				return;
 			}
 		}
 
-		// how many start locations have we explored
+	
 		int exploredStartLocations = 0;
 
-		// an unexplored base location holder
 		Base *unexplored = nullptr;
 
 		uMap &eBuildings = getBuildings(E);
@@ -1245,8 +1048,7 @@ void InformationManager::updateEnemyBaseLocationInfo() {
 			if (startLocation == _mainBaseLocations[S])
 				continue;
 
-			// 적의 건물이 특정 스타트 포지션의 앞마당에 있거나 GroundDistance 1600 이내라면
-			// 해당 스타트 포지션을 적의 베이스로 간주한다.
+		
 			for (auto &b : eBuildings) {
 				if (b.second->pos() == Positions::Unknown)
 					continue;
@@ -1264,15 +1066,13 @@ void InformationManager::updateEnemyBaseLocationInfo() {
 
 			}
 
-			// if it's explored, increment
 			if (startLocation->GetLastVisitedTime())
 				exploredStartLocations++;
-			// otherwise set it as unexplored base
+	
 			else
 				unexplored = startLocation;
 		}
 
-		// if we've explored every start location except one, it's the enemy
 		if (exploredStartLocations == (mapPlayerLimit - 2) && unexplored)
 		{
 			cout << "updateBaseLocationInfo2" << unexplored->getTilePosition() << endl;
@@ -1283,7 +1083,7 @@ void InformationManager::updateEnemyBaseLocationInfo() {
 			return;
 		}
 
-		// 현재 가고있는 base 의 lastVisitTime 이 20 프레임 이내인 경우 다음 base 선택.
+	
 		if (getMainBaseLocation(E)->GetLastVisitedTime() && getMainBaseLocation(E)->GetLastVisitedTime() + 20 > TIME) {
 			_mainBaseLocations[E] = getNextSearchBase();
 			_mainBaseLocationChanged[E] = true;
@@ -1293,7 +1093,7 @@ void InformationManager::updateEnemyBaseLocationInfo() {
 }
 
 const Base *InformationManager::getNextSearchBase(bool reverse) {
-	// 정방향
+
 	if (!reverse) {
 		auto iter = _startBaseLocations.begin();
 
@@ -1317,7 +1117,7 @@ const Base *InformationManager::getNextSearchBase(bool reverse) {
 				return bl;
 		}
 	}
-	// 역방향
+
 	else {
 		auto iter = _startBaseLocations.rbegin();
 
@@ -1346,7 +1146,7 @@ const Base *InformationManager::getNextSearchBase(bool reverse) {
 		}
 	}
 
-	// 모든 base 를 탐색 한적이 있다면 안간지 오래된 base 부터 탐색. (추후 보완 필요하려나?)
+
 	const Base *rBase = getMainBaseLocation(S);
 
 	for (auto &base : _allBaseLocations) {
@@ -1372,23 +1172,13 @@ void InformationManager::updateChangedMainBaseInfo(Player player)
 		_secondChokePoint[player] = nullptr;
 
 		if (_mainBaseLocations[player]) {
-			// 현재 위치에서 모든 인접한 area 를 가져온다.
+		
 			const Area *baseArea = theMap.GetArea(_mainBaseLocations[player]->Location());
 
 			try {
 				updateChokePointAndExpansionLocation(*baseArea, player);
 			}
-			catch (SAIDA_Exception e) {
-				Logger::error("updateChokePointAndExpansionLocation Error. (ErrorCode : %x, Eip : %p)\n", e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-				throw e;
-			}
-			catch (const exception &e) {
-				Logger::error("updateChokePointAndExpansionLocation Error. (Error : %s)\n", e.what());
-				throw e;
-			}
 			catch (...) {
-				Logger::error("updateChokePointAndExpansionLocation Unknown Error.\n");
-				throw;
 			}
 		}
 	}
@@ -1401,31 +1191,30 @@ bool InformationManager::updateChokePointAndExpansionLocation(const Area &baseAr
 		if (checkPassedArea(*cba.first, passedAreas))
 			continue;
 
-		// 주변에 base 가 있는지?
+	
 		if (!cba.first->Bases().empty()) {
-			// 이어진 chokepoint 의 길이가 특정 이하인지?
+	
 			for (auto &cp : *cba.second) {
 				int dist = cp.Pos(ChokePoint::end1).getApproxDistance(cp.Pos(ChokePoint::middle));
 				dist += cp.Pos(ChokePoint::end2).getApproxDistance(cp.Pos(ChokePoint::middle));
 
-				// 초크포인트 크기가 작은 경우
+			
 				if (dist < 39) {
 					for (Base *targetBaseLocation : INFO.getBaseLocations()) {
 						for (auto &base : cba.first->Bases()) {
 							if (base.Location() == targetBaseLocation->Location()) {
-								// 첫번째 확장기지 세팅
+							
 								_firstExpansionLocation[player] = targetBaseLocation;
-								// 첫번째 초크포인트 세팅
+							
 								_firstChokePoint[player] = &cp;
 
 								word depth = 0;
 
 								for (auto &expansionAreaCP : cba.first->ChokePoints()) {
-									// 데스티네이션이 secondChokePoint 가 두개이기 때문에 본진에 가까운 것을 secondChokePoint 로 지정한다.
-									// 단장의능선은 secondChokePoint 가 상대 본진 반대방향이 있기 때문에 CP depth 도 함께 체크 한다.
+								
 									for (auto &baseAreaCP : *cba.second) {
 										if (expansionAreaCP->Center() != baseAreaCP.Center()) {
-											// 두번째 초크포인트 세팅
+										
 											if (_secondChokePoint[player] == nullptr) {
 												_secondChokePoint[player] = expansionAreaCP;
 
@@ -1458,7 +1247,7 @@ bool InformationManager::updateChokePointAndExpansionLocation(const Area &baseAr
 		}
 	}
 
-	// 못찾은 경우 인접한 area 기준으로 다시 검색하기
+
 	for (auto &cba : baseArea.ChokePointsByArea()) {
 		if (checkPassedArea(*cba.first, passedAreas))
 			continue;
@@ -1471,7 +1260,7 @@ bool InformationManager::updateChokePointAndExpansionLocation(const Area &baseAr
 	return false;
 }
 
-// 기존에 지난 area 인지 체크
+
 bool InformationManager::checkPassedArea(const Area &area, vector<const Area *> passedAreas) {
 	for (auto passedArea : passedAreas) {
 		if (passedArea->Id() == area.Id()) {
@@ -1499,10 +1288,10 @@ void InformationManager::updateOccupiedAreas(Player player)
 	}
 }
 
-// BaseLocation 주위 원 안에 player의 건물이 있으면 true 를 반환한다
+
 bool InformationManager::hasBuildingAroundBaseLocation(Base *baseLocation, Player player, int radius)
 {
-	// invalid areas aren't considered the same, but they will both be null
+	
 	if (!baseLocation)
 	{
 		return false;
@@ -1514,10 +1303,10 @@ bool InformationManager::hasBuildingAroundBaseLocation(Base *baseLocation, Playe
 
 		TilePosition buildingPosition(b.second->pos());
 
-		// 직선거리는 가깝지만 다른 Area 에 있는 건물인 경우 무시한다
+		
 		if (theMap.GetArea(buildingPosition) != baseLocation->GetArea())	continue;
 
-		// BasicBot 1.2 Patch End //////////////////////////////////////////////////
+
 
 		if (buildingPosition.x >= baseLocation->Location().x - radius && buildingPosition.x <= baseLocation->Location().x + radius
 				&& buildingPosition.y >= baseLocation->Location().y - radius && buildingPosition.y <= baseLocation->Location().y + radius)
@@ -1536,7 +1325,7 @@ bool InformationManager::hasBuildingAroundBaseLocation(Base *baseLocation, Playe
 
 bool InformationManager::existsPlayerBuildingInArea(const Area *area, Player player)
 {
-	// invalid areas aren't considered the same, but they will both be null
+
 	if (area == nullptr || player == nullptr)
 	{
 		return false;
@@ -1566,7 +1355,7 @@ bool InformationManager::isInFirstExpansionLocation(Base *startLocation, TilePos
 
 }
 
-// BasicBot 1.1 Patch End //////////////////////////////////////////////////
+
 
 set<Area *> &InformationManager::getOccupiedAreas(Player player)
 {
@@ -1818,11 +1607,9 @@ UnitType InformationManager::getAdvancedDefenseBuildingType(Race race, bool isAi
 	}
 }
 
-///////////////////////////////////////////
-// 공통 Function 구현
-///////////////////////////////////////////
 
-// UnitData에서 UnitInfo를 찾아 Return함.
+
+
 UnitInfo *InformationManager::getUnitInfo(Unit unit, Player p)
 {
 	if (unit == nullptr)
@@ -1898,13 +1685,7 @@ int InformationManager::getAllCount(UnitType t, Player p)
 	}
 }
 
-// getUnitsInRadius
-// pos에서 radius(pixel) 만큼 안에 있는 Unit을 가져온다.
-// 필수 input : Player
-// 옵션 input :
-// pos, radius( 입력하지 않는 경우 모든 유닛을 가져온다. )
-// ground (지상 유닛, 일꾼 포함) , air ( 공중 유닛 ), worker (일꾼 포함 여부, 참고로 일꾼만은 가져올 수 없음)
-// hide( 현재 맵에서 없어진 유닛까지 가져올때 )
+
 uList InformationManager::getUnitsInRadius(Player p, Position pos, int radius, bool ground, bool air, bool worker, bool hide, bool groundDistance)
 {
 	uList units;
@@ -1916,7 +1697,7 @@ uList InformationManager::getUnitsInRadius(Player p, Position pos, int radius, b
 		if (u.second->type() != Zerg_Lurker && hide == false && u.second->isHide())
 			continue;
 
-		// 일단 Mine은 Skip
+	
 		if (u.second->type() == Terran_Vulture_Spider_Mine)
 			continue;
 
@@ -1997,7 +1778,6 @@ uList InformationManager::getUnitsInRectangle(Player p, Position leftTop, Positi
 		int Threshold_T = leftTop.y;
 		int Threshold_D = rightDown.y;
 
-		//		if (u.second->unit()->getTop() > Threshold_D || u.second->unit()->getBottom() < Threshold_T || u.second->unit()->getLeft() > Threshold_R || u.second->unit()->getRight() < Threshold_L)
 		if (u.second->pos().y > Threshold_D || u.second->pos().y < Threshold_T || u.second->pos().x > Threshold_R || u.second->pos().x  < Threshold_L)
 			continue;
 
@@ -2260,7 +2040,6 @@ uList InformationManager::getTypeUnitsInRectangle(UnitType t, Player p, Position
 		int Threshold_T = leftTop.y;
 		int Threshold_D = rightDown.y;
 
-		//		if (u.second->unit()->getTop() > Threshold_D || u.second->unit()->getBottom() < Threshold_T || u.second->unit()->getLeft() > Threshold_R || u.second->unit()->getRight() < Threshold_L)
 		if (u->pos().y > Threshold_D || u->pos().y < Threshold_T || u->pos().x > Threshold_R || u->pos().x  < Threshold_L)
 			continue;
 
@@ -2375,7 +2154,7 @@ UnitInfo *InformationManager::getClosestUnit(Player p, Position pos, TypeKind ki
 			if (detectedOnly && !u.second->isHide() && !u.second->unit()->isDetected())
 				continue;
 
-			// Closest 유닛에서 제외하는 종류
+		
 			if (u.second->type() == Zerg_Egg || u.second->type() == Zerg_Larva || u.second->type() == Protoss_Interceptor ||
 					u.second->type() == Protoss_Scarab || u.second->type() == Terran_Vulture_Spider_Mine)
 				continue;
@@ -2505,7 +2284,7 @@ UnitInfo *InformationManager::getFarthestUnit(Player p, Position pos, TypeKind k
 			if (detectedOnly && !u.second->isHide() && !u.second->unit()->isDetected())
 				continue;
 
-			// Closest 유닛에서 제외하는 종류
+			
 			if (u.second->type() == Zerg_Egg || u.second->type() == Zerg_Larva || u.second->type() == Protoss_Interceptor ||
 					u.second->type() == Protoss_Scarab || u.second->type() == Terran_Vulture_Spider_Mine)
 				continue;
@@ -2843,11 +2622,10 @@ UnitInfo *InformationManager::getFarthestTypeUnit(Player p, Position pos, UnitTy
 	return farthest;
 }
 
-// 예상 멀티 순위 판별(my, enemy)
-// [호출조건] 점령지(occupied) 상태가 바뀔때만 해줌
+
 void InformationManager::updateExpectedMultiBases()
 {
-	// MainBase를 찾은 후 처리
+	
 	if (!isEnemyBaseFound) return;
 
 	if (getOccupiedBaseLocations(E).empty() || getOccupiedBaseLocations(S).empty()) return;
@@ -2864,12 +2642,12 @@ void InformationManager::updateExpectedMultiBases()
 			continue;
 		}
 
-		if (base->isIsland()) continue; //섬 지역 제외
+		if (base->isIsland()) continue; 
 
 		int path = 0;
 		theMap.GetPath(base->Center(), theMap.Center(), &path, false);
 
-		if (path < 0) continue; // Fortress Ground Distance 제외
+		if (path < 0) continue; 
 
 		int enemyDist = 0;
 
@@ -2920,10 +2698,8 @@ void InformationManager::updateExpectedMultiBases()
 
 void InformationManager::setFirstWaitLinePosition()
 {
-	/// FirstExpansion, SecondChokePoint 를 이용해 처음으로 대기해야 할 장소를 구한다.
 	Position pos = Positions::Unknown;
 
-	// 한번 설정되면 더이상 구하지 않는다.
 	if (_firstWaitLinePosition != Positions::Unknown)
 		return;
 
@@ -2933,21 +2709,16 @@ void InformationManager::setFirstWaitLinePosition()
 	if (INFO.getOccupiedBaseLocations(S).size() < 2 || INFO.getCompletedCount(Terran_Command_Center, S) < 2)
 		return;
 
-	// FirstExpansion 에서 SecondChokePoint 방향으로, SecondChokePoint 기준 10타일 위치
 	pos = getDirectionDistancePosition(_firstExpansionLocation[S]->getPosition(), (Position)_secondChokePoint[S]->Center(),
 									   _firstExpansionLocation[S]->getPosition().getApproxDistance((Position)_secondChokePoint[S]->Center()) + 10 * TILE_SIZE);
 
-	// 위에서 구한 위치에서 2번째 멀티 위치쪽으로 보정
 	if (INFO.getSecondExpansionLocation(S) != nullptr)
 		pos = getDirectionDistancePosition(pos, INFO.getSecondExpansionLocation(S)->getPosition(), 5 * TILE_SIZE);
 
-	// 맵 센터쪽으로도 보정
 	pos = getDirectionDistancePosition(pos, (Position)theMap.Center(), 3 * TILE_SIZE);
 
-	// 적 방향 쪽으로도 보정
 	pos = getDirectionDistancePosition(pos, INFO.getSecondChokePosition(E), 3 * TILE_SIZE);
 
-	// 구한 pos 이 걸어서 갈 수 없는 곳이면 내 앞마당쪽으로 보정
 	if (!bw->isWalkable((WalkPosition)pos))
 	{
 		for (int i = 0; i < 3; i++)
@@ -2959,7 +2730,6 @@ void InformationManager::setFirstWaitLinePosition()
 		}
 	}
 
-	// 구한 pos 이 벽이랑 너무 가까우면 센터쪽으로 보정
 	if (theMap.GetMiniTile((WalkPosition)pos).Altitude() < 150)
 	{
 		for (int i = 0; i < 5; i++)
@@ -2977,7 +2747,6 @@ void InformationManager::setFirstWaitLinePosition()
 
 void InformationManager::checkActivationBaseCount()
 {
-	// 실제 미네랄 채취중인 멀티 개수 (구현해야함.. 어떻게 처리할 지 고민중)
 	uList commandCenter = getBuildings(Terran_Command_Center, S);
 	int enoughMineralScv = 0;
 
@@ -2986,9 +2755,8 @@ void InformationManager::checkActivationBaseCount()
 		if (!c->isComplete())
 			continue;
 
-		// 미네랄 숫자보다 미네랄 채취중인 scv 가 더 많을 경우 활성화된 멀티라고 판단
-		if (ScvManager::Instance().getDepotMineralSize(c->unit()) > 0 && getAverageMineral(c->pos()) > 100
-				&& ScvManager::Instance().getAssignedScvCount(c->unit()) >= ScvManager::Instance().getDepotMineralSize(c->unit()))
+		if (SoldierManager::Instance().getDepotMineralSize(c->unit()) > 0 && getAverageMineral(c->pos()) > 100
+				&& SoldierManager::Instance().getAssignedScvCount(c->unit()) >= SoldierManager::Instance().getDepotMineralSize(c->unit()))
 		{
 			enoughMineralScv++;
 		}
@@ -2996,10 +2764,9 @@ void InformationManager::checkActivationBaseCount()
 
 	activationMineralBaseCount = enoughMineralScv;
 
-	// 실제 가스 채취중인 멀티 개수
 	int gasSvcCount = 0;
 
-	for (auto iter = ScvManager::Instance().getRefineryScvCountMap().begin(); iter != ScvManager::Instance().getRefineryScvCountMap().end(); iter++)
+	for (auto iter = SoldierManager::Instance().getRefineryScvCountMap().begin(); iter != SoldierManager::Instance().getRefineryScvCountMap().end(); iter++)
 	{
 		gasSvcCount += iter->second;
 	}
@@ -3087,7 +2854,6 @@ int InformationManager::getActivationGasBaseCount()
 
 int InformationManager::getAverageMineral(Position basePosition)
 {
-	// 해당 위치의 Base 에 내 커맨드센터가 있고 남아있는 평균 미네랄 값, 커맨드 없으면 INT_MAX
 	uList commandCenter = INFO.getTypeBuildingsInRadius(Terran_Command_Center, S, basePosition, 5 * TILE_SIZE, true);
 	Unit depot = nullptr;
 	int averageMineral = INT_MAX;
@@ -3102,9 +2868,9 @@ int InformationManager::getAverageMineral(Position basePosition)
 	}
 
 	if (depot == nullptr)
-		return averageMineral; // return INT_MAX
+		return averageMineral; 
 
-	averageMineral = ScvManager::Instance().getRemainingAverageMineral(depot);
+	averageMineral = SoldierManager::Instance().getRemainingAverageMineral(depot);
 
 	return averageMineral;
 }
@@ -3132,10 +2898,7 @@ Base *InformationManager::getFirstMulti(Player p, bool existGas, bool notCenter,
 
 		if (notCenter)
 		{
-			//if (_firstWaitLinePosition != Positions::Unknown && _firstWaitLinePosition.isValid())
 			{
-				// firstWaitLine 보다 센터랑 거리가 가까우면 Skip
-				//if (theMap.Center().getApproxDistance((*targetBase)->getPosition()) < theMap.Center().getApproxDistance(_firstWaitLinePosition))
 				if (isSameArea(theMap.Center(), (*targetBase)->getPosition()))
 				{
 					rank++;
@@ -3153,7 +2916,6 @@ Base *InformationManager::getFirstMulti(Player p, bool existGas, bool notCenter,
 			}
 		}
 
-		// 해당 베이스에 남은 미네랄이 너무 적으면 안먹을래
 		if (getAverageMineral((*targetBase)->getPosition()) < 200)
 		{
 			rank++;
@@ -3199,7 +2961,6 @@ void InformationManager::updateAllFirstExpansions()
 			}
 		}
 
-		// 본진에서 확장까지 초크포인트를 2개 지나면 본진과 확장 사이에 있는 area를 본진과 동일하게 취급해준다.
 		if (path.size() > 1) {
 			for (auto &area : theMap.Areas()) {
 				int sameCp = 0;
@@ -3236,7 +2997,6 @@ void InformationManager::updateSecondExpansion()
 			return pos == base->Center();
 		});
 
-		// 내 _secondExpansionLocation 이 적이 점령한 상태라면 재계산 필요
 		if (targetBase != _occupiedBaseLocations[E].end())
 		{
 			_secondExpansionLocation[S] = nullptr;
@@ -3253,7 +3013,6 @@ void InformationManager::updateSecondExpansion()
 
 	Base *multi = nullptr;
 
-	// 상대가 테란인 경우 무조건 가스 멀티로 먼저 확인, 센터 아닌곳으로
 	if (INFO.enemyRace == Races::Terran)
 	{
 		multi = INFO.getFirstMulti(S, true, true);
@@ -3348,10 +3107,8 @@ void InformationManager::updateThirdExpansion()
 			return pos == base->Center();
 		});
 
-		// 내 _thirdExpansionLocation 이 적이 점령한 상태라면 재계산 필요
 		if (enemyBase != _occupiedBaseLocations[E].end())
 		{
-			cout << "=== 상대 점령지라 리셋할래" << endl;
 			reset = true;
 		}
 		else
@@ -3360,19 +3117,14 @@ void InformationManager::updateThirdExpansion()
 				return pos == base->Center();
 			});
 
-			// 나/상대 베이스 둘 다 아닐때 해당 위치에 상대가 많으면 위치 변경할래
 			if (myBase == _occupiedBaseLocations[S].end())
 			{
-				// ThirdExpansionLocation 주변에 적 유닛이 너무 많으면 위치 변경 필요
 				int myUnitCountInThirdExpansion = INFO.getUnitsInRadius(S, INFO.getThirdExpansionLocation(S)->getPosition(), 20 * TILE_SIZE, true, true, false, true).size();
 				int enemyUnitCountInThirdExpansion = INFO.getUnitsInRadius(E, INFO.getThirdExpansionLocation(S)->getPosition(), 20 * TILE_SIZE, true, true, false, true).size();
 
-				// ThirdExpansionLocation 주변에 적 유닛들이 나보다 많으면 안먹어
 				if (enemyUnitCountInThirdExpansion > 3 && myUnitCountInThirdExpansion <= enemyUnitCountInThirdExpansion)
 				{
-					cout << "=== ThirdExpansion 주변에 적이 많아서 위치 리셋할래 " << _thirdExpansionLocation[S]->getTilePosition() << endl;
 					notCenter = true;
-					//_thirdExpansionLocation[S]->SetExpectedMyMultiRank(INT_MAX);
 					reset = true;
 				}
 				else
@@ -3394,7 +3146,6 @@ void InformationManager::updateThirdExpansion()
 
 	Base *multi = nullptr;
 
-	// 상대가 테란인 경우 무조건 가스 멀티로 먼저 확인, 일단 센터 멀티는 제외
 	if (INFO.enemyRace == Races::Terran)
 	{
 		if (notCenter)
@@ -3437,13 +3188,11 @@ void InformationManager::updateIslandExpansion()
 
 	if (_islandExpansionLocation[S] != nullptr)
 	{
-		// 갱신하는 부분 개발 필요
 		bw->drawTextMap(_islandExpansionLocation[S]->getPosition(), "IslandExpansionLocation");
 	}
 
 	if (_islandExpansionLocation[E] != nullptr)
 	{
-		// 갱신하는 부분 개발 필요
 	}
 
 	for (Base *baseLocation : _allBaseLocations)
@@ -3454,13 +3203,11 @@ void InformationManager::updateIslandExpansion()
 		if (baseLocation->Minerals().size() < 3)
 			continue;
 
-		// 1. 해당 지역의 점령 상태 판별 (undefined, myBase, enemyBase)
-		// [조건] INFO에서 빌딩을 가져와서 적 빌딩 있으면 enemyBase, 없으면 myBase 로 지정
 
 		uList sBuildings = INFO.getBuildingsInArea(S, baseLocation->getPosition(), true, false, true);
 		uList eBuildings = INFO.getBuildingsInArea(E, baseLocation->getPosition(), true, false, true);
 
-		if (!eBuildings.empty()) //상대 건물이 있는 경우
+		if (!eBuildings.empty()) 
 		{
 			if (_islandExpansionLocation[E] == nullptr)
 				_islandExpansionLocation[E] = baseLocation;
@@ -3524,7 +3271,6 @@ bool InformationManager::isBaseSafe(const Base *base)
 	int groundEnem = 0;
 	int airEnem = 0;
 
-	// 해당 베이스 주위 1000 반경안의 적들을 가져온다
 	vector<UnitInfo *> enem = INFO.getUnitsInRadius(E, base->getPosition(), 1000, true, true, true);
 
 	if (enem.empty())
@@ -3533,10 +3279,8 @@ bool InformationManager::isBaseSafe(const Base *base)
 
 	for (auto ui : enem)
 	{
-		// 지상을 공격할 수 있는 유닛 중
 		if (ui->unit()->getType().groundWeapon().targetsGround())
 		{
-			// 클로킹 유닛이 있고 내가 볼 수가 없다면 안전하지 않다
 			if (!ui->unit()->isDetected())
 				return false;
 
@@ -3547,7 +3291,6 @@ bool InformationManager::isBaseSafe(const Base *base)
 		}
 	}
 
-	// 해당 베이스 주위 1000 반경 안의 아군들을 가져온다
 	vector<UnitInfo *> my = INFO.getUnitsInRadius(S, base->getPosition(), 1000, true, true, true, true);
 
 	if (my.empty())
@@ -3556,7 +3299,6 @@ bool InformationManager::isBaseSafe(const Base *base)
 	int groundMy = 0;
 	int airMy = 0;
 
-	// 적군과 싸울 수 있는 유닛
 	for (auto ui : my)
 	{
 		if (ui->unit()->getType().groundWeapon().targetsGround())
@@ -3565,15 +3307,12 @@ bool InformationManager::isBaseSafe(const Base *base)
 			airMy++;
 	}
 
-	// 공중적군은 있는데 공중공격가능 아군이 없다면
 	if (airEnem > 0 && airMy == 0)
 		return false;
 
-	// 지상적군은 있는데 지상공격가능 아군이 없다면
 	if (groundEnem > 0 && groundMy == 0)
 		return false;
 
-	// 아군 공격가능 유닛이 3마리도 안되고 적군과 아군(scv 포함)의 차이가 10마리 이상 날 경우
 	if ((airMy + groundMy) < 3 && enem.size() - my.size() > 10)
 		return false;
 
@@ -3648,9 +3387,6 @@ int InformationManager::getAltitudeDifference(TilePosition p1, TilePosition p2) 
 	return gh1 > gh2 ? 1 : -1;
 }
 
-// 첫번째 초크에 있는 center end1 end2 세개의 점을 이용하여 직선의 방정식을 구한뒤,
-// 수선의 발을 내린 후,
-// 최소 min 타일부터 최대 max 타일 내에 있는 하나의 점을 찾는다.
 Position InformationManager::getWaitingPositionAtFirstChoke(int min, int max) {
 
 	Position waitingPositionAtFirstChoke;
@@ -3658,9 +3394,8 @@ Position InformationManager::getWaitingPositionAtFirstChoke(int min, int max) {
 	Position chokeE1;
 	Position chokeE2;
 	Position chokeCenter;
-	Position waitingPoint; // 앞마당에서 기다릴 것인가, 본진언덕에서 기다릴 것인가
+	Position waitingPoint; 
 
-	// 역언덕 or 평지 체크
 	if (INFO.getAltitudeDifference() <= 0) {
 		if (!INFO.getSecondChokePoint(S))
 			return Positions::None;
@@ -3695,7 +3430,7 @@ Position InformationManager::getWaitingPositionAtFirstChoke(int min, int max) {
 	gradient *= -1.0;
 	double b = chokeCenter.y - gradient * chokeCenter.x;
 
-	// 기울기가 1보다 크면, Y 좌표 +,- 를 찾음.
+	
 	if (abs(gradient) > 1) {
 
 		for (int i = min; i <= max; i++) {
@@ -3724,7 +3459,6 @@ Position InformationManager::getWaitingPositionAtFirstChoke(int min, int max) {
 
 	}
 	else {
-		// 기울기가 1보다 작으면, X 좌표 +,- 를 찾음.
 
 		for (int i = min; i <= max; i++) {
 
@@ -3761,7 +3495,6 @@ int InformationManager::getFirstChokeDefenceCnt()
 	if (INFO.enemyRace == Races::Terran || TIME < 3 * 24 * 60 || INFO.getAltitudeDifference() <= 0)
 		return 0;
 
-	// 앞마당에서 언덕을 올라오려는 적이 있는가?
 	int needCnt = 0;
 
 	if (INFO.enemyRace == Races::Protoss) {
@@ -3781,7 +3514,6 @@ int InformationManager::getFirstChokeDefenceCnt()
 
 	}
 
-	// 앞마당에 이미 랜딩한 커맨드가 있는가?
 	if (INFO.getFirstExpansionLocation(S)) {
 		uList command = INFO.getTypeBuildingsInRadius(Terran_Command_Center, S, INFO.getFirstExpansionLocation(S)->Center(), 3 * TILE_SIZE, true);
 
@@ -3792,7 +3524,6 @@ int InformationManager::getFirstChokeDefenceCnt()
 		}
 	}
 
-	// 전략 판단을 늦게해서 이미 커맨드를 본진 안쪽에 짓고 있는 경우
 	uList commandList = INFO.getTypeBuildingsInArea(Terran_Command_Center, S, MYBASE, false);
 
 	if (commandList.size() > 1)
@@ -3803,7 +3534,6 @@ int InformationManager::getFirstChokeDefenceCnt()
 		uList eList = INFO.getUnitsInRadius(E, INFO.getFirstChokePosition(S), 10 * TILE_SIZE, true, false, false);
 
 		for (auto e : eList) {
-			// 적이 한명이라도 들어왔다면?
 			if (isSameArea(e->pos(), MYBASE) && getGroundDistance(e->pos(), INFO.getFirstChokePosition(S)) > 64) {
 				needCnt = 0;
 				break;
@@ -3835,13 +3565,10 @@ void InformationManager::checkMoveInside()
 		return;
 	}
 
-	// 상대 초크 10 TILE 안의 지상 유닛을 본다.
 	uList aroundChoke = getUnitsInRadius(S, getFirstChokePosition(E), 10 * TILE_SIZE, true, false, false);
 	uList aroundEnChoke = getUnitsInRadius(E, getFirstChokePosition(E), 15 * TILE_SIZE, true, false, false); // 탱크 때문에 15
-	// 초크포인트를 지나서 자리 잡을 공간도 필요하기 때문에 더 많은 범위를 체크한다.
 	int aroundDefChoke = getDefenceBuildingsInRadius(E, getFirstChokePosition(E), 15 * TILE_SIZE, false).size();
 
-	// 저그는 성큰이 세기 때문에 가중치를 더 준다.
 	if (INFO.enemyRace == Races::Zerg)
 		aroundDefChoke *= 3;
 
@@ -3870,18 +3597,15 @@ void InformationManager::setNextScanPointOfMainBase()
 	if (!scanPositionOfMainBase.empty())
 		return;
 
-	// 첫번째는 본진에..
 	if (INFO.getMainBaseLocation(E))
 		scanPositionOfMainBase.push_back((TilePosition)INFO.getMainBaseLocation(E)->Center());
 
-	// 본진과 상,하,좌,우 를 살펴보면서 가장 공간이 넓은 순서로 스캔 뿌린다.
 
 	TilePosition nPosition = (TilePosition)INFO.getMainBaseLocation(E)->Center();
 	int index = 1;
 	vector<pair<int, int>> sortArray;
 	vector<pair<int, int>>::iterator iter;
 
-	// 상
 	while (nPosition.y - index > 0
 			&& isSameArea((Position)TilePosition(nPosition.x, nPosition.y - index), (Position)nPosition))
 		index++;
@@ -3891,7 +3615,6 @@ void InformationManager::setNextScanPointOfMainBase()
 
 	index = 1;
 
-	// 하
 	while (nPosition.y + index < 128
 			&& isSameArea((Position)TilePosition(nPosition.x, nPosition.y + index), (Position)nPosition))
 		index++;
@@ -3901,7 +3624,6 @@ void InformationManager::setNextScanPointOfMainBase()
 
 	index = 1;
 
-	// 좌
 	while (nPosition.x - index > 0
 			&& isSameArea((Position)TilePosition(nPosition.x - index, nPosition.y), (Position)nPosition))
 		index++;
@@ -3911,7 +3633,6 @@ void InformationManager::setNextScanPointOfMainBase()
 
 	index = 1;
 
-	// 우
 	while (nPosition.x + index < 128
 			&& isSameArea((Position)TilePosition(nPosition.x + index, nPosition.y), (Position)nPosition))
 		index++;
@@ -3925,20 +3646,16 @@ void InformationManager::setNextScanPointOfMainBase()
 	});
 
 	if (sortArray.size() > 0)
-		sortArray.erase(sortArray.end() - 1); // 마지막 방향은 삭제
+		sortArray.erase(sortArray.end() - 1); 
 
 	for (iter = sortArray.begin(); iter != sortArray.end(); iter++) {
 
-		// 상
 		if (iter->first == 0)
 			scanPositionOfMainBase.push_back(TilePosition(nPosition.x, nPosition.y - 8));
-		// 하
 		else if (iter->first == 1)
 			scanPositionOfMainBase.push_back(TilePosition(nPosition.x, nPosition.y + 8));
-		// 좌
 		else if (iter->first == 2)
 			scanPositionOfMainBase.push_back(TilePosition(nPosition.x - 8, nPosition.y));
-		// 우
 		else if (iter->first == 3)
 			scanPositionOfMainBase.push_back(TilePosition(nPosition.x + 8, nPosition.y));
 	}

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../UnitState/VultureState.h"
+#include "../UnitManager/VultureState.h"
 #include "TankManager.h"
 #include "../StrategyManager.h"
 #include "../InformationManager.h"
@@ -40,7 +40,7 @@ namespace MyBot
 		bool setGuardMine(UnitInfo *);
 	private:
 		Position target;
-		int needWaiting; // 0 : no Wait, 1 : defence Build, 2 : range Unit
+		int needWaiting; 
 		bool needCheck;
 		int direction;
 		int waitingTime;
@@ -51,7 +51,7 @@ namespace MyBot
 
 		bool needFight;
 
-		// 테란전
+		
 		int preStage = WaitToBase;
 		int changedTime = 0;
 	};
@@ -78,8 +78,7 @@ namespace MyBot
 		bool scoutDone = false;
 		int lastScoutTime = 0;
 
-		// 전진 Pylon의 위치를 찾기 위함.
-		// Unknown 은 초기화 상태 , 발견되서 파괴되었으면 Positions::None으로 변경된다.
+		
 		Position forwardBuildingPosition = Positions::Unknown;
 		bool checkedForwardPylon = false;
 

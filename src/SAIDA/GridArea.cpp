@@ -13,7 +13,7 @@ GridArea::GridArea(const Area *wholeArea, int N)
 
 	if (N <= 0)	N = 1;
 
-	// 최소 3 TILE 이상 일 경우만 쪼갬
+
 	if (N > min(width, height) / 3)	N = min(width, height) / 3;
 
 	sArea.resize(N);
@@ -98,12 +98,12 @@ vector<GridAreaCell *> GridArea::getEnemyBoundary(int margin)
 	return vector<GridAreaCell *>();
 }
 
-// 해당 유저 베이스에서 가장 가까운 미점령 Cell을 찾는다.
+
 GridAreaCell GridArea::getNearestCell(Player p)
 {
 	int N = sArea.size();
 	const BWEM::Base *baseLoc = INFO.getMainBaseLocation(p);
-	GridAreaCell ret = sArea[N / 2][N / 2];		// 중앙 Cell
+	GridAreaCell ret = sArea[N / 2][N / 2];		
 
 	if (baseLoc != nullptr)
 	{
@@ -111,7 +111,7 @@ GridAreaCell GridArea::getNearestCell(Player p)
 
 		int dist = 100000;
 
-		// 베이스에서 가장 가까운 미점령한 cell 찾기
+
 		for (int i = 0; i < N; i++)
 			for (int j = 0; j < N; j++)
 			{
@@ -131,13 +131,11 @@ GridAreaCell GridArea::getNearestCell(Player p)
 	return ret;
 }
 
-// 해당 유저 베이스에서 본인이 점령한 가장 먼 Cell을 찾는다.
-// 만약 점령한 Cell이 없으면 중앙셀을 리턴
 GridAreaCell GridArea::getFarthestCell(Player p)
 {
 	int N = sArea.size();
 	const BWEM::Base *baseLoc = INFO.getMainBaseLocation(p);
-	GridAreaCell ret = sArea[N / 2][N / 2];		// 중앙 Cell
+	GridAreaCell ret = sArea[N / 2][N / 2];		
 
 	AreaStatus status = AreaStatus::EnemyArea;
 
@@ -152,7 +150,7 @@ GridAreaCell GridArea::getFarthestCell(Player p)
 
 		int dist = 0;
 
-		// 베이스에서 가장 먼 거리 점령한 cell 찾기
+	
 		for (int i = 0; i < N; i++)
 			for (int j = 0; j < N; j++)
 			{
@@ -177,7 +175,7 @@ vector<GridAreaCell *> GridArea::getBoundary(TilePosition base, int dist)
 	int N = sArea.size();
 	vector<GridAreaCell *> cells;
 
-	// base에서 dist 거리 밖의 가장자리에 해당하는 GridAreaCell 찾기
+	
 	if (dist > 0)
 	{
 		for (int j = 0; j < N; j++)
@@ -192,7 +190,7 @@ vector<GridAreaCell *> GridArea::getBoundary(TilePosition base, int dist)
 					if (bw->isWalkable(WalkPosition(sArea[i + 1][j].center())))
 						cells.push_back(&sArea[i + 1][j]);
 
-					//printf("(%d, %d) d1 = %d, d2 = %d, dist = %d\n", i + 1, j, d1, d2, dist);
+			
 
 					break;
 				}
@@ -201,7 +199,7 @@ vector<GridAreaCell *> GridArea::getBoundary(TilePosition base, int dist)
 					if (bw->isWalkable(WalkPosition(sArea[i][j].center())))
 						cells.push_back(&sArea[i][j]);
 
-					//printf("(%d, %d) d1 = %d, d2 = %d, dist = %d\n", i, j, d1, d2, dist);
+				
 
 					break;
 				}
@@ -210,7 +208,7 @@ vector<GridAreaCell *> GridArea::getBoundary(TilePosition base, int dist)
 					if (bw->isWalkable(WalkPosition(sArea[i + 1][j].center())))
 						cells.push_back(&sArea[i + 1][j]);
 
-					//printf("(%d, %d) d1 = %d, d2 = %d, dist = %d\n", i + 1, j, d1, d2, dist);
+					
 
 					break;
 				}
@@ -324,8 +322,7 @@ void GridArea::update()
 
 		if (u.second->type() == UnitTypes::Terran_Vulture_Spider_Mine)
 		{
-			//printf("Mines at (%d, %d) cell, (%d, %d) pixels\n", xind, yind, tp.x, tp.y);
-			//Broodwar->drawCircleMap(u.second->pos(), 10, BWAPI::Colors::Red);
+
 
 			sArea[xind][yind].setMineCount(sArea[xind][yind].mineCount() + 1);
 		}
@@ -348,7 +345,7 @@ void GridArea::update()
 		sArea[xind][yind].setMyBcnt(cnt + 1);
 	}
 
-	// Enemy Units
+
 	for (auto &u : enU)
 	{
 		Position upos = u.second->pos();
@@ -365,7 +362,6 @@ void GridArea::update()
 		sArea[xind][yind].setEnUcnt(cnt + 1);
 	}
 
-	// Enemy Buildings
 	for (auto &u : enB)
 	{
 		Position upos = u.second->pos();
@@ -382,7 +378,6 @@ void GridArea::update()
 		sArea[xind][yind].setEnBcnt(cnt + 1);
 	}
 
-	// 상태 판단
 	for (int i = 0; i < (int)sArea.size(); i++)
 		for (int j = 0; j < (int)sArea[i].size(); j++)
 		{

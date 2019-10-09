@@ -1,5 +1,5 @@
 #include "TrainManager.h"
-#include "EnemyStrategyManager.h"
+#include "HostileManager.h"
 
 using namespace MyBot;
 
@@ -23,7 +23,7 @@ void TrainManager::update()
 	if (TIME % 4 != 0)
 		return;
 
-	// 초반 Upgrade 우선 순위로 두기 위해 수정
+
 	if (SM.getNeedUpgrade())
 	{
 		return;
@@ -42,71 +42,35 @@ void TrainManager::update()
 	try {
 		factoryTraining();
 	}
-	catch (SAIDA_Exception e) {
-		Logger::error("factoryTraining Error. (ErrorCode : %x, Eip : %p)\n", e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-		throw e;
-	}
-	catch (const exception &e) {
-		Logger::error("factoryTraining Error. (Error : %s)\n", e.what());
-		throw e;
-	}
+	
 	catch (...) {
-		Logger::error("factoryTraining Unknown Error.\n");
-		throw;
 	}
 
 	try {
 		commandCenterTraining();
 	}
-	catch (SAIDA_Exception e) {
-		Logger::error("commandCenterTraining Error. (ErrorCode : %x, Eip : %p)\n", e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-		throw e;
-	}
-	catch (const exception &e) {
-		Logger::error("commandCenterTraining Error. (Error : %s)\n", e.what());
-		throw e;
-	}
+	
 	catch (...) {
-		Logger::error("commandCenterTraining Unknown Error.\n");
-		throw;
 	}
 
 	try {
 		barracksTraining();
 	}
-	catch (SAIDA_Exception e) {
-		Logger::error("barracksTraining Error. (ErrorCode : %x, Eip : %p)\n", e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-		throw e;
-	}
-	catch (const exception &e) {
-		Logger::error("barracksTraining Error. (Error : %s)\n", e.what());
-		throw e;
-	}
+
 	catch (...) {
-		Logger::error("barracksTraining Unknown Error.\n");
-		throw;
 	}
 
 	try {
 		starportTraining();
 	}
-	catch (SAIDA_Exception e) {
-		Logger::error("starportTraining Error. (ErrorCode : %x, Eip : %p)\n", e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
-		throw e;
-	}
-	catch (const exception &e) {
-		Logger::error("starportTraining Error. (Error : %s)\n", e.what());
-		throw e;
-	}
+
 	catch (...) {
-		Logger::error("starportTraining Unknown Error.\n");
-		throw;
 	}
 }
 
 bool TrainManager::hasEnoughResources(UnitType unitType)
 {
-	// 현재 프레임을 기준으로 BuildQueue 에 추가되어 예약된 자원과 병력 생산에 사용된 자원을 제외한 사용 가능한 자원과 비교
+	
 	return (unitType.mineralPrice() <= getAvailableMinerals()) && (unitType.gasPrice() <= getAvailableGas());
 }
 
@@ -168,14 +132,7 @@ void TrainManager::commandCenterTraining()
 	if (commandCenterList.empty())
 		return;
 
-	// 9 Drone 이하 내 본진에서
-	//	if (INFO.enemyRace == Races::Zerg && EIB <= Zerg_9_Drone &&
-	//			INFO.getTypeUnitsInRadius(Zerg_Zergling, E, INFO.getMainBaseLocation(S)->getPosition(), 10 * TILE_SIZE).size())
-	//	{
-	//		return;
-	//	}
 
-	// 초반 일꾼러쉬 상대로 마린 1기 생산하기 위해 일꾼 생산 중단
 	if (needStopTrainToBarracks())
 		return;
 
@@ -183,18 +140,18 @@ void TrainManager::commandCenterTraining()
 	{
 		if (needStopTrainToFactory())
 		{
-			// cout << "@@@ 팩토리 병력좀 생산해야해서 일꾼 생산 쉴게 ㅠ" << endl;
+			
 			return;
 		}
 	}
 
-	// SCV는 최대 60을 넘기지 않는다. 병력생산해야됨.
+	
 	int curScvCnt = INFO.getAllCount(Terran_SCV, S);
 
-	// 필요한 SCV Count 계산.
+	
 	int maxScvNeedCount = getMaxScvNeedCount();
 
-	// 공중에 떠있는 커맨드가 있는가
+	
 	bool isExistLiftAndMoveCommandCenter = false;
 
 	for (auto c : commandCenterList)
@@ -214,12 +171,12 @@ void TrainManager::commandCenterTraining()
 
 		string state = c->getState();
 
-		// 우리 본진 커맨드센터가 아니라면 위기상황 판단하여 띄운다
+		
 		if (state != "LiftAndMove") {
-			// 현재 베이스를 유지할 상황이 안된다면
+			
 			if (c->isComplete() && isTimeToMoveCommandCenter(c))
 			{
-				// 내가 있던 위치가 추가 멀티 지역이었으면 내 추가 멀티 리스트에서 정보 삭제
+				
 				Position pos = c->pos();
 
 				auto targetBase = find_if(INFO.getAdditionalExpansions().begin(), INFO.getAdditionalExpansions().end(), [pos](Base * base) {
@@ -232,7 +189,7 @@ void TrainManager::commandCenterTraining()
 				const Base *b = getEscapeBase(c);
 
 				if (b) {
-					// addon건설중이거나 유닛 훈련중이면 취소한다
+					
 					if (c->unit()->canCancelAddon())
 						c->unit()->cancelAddon();
 
@@ -241,7 +198,7 @@ void TrainManager::commandCenterTraining()
 							c->unit()->cancelTrain();
 					}
 
-					// 안전한 곳으로 날라간다
+					
 					c->setState(new CommandCenterLiftAndMoveState(getEscapeBase(c)->getTilePosition()));
 					state = c->getState();
 				}
@@ -250,7 +207,7 @@ void TrainManager::commandCenterTraining()
 
 		if (state == "New" || state == "Idle")
 		{
-			// 앞마당 언덕에서 지은 커맨드인지 판단
+			
 			if (c->isComplete() && c->unit()->getDistance(MYBASE) > 5 * TILE_SIZE && isSameArea(c->pos(), MYBASE)
 					&& INFO.getCompletedCount(Terran_Command_Center, S) == 2) {
 
@@ -259,7 +216,7 @@ void TrainManager::commandCenterTraining()
 					c->setState(new CommandCenterLiftAndMoveState(INFO.getFirstExpansionLocation(S)->getTilePosition()));
 					c->action();
 				}
-				else // 일단 띄운다.
+				else 
 				{
 					if (!c->getLift())
 						c->unit()->lift();
@@ -270,25 +227,25 @@ void TrainManager::commandCenterTraining()
 
 			UnitType trainUnit = Terran_SCV;
 
-			// 자원 부족
+			
 			if (!hasEnoughResources(trainUnit))
 				continue;
 
-			// 적이 내 본진 근처에 있고 Factory가 안돌고 있으면 SCV를 뽑지 않음...
+			
 			if (waitToProduce && INFO.enemyInMyArea().size())
 				continue;
 
-			// 컴샛스테이션 지을수 있으면 상태변경
+			
 			else if (INFO.getCompletedCount(Terran_Academy, S) >= 1 && c->unit()->getAddon() == nullptr && c->unit()->canBuildAddon()
 					 && hasEnoughResources(Terran_Comsat_Station) && isSafeComsatPosition(c)) {
 				c->setState(new CommandCenterBuildAddonState());
 				addReserveResources(Terran_Comsat_Station);
 			}
-			// SCV 만들 수 있으면 뽑기
+		
 			else if (curScvCnt <= maxScvNeedCount && c->unit()->canTrain())
 			{
 				if (INFO.getCompletedCount(Terran_Command_Center, S) > 2
-						&& ScvManager::Instance().depotHasEnoughMineralWorkers(c->unit())) // 앞마당 이상일 때
+						&& SoldierManager::Instance().depotHasEnoughMineralWorkers(c->unit())) 
 					continue;
 
 				if (!SM.checkTurretFirst()) {
@@ -296,7 +253,7 @@ void TrainManager::commandCenterTraining()
 					addReserveResources(trainUnit);
 				}
 			}
-			// 커맨드센터 근처에 있는 자원이 다 떨어지면 커맨드센터 옮긴다.
+			
 			else {
 				if (!INFO.isBaseHasResourses(INFO.getNearestBaseLocation(c->pos()), 0, 0) && INFO.getActivationMineralBaseCount() < 1
 						&& !isExistLiftAndMoveCommandCenter && TIME % 24 * 30 == 0)
@@ -311,7 +268,7 @@ void TrainManager::commandCenterTraining()
 							break;
 					}
 
-					// 멀티 할 수 있는 위치 있으면
+					
 					if (multiBase) {
 						isExistLiftAndMoveCommandCenter = true;
 						c->setState(new CommandCenterLiftAndMoveState(multiBase->getTilePosition()));
@@ -326,10 +283,6 @@ void TrainManager::commandCenterTraining()
 
 void TrainManager::barracksTraining()
 {
-	// 9 Drone 이하 내 본진에서
-	//if (INFO.enemyRace == Races::Zerg && EIB <= Zerg_9_Drone &&
-	//		INFO.getCompletedCount(Terran_Factory, S) > 0 && INFO.getAllCount(Terran_Vulture, S) == 0)
-	//	return;
 
 	if (waitToProduce && INFO.enemyInMyArea().size())
 		return;
@@ -342,7 +295,6 @@ void TrainManager::barracksTraining()
 	int marineCount = INFO.getAllCount(Terran_Marine, S);
 	int liftThreshold = 0;
 
-	// Marine 생산 Threshold
 	if (INFO.enemyRace == Races::Terran) {
 		if ((EIB == Terran_bunker_rush || EIB == Terran_1b_forward || EIB == Terran_2b_forward) && EMB == UnknownMainBuild)
 			liftThreshold = max(INFO.getCompletedCount(Terran_Marine, E) + 1, 3);
@@ -406,7 +358,7 @@ void TrainManager::barracksTraining()
 		else
 			liftThreshold = 2;
 
-		// 초반 1게이트 첫 드라군 타이밍 전에 질럿이 1기 이상 보이면 최소 3마린 생산
+		
 		if (TIME < (24 * 60 * 5) && (INFO.getAllCount(Protoss_Zealot, E) + INFO.getDestroyedCount(Protoss_Zealot, E) >= 1))
 			liftThreshold = max(liftThreshold, 3);
 	}
@@ -419,21 +371,20 @@ void TrainManager::barracksTraining()
 	{
 		string state = b->getState();
 
-		// 새로 만들어진 배럭이라면 Idle 로 설정
+		
 		if (state == "New" && b->isComplete()) {
 			b->setState(new BarrackIdleState());
 		}
 
-		// Idle 일때 마린생산
 		if (state == "Idle")
 		{
 			UnitType trainUnit = Terran_Marine;
 
-			// 자원 부족
+			
 			if (!hasEnoughResources(trainUnit))
 				continue;
 
-			// 2질럿 ~ 2게이트 사이가 아닌 경우에는 2번째 마린은 팩토리 짓고나서 뽑자
+			
 			if (INFO.enemyRace == Races::Protoss &&
 					(EIB != UnknownBuild && EIB >= Toss_pure_double))
 			{
@@ -451,7 +402,7 @@ void TrainManager::barracksTraining()
 					if (!bunkerList.empty())
 						barricadeBarrack = INFO.getTypeBuildingsInRadius(Terran_Barracks, S, (*bunkerList.begin())->pos(), 6 * TILE_SIZE);
 
-					// 완성된 벙커 있고 마린 2기 생산됐고 바리케이트 배럭 없다면
+				
 					if ((EIB == Toss_1g_double || EIB == Toss_2g_dragoon || EMB == Toss_range_up_dra_push || EMB == Toss_2gate_dra_push)
 							&& !bunkerList.empty() && barricadeBarrack.empty()
 							&& marineCount >= 2 && liftThreshold != 3)
@@ -463,7 +414,7 @@ void TrainManager::barracksTraining()
 
 				if (needStopTrainToFactory())
 				{
-					// cout << "@@@ 병력좀 생산해야해서 배럭 생산 쉴게 ㅠ" << endl;
+					
 					continue;
 				}
 
@@ -481,12 +432,12 @@ void TrainManager::barracksTraining()
 					if ((EIB == Toss_1g_double || EIB == Toss_2g_dragoon || EMB == Toss_range_up_dra_push || EMB == Toss_2gate_dra_push)
 							&& !bunkerList.empty())
 					{
-						// 드라군 푸시류일땐 완성된 벙커 있으면 바리케이트
+						
 						setBarricadeBarrack(barracksList);
 					}
 					else
 					{
-						// 다른 빌드일땐 앞마당 커맨드 올라가고 나서 바리케이트
+						
 						if (!INFO.getTypeBuildingsInRadius(Terran_Command_Center, S, INFO.getFirstExpansionLocation(S)->getPosition(), 5 * TILE_SIZE).empty())
 							setBarricadeBarrack(barracksList);
 					}
@@ -505,7 +456,7 @@ void TrainManager::barracksTraining()
 						b->setState(new BarrackLiftAndMoveState());
 					}
 				}
-				else //zerg일 경우
+				else 
 				{
 					if (SM.getMainStrategy() == AttackAll) {
 						if (INFO.getCompletedCount(Terran_Command_Center, S) > 1)
@@ -517,11 +468,11 @@ void TrainManager::barracksTraining()
 			}
 		}
 
-		// 바리케이드인데, 마린이 필요하다면 Idle로 교체
+		
 		if (state == "Barricade") {
-			//			cout << "@@ 바리케이트야. --- marineCount = " << marineCount << ", liftThreshold = " << liftThreshold << endl;
+			
 
-			if (!b->unit()->isLifted()/* && INFO.getUnitsInRadius(E, b->pos(), 10 * TILE_SIZE, true).size() <= 2*/) {
+			if (!b->unit()->isLifted()) {
 				if (marineCount < liftThreshold) {
 					b->setState(new BarrackIdleState());
 				}
@@ -539,7 +490,7 @@ int TrainManager::getBaseVultureCount(InitialBuildType eib, MainBuildType emb) {
 		{
 			if (S->getUpgradeLevel(UpgradeTypes::Ion_Thrusters) && S->hasResearched(TechTypes::Spider_Mines))
 				return S->supplyUsed() / 100 + 3;
-			else if (EnemyStrategyManager::Instance().getEnemyInitialBuild() == Terran_2b_forward)
+			else if (HostileManager::Instance().getEnemyInitialBuild() == Terran_2b_forward)
 				return 3;
 			else
 				return 1;
@@ -552,7 +503,7 @@ int TrainManager::getBaseVultureCount(InitialBuildType eib, MainBuildType emb) {
 		if (eib <= Zerg_9_Balup || emb == Zerg_main_zergling) {
 			if (E->getUpgradeLevel(UpgradeTypes::Metabolic_Boost) || E->isUpgrading(UpgradeTypes::Metabolic_Boost))
 				return 4;
-			// 벌쳐를 최소 2마리 ~ 4마리 까지 적 병력에 맞춰서 뽑는다.
+			
 			else if (INFO.getCompletedCount(Zerg_Zergling, E) > INFO.getAllCount(Terran_Vulture, S) * 4)
 				return 4;
 		}
@@ -578,7 +529,6 @@ int TrainManager::getBaseVultureCount(InitialBuildType eib, MainBuildType emb) {
 		if (eib == Toss_1g_double || eib == Toss_pure_double)
 			return 1;
 
-		// 3분 15초(1게이트 첫 드라군 타이밍) 전에 질럿이 2마리 이상 보이면 벌쳐 1마리 생산 후 애드온 추가하도록
 		if (TIME < (24 * 60 * 3 + 15) && (INFO.getAllCount(Protoss_Zealot, E) + INFO.getDestroyedCount(Protoss_Zealot, E) >= 2))
 			return 1;
 	}
@@ -619,7 +569,7 @@ void TrainManager::factoryTraining()
 	int mashineShopCount = 0;
 	int currentFrameSetAddOnCount = 0;
 
-	// Tank 생산 Threshold
+	
 	if (INFO.enemyRace == Races::Terran)
 	{
 		if (SM.getMyBuild() == MyBuildTypes::Terran_TankGoliath)
@@ -641,7 +591,7 @@ void TrainManager::factoryTraining()
 		}
 	}
 
-	// Goliath 생산 Threshold
+	
 	if (INFO.enemyRace == Races::Terran)
 	{
 		if (SM.getMyBuild() == MyBuildTypes::Terran_TankGoliath)
@@ -658,7 +608,7 @@ void TrainManager::factoryTraining()
 				baseGoliathCount = (int)(tankCount * ratio + 4);
 			}
 
-			// 배틀크루저 나왔을 때 골리앗 조금 더 추가 생산
+			
 			baseGoliathCount += INFO.getCompletedCount(Terran_Battlecruiser, E);
 			maxGoliathCount = tankCount + INFO.getCompletedCount(Terran_Battlecruiser, E);
 		}
@@ -699,7 +649,7 @@ void TrainManager::factoryTraining()
 		}
 	}
 
-	// 머신샵 카운트
+	
 	if (INFO.enemyRace == Races::Zerg)
 	{
 		mashineShopCount = 1;
@@ -716,7 +666,6 @@ void TrainManager::factoryTraining()
 			if (INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) >= 2 && INFO.getAllCount(Terran_Goliath, S) >= 4)
 				mashineShopCount = 2;
 
-			// 상대가 빠른 3애드온 탱크인 경우 맞춰서 3애드온
 			if (INFO.getAllCount(Terran_Command_Center, S) == 2 && INFO.getAllCount(Terran_Machine_Shop, E) >= 3)
 				mashineShopCount = 3;
 		}
@@ -743,7 +692,7 @@ void TrainManager::factoryTraining()
 		}
 	}
 
-	// 추가 멀티 생기면 머신샵 하나 추가
+	
 	if (INFO.getActivationGasBaseCount() >= 3)
 	{
 		if (INFO.enemyRace == Races::Zerg)
@@ -761,7 +710,7 @@ void TrainManager::factoryTraining()
 			mashineShopCount += 1;
 	}
 
-	// Factory with Machinshop 먼저 처리해주기 위함.
+	
 	int addonIndex = 0;
 
 	for (auto f : factoryList)
@@ -770,28 +719,26 @@ void TrainManager::factoryTraining()
 		{
 			string state = f->getState();
 
-			// 새로 만들어진 팩토리라면 Idle 로 설정
+			
 			if (state == "New" && f->isComplete()) {
 				f->setState(new FactoryIdleState());
 			}
 
-			// 최소 벌쳐 생산 후 머신샵 추가
+			
 			if (state == "Idle")
 			{
 				UnitType trainUnit = Terran_Vulture;
 
-				// 자원부족, 머신샵은 50/50 이라 나중에 수정 필요해보임
-				// 자원 부족하면 일꾼 생산 쉬자. // 병력 우선.
+				
 				if (!hasEnoughResources(trainUnit))
 				{
 					waitToProduce = true;
 					return;
 				}
 
-				// 기본 벌쳐 수는 맞춘다.
 				if (vultureAllCount >= baseVultureCount)
 				{
-					// 병력 생산
+					
 					if (INFO.enemyRace == Races::Zerg)
 					{
 						if (EMB == Zerg_main_lurker)
@@ -823,7 +770,7 @@ void TrainManager::factoryTraining()
 
 									if (trainUnit == None)
 									{
-										// 가스 부족으로 골리앗 못뽑을 경우 미네랄 체크하고 벌쳐 생산
+										
 										trainUnit = getAvailableGas() >= Terran_Goliath.gasPrice() ? None : hasEnoughResources(Terran_Vulture) ? Terran_Vulture : None;
 									}
 								}
@@ -846,7 +793,7 @@ void TrainManager::factoryTraining()
 											 hasEnoughResources(Terran_Vulture) ? Terran_Vulture : None);
 						}
 
-						// 가스 세이브하기 위해 벌쳐 생산
+						
 						if (saveGas)
 							trainUnit = hasEnoughResources(Terran_Vulture) ? Terran_Vulture : None;
 					}
@@ -869,7 +816,7 @@ void TrainManager::factoryTraining()
 							{
 								trainUnit = getAvailableGas() >= Terran_Siege_Tank_Tank_Mode.gasPrice() ? Terran_Siege_Tank_Tank_Mode : Terran_Vulture;
 
-								// Tank 만들 Gas는 있으나 Mineral이 부족한 경우 Tank 생산을 위해 이하 Factory에서 Vulture 생산을 중단한다.
+								
 								if (trainUnit == Terran_Siege_Tank_Tank_Mode && getAvailableMinerals() < Terran_Siege_Tank_Tank_Mode.mineralPrice())
 									return;
 							}
@@ -879,13 +826,12 @@ void TrainManager::factoryTraining()
 							}
 						}
 					}
-					else // 프로토스
+					else 
 					{
-						// Tank의 경우 Gas가 부족한 경우만 Vulture를 생산한다.
-						//캐리어의 경우,
+						
 						if (EMB == Toss_fast_carrier || EMB == Toss_arbiter_carrier
 								|| EMB == Toss_Scout || EMB == Toss_arbiter) {
-							// 첫번째 애드온에서는 Tank 먼저 뽑는다.
+							
 							if (((addonIndex == 0 && tankCount >= baseTankCount) || addonIndex != 0) && goliathCount < baseGoliathCount && INFO.getCompletedCount(Terran_Armory, S) > 0) {
 								trainUnit = getAvailableGas() >= Terran_Goliath.gasPrice() ? Terran_Goliath : Terran_Vulture;
 							}
@@ -896,7 +842,7 @@ void TrainManager::factoryTraining()
 						else if ((EIB == Toss_1g_dragoon || EIB == Toss_2g_dragoon ||
 								  EIB == Toss_1g_double || EIB == UnknownBuild) && tankCount < 2)
 						{
-							// Tank 없는 상태면 Tank 뽑는다.
+							
 							trainUnit = getAvailableGas() >= Terran_Siege_Tank_Tank_Mode.gasPrice() ? Terran_Siege_Tank_Tank_Mode : None;
 						}
 						else if ((EIB == Toss_2g_zealot || EIB == Toss_1g_forward || EIB == Toss_2g_forward) && (EMB == Toss_1base_fast_zealot || EMB == UnknownMainBuild))
@@ -907,7 +853,7 @@ void TrainManager::factoryTraining()
 								trainUnit = getAvailableGas() >= Terran_Siege_Tank_Tank_Mode.gasPrice() ? Terran_Siege_Tank_Tank_Mode : Terran_Vulture;
 						}
 						else {
-							if (tankCount > 8 && tankCount * 0.7 > vultureCount) // 탱크가 많으면 벌쳐 찍자
+							if (tankCount > 8 && tankCount * 0.7 > vultureCount) 
 								trainUnit = Terran_Vulture;
 							else
 								trainUnit = getAvailableGas() >= Terran_Siege_Tank_Tank_Mode.gasPrice() ? Terran_Siege_Tank_Tank_Mode : Terran_Vulture;
@@ -915,7 +861,6 @@ void TrainManager::factoryTraining()
 					}
 				}
 
-				// 후반에 탱크가 너무 많아지는것 방지하기 위해 추가
 				if (trainUnit == Terran_Siege_Tank_Tank_Mode && maxTankCount <= INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S))
 					trainUnit = Terran_Vulture;
 
@@ -926,7 +871,7 @@ void TrainManager::factoryTraining()
 			}
 			else if (state == "Train")
 			{
-				// 병력 생산 종료되면 Idle로 바뀜
+				
 				f->action();
 			}
 			else if (state == "BuildAddon")
@@ -944,12 +889,12 @@ void TrainManager::factoryTraining()
 
 	}
 
-	// AddOn 다는데 Delay가 있어서 별도 체크함.
+
 	for (auto f : factoryList)
 	{
 		string state = f->getState();
 
-		// 새로 만들어진 팩토리라면 Idle 로 설정
+		
 		if (state == "BuildAddon") {
 			currentFrameSetAddOnCount++;
 		}
@@ -961,12 +906,12 @@ void TrainManager::factoryTraining()
 		{
 			string state = f->getState();
 
-			// 새로 만들어진 팩토리라면 Idle 로 설정
+			
 			if (state == "New" && f->isComplete()) {
 				f->setState(new FactoryIdleState());
 			}
 
-			// 애드온 자리에 적 건물이 있을 때 LiftAndLand 상태로 팩토리를 띄우게 된다.
+			
 			if (state == "LiftAndLand")
 			{
 				if (f->unit()->isLifted() || !f->unit()->canLift())
@@ -981,27 +926,25 @@ void TrainManager::factoryTraining()
 				}
 			}
 
-			// 최소 벌쳐 생산 후 머신샵 추가
 			if (state == "Idle")
 			{
 				UnitType trainUnit = Terran_Vulture;
 
-				// 자원부족, 머신샵은 50/50 이라 나중에 수정 필요해보임
-				// 자원 부족하면 일꾼 생산 쉬자. // 병력 우선.
+				
 				if (!hasEnoughResources(trainUnit))
 				{
 					waitToProduce = true;
 					return;
 				}
 
-				// 기본 벌쳐 수는 맞춘다.
+				
 				if (vultureAllCount >= baseVultureCount)
 				{
 					if (machineShopCount + currentFrameSetAddOnCount < mashineShopCount)
 					{
 						bool needMachineShop = true;
 
-						// 발업 저글링 상대로 안전하게 머신샵 추가
+						
 						if (INFO.enemyRace == Races::Zerg)
 						{
 							if (EIB <= Zerg_9_Balup || EMB == Zerg_main_zergling)
@@ -1021,7 +964,7 @@ void TrainManager::factoryTraining()
 							}
 						}
 
-						// 머신샵 추가
+						
 						if (f->unit()->getAddon() == nullptr && hasEnoughResources(Terran_Machine_Shop) && needMachineShop)
 						{
 							if (!bw->canBuildHere(f->unit()->getTilePosition(), Terran_Machine_Shop, f->unit())
@@ -1050,7 +993,7 @@ void TrainManager::factoryTraining()
 						}
 					}
 
-					// 병력 생산
+				
 					if (INFO.enemyRace == Races::Zerg)
 					{
 						if (INFO.getCompletedCount(Terran_Armory, S) == 0)
@@ -1072,13 +1015,13 @@ void TrainManager::factoryTraining()
 
 								if (trainUnit == None)
 								{
-									// 가스 부족으로 골리앗 못뽑을 경우 미네랄 체크하고 벌쳐 생산
+									
 									trainUnit = getAvailableGas() >= Terran_Goliath.gasPrice() ? None : hasEnoughResources(Terran_Vulture) ? Terran_Vulture : None;
 								}
 							}
 						}
 
-						// 가스 세이브하기 위해 벌쳐 생산
+						
 						if (saveGas)
 							trainUnit = hasEnoughResources(Terran_Vulture) ? Terran_Vulture : None;
 					}
@@ -1088,7 +1031,7 @@ void TrainManager::factoryTraining()
 						{
 							if (S->hasResearched(TechTypes::Spider_Mines))
 							{
-								// 후반까지 일정 수 벌쳐 사용하기 위해 추가
+								
 								if (baseVultureCount > vultureCount)
 								{
 									trainUnit = hasEnoughResources(Terran_Vulture) ? Terran_Vulture : None;
@@ -1106,7 +1049,7 @@ void TrainManager::factoryTraining()
 								trainUnit = hasEnoughResources(Terran_Goliath) ? Terran_Goliath : None;
 							}
 
-							// 가스 세이브하기 위해 벌쳐 생산
+						
 							if (saveGas)
 								trainUnit = hasEnoughResources(Terran_Vulture) ? Terran_Vulture : None;
 						}
@@ -1122,32 +1065,32 @@ void TrainManager::factoryTraining()
 							}
 						}
 					}
-					else // 프로토스
+					else 
 					{
-						// Tank의 경우 Gas가 부족한 경우만 Vulture를 생산한다.
+						
 						if (goliathCount < baseGoliathCount && INFO.getCompletedCount(Terran_Armory, S) > 0)
 						{
 							trainUnit = hasEnoughResources(Terran_Goliath) ? Terran_Goliath : None;
 
-							// 가스 부족으로 골리앗 못뽑을 경우 미네랄 체크하고 벌쳐 생산
+							
 							if (trainUnit == None)
 								trainUnit = getAvailableGas() >= Terran_Goliath.gasPrice() ? None : hasEnoughResources(Terran_Vulture) ? Terran_Vulture : None;
 						}
 						else
 						{
-							// 골리앗 필요하지 않은 경우 벌쳐만
+							
 							trainUnit = hasEnoughResources(Terran_Vulture) ? Terran_Vulture : None;
 						}
 					}
 				}
 
 				if (INFO.enemyRace == Races::Terran) {
-					// 테테전 후반에 쓸데없이 벌쳐 너무 많이 안찍도록
+					
 					if (trainUnit == Terran_Vulture && maxVultureCount <= INFO.getAllCount(Terran_Vulture, S)
 							|| (S->hasResearched(TechTypes::Spider_Mines) && S->isUpgrading(UpgradeTypes::Ion_Thrusters) && maxVultureCount >= tankCount + goliathCount))
 						continue;
 
-					// 후반에 탱크보다 골리앗이 더 많아지는것 방지하기 위해 추가
+					
 					else if (trainUnit == Terran_Goliath && maxGoliathCount <= INFO.getAllCount(Terran_Goliath, S)
 							 && S->getUpgradeLevel(UpgradeTypes::Charon_Boosters))
 						continue;
@@ -1160,7 +1103,7 @@ void TrainManager::factoryTraining()
 			}
 			else if (state == "Train")
 			{
-				// 병력 생산 종료되면 Idle로 바뀜
+				
 				f->action();
 			}
 			else if (state == "BuildAddon")
@@ -1210,7 +1153,7 @@ void TrainManager::starportTraining()
 		if (SM.getMyBuild() == MyBuildTypes::Terran_TankGoliath)
 		{
 			needConrolTowerCount = 1;
-			maxDropshipCount = 3; //Dropship TEST
+			maxDropshipCount = 3; 
 		}
 		else if (SM.getMyBuild() == MyBuildTypes::Terran_VultureTankWraith)
 		{
@@ -1222,11 +1165,11 @@ void TrainManager::starportTraining()
 			}
 			else
 			{
-				// wraith 생산 Threshold
+				
 				baseWraithCount = 1;
-				// wraith 최대 생산
+				
 				maxWraithCount = 3;
-				// 필요한 컨트롤타워
+				
 				needConrolTowerCount = (en_wraithCount > 0) ? 1 : 0;
 			}
 		}
@@ -1249,15 +1192,14 @@ void TrainManager::starportTraining()
 			s->setState(new StarportIdleState());
 		}
 
-		// 최소 레이스 생산 후 머신샵 추가
+		
 		if (state == "Idle")
 		{
-			//if (wraithCount >= maxWraithCount && vesselCount >= maxVesselCount)
-			//	continue;
+			
 
 			UnitType trainUnit = UnitTypes::None;
 
-			// 기본 레이스 수는 맞춘다.
+		
 			if (wraithCount < baseWraithCount)
 			{
 				trainUnit = Terran_Wraith;
@@ -1266,7 +1208,7 @@ void TrainManager::starportTraining()
 			{
 				if ((int)controlTowerList.size() < needConrolTowerCount)
 				{
-					// 컨트롤타워 추가
+					
 					if (s->unit()->getAddon() == nullptr && hasEnoughResources(Terran_Control_Tower))
 					{
 						s->setState(new StarportBuildAddonState());
@@ -1299,7 +1241,7 @@ void TrainManager::starportTraining()
 							continue;
 						}
 
-						// 캐리어 상대할 땐 가스 여유 될 때 생산
+				
 						if (EMB == Toss_fast_carrier && INFO.getActivationGasBaseCount() < 3)
 							continue;
 
@@ -1321,7 +1263,7 @@ void TrainManager::starportTraining()
 				}
 			}
 
-			// 자원 부족
+			
 			if (trainUnit == Terran_Science_Vessel && nextVessleTime < TIME)
 			{
 				if (!hasEnoughResources(trainUnit) && trainUnit.gasPrice() > getAvailableGas())
@@ -1331,7 +1273,7 @@ void TrainManager::starportTraining()
 				}
 			}
 
-			// 뽑을 유닛 없음
+			
 			if (trainUnit == UnitTypes::None)
 				continue;
 
@@ -1342,7 +1284,7 @@ void TrainManager::starportTraining()
 			if (trainUnit == Terran_Science_Vessel && saveGas)
 			{
 				saveGas = false;
-				nextVessleTime = TIME + (24 * 60 * 2); // 베슬 재생산은 2분 후부터
+				nextVessleTime = TIME + (24 * 60 * 2); 
 				cout << "## 베슬 재생산은 2분뒤에.." << nextVessleTime << endl;
 			}
 
@@ -1350,7 +1292,7 @@ void TrainManager::starportTraining()
 		}
 		else if (state == "Train")
 		{
-			// 병력 생산 종료되면 Idle로 바뀜
+			
 			s->action();
 		}
 		else if (state == "BuildAddon")
@@ -1372,7 +1314,7 @@ int TrainManager::getMaxScvNeedCount()
 	for (auto c : commandCenterList)
 	{
 		// Command의 Mineral * 2 만큰 추가
-		maxScvNeedCount += ScvManager::Instance().getDepotMineralSize(c->unit()) * 2;
+		maxScvNeedCount += SoldierManager::Instance().getDepotMineralSize(c->unit()) * 2;
 		maxScvNeedCount += 3; // for Refinery
 		maxScvNeedCount += 1; // for Spare(Build, Scout, Repair)
 
@@ -1386,204 +1328,7 @@ int TrainManager::getMaxScvNeedCount()
 
 	return min(maxScvNeedCount, 60);
 }
-/*
-Position TrainManager::getBarrackEnemyChokePosition()
-{
-	Position targetPos = Positions::None;
 
-	if (INFO.getSecondChokePoint(E) == nullptr)
-		targetPos = INFO.getMainBaseLocation(E)->Center();
-	else
-	{
-		const ChokePoint *secondChokePoint = INFO.getSecondChokePoint(E);
-
-		int dist1 = INFO.getMainBaseLocation(E)->Center().getApproxDistance((Position)secondChokePoint->Pos(BWEM::ChokePoint::end1));
-		int dist2 = INFO.getMainBaseLocation(E)->Center().getApproxDistance((Position)secondChokePoint->Pos(BWEM::ChokePoint::end2));
-
-		targetPos = dist1 > dist2 ? (Position)secondChokePoint->Pos(BWEM::ChokePoint::end1) : (Position)secondChokePoint->Pos(BWEM::ChokePoint::end2);
-
-		Position tempPos = getCirclePosFromPosByDegree(targetPos, (Position)secondChokePoint->Center(), 180);
-
-		if (!tempPos.isValid())
-			tempPos.makeValid();
-
-		if (targetPos.getApproxDistance(tempPos) > 3 * TILE_SIZE)
-			targetPos = getMiddlePositionByDist(targetPos, tempPos, 3 * TILE_SIZE);
-		else
-			targetPos = tempPos;
-
-		if (!targetPos.isValid())
-			targetPos.makeValid();
-	}
-
-	return targetPos;
-}
-
-void TrainManager::setBarrackLiftState(UnitInfo *b)
-{
-	// 공격받으면
-	if (b->unit()->isUnderAttack() || b->getVeryFrontEnemyUnit() != nullptr)
-	{
-		b->setState(new BarrackLiftAndMoveState());
-
-		if (b->getVeryFrontEnemyUnit() != nullptr)
-		{
-			int safeDist = b->getVeryFrontEnemyUnit()->getType().airWeapon().maxRange() > TILE_SIZE ? b->getVeryFrontEnemyUnit()->getType().airWeapon().maxRange() / TILE_SIZE : TILE_SIZE;
-			b->action(getBackPostion(b->pos(), b->getVeryFrontEnemyUnit()->getPosition(), safeDist + 1));
-		}
-		else
-		{
-			moveBackPostion(b, b->pos(), 2);
-		}
-	}
-	else if (INFO.getSecondChokePosition(S).isValid() && (b->hp() * 100) / b->type().maxHitPoints() < 33)
-	{
-		b->setState(new BarrackLiftAndMoveState());
-		b->action(INFO.getSecondChokePosition(S));
-	}
-	else if (TIME % 24 == 0)
-	{
-		if (INFO.enemyRace == Races::Terran)
-		{
-			if (SM.getMainStrategy() == WaitToBase || SM.getMainStrategy() == WaitToFirstExpansion)
-			{
-				if (b->pos().getApproxDistance(INFO.getMainBaseLocation(E)->getPosition()) > 10)
-				{
-					b->setState(new BarrackLiftAndMoveState());
-					// 적 메인베이스 두번째 초크포인트(널이라면 메인베이스)로 정찰하러 감
-					b->action(getBarrackEnemyChokePosition());
-				}
-			}
-			else
-			{
-				b->setState(new BarrackLiftAndMoveState());
-
-				uList tankList = INFO.getUnits(Terran_Siege_Tank_Tank_Mode, S);
-
-				// 탱크전체의 평균 포지션에서 탱크 전체 평균 방향 4타일 앞으로 이동
-				if (!tankList.empty())
-				{
-					b->action(get1stUnitFrontPosition(tankList));
-					// 추후 탱크에 전선형성 로직이 들어가면 이 함수가 좋음
-					//b->action(getAvgTankFrontPosition(tankList));
-				}
-				else
-					b->action(getBarrackEnemyChokePosition());
-			}
-
-		}
-		else if (INFO.enemyRace == Races::Protoss && SM.getMainStrategy() != WaitToBase && SM.getMainStrategy() != WaitToFirstExpansion)
-		{
-			b->setState(new BarrackLiftAndMoveState());
-			uList tankList = INFO.getUnits(Terran_Siege_Tank_Tank_Mode, S);
-
-			// 선두 탱크 포지션에서 탱크 방향 4타일 앞으로 이동
-			if (!tankList.empty())
-			{
-				b->action(get1stUnitFrontPosition(tankList));
-			}
-			else if (INFO.getSecondChokePosition(S).isValid())
-				b->action(INFO.getSecondChokePosition(S));
-		}
-		else
-		{
-			if (INFO.getSecondChokePosition(S).isValid() && b->pos().getApproxDistance(INFO.getSecondChokePosition(S)) > 10)
-			{
-				b->setState(new BarrackLiftAndMoveState());
-				b->action(INFO.getSecondChokePosition(S));
-			}
-		}
-
-	}
-}
-
-void TrainManager::actionBarrackLiftAndMoveState(UnitInfo *b)
-{
-
-	if (b->unit()->isUnderAttack() || b->getVeryFrontEnemyUnit() != nullptr)
-	{
-		if (b->getVeryFrontEnemyUnit() != nullptr)
-		{
-			int safeDist = b->getVeryFrontEnemyUnit()->getType().airWeapon().maxRange() > TILE_SIZE ? b->getVeryFrontEnemyUnit()->getType().airWeapon().maxRange() / TILE_SIZE : TILE_SIZE;
-			b->action(getBackPostion(b->pos(), b->getVeryFrontEnemyUnit()->getPosition(), safeDist + 1));
-		}
-		else
-		{
-			moveBackPostion(b, b->pos(), 2);
-		}
-	}
-	else if ((b->hp() * 100) / b->type().maxHitPoints() < 33)
-	{
-		b->action(INFO.getSecondChokePosition(S));
-	}
-	// 건물 특정 포인트까지 이동
-	else if (TIME % 48 == 0)
-	{
-		if (INFO.enemyRace == Races::Terran)
-		{
-			if (SM.getMainStrategy() == WaitToBase || SM.getMainStrategy() == WaitToFirstExpansion)
-			{
-				// 적 메인베이스 정찰하러 감
-				b->action(getBarrackEnemyChokePosition());
-			}
-			else
-			{
-				uList tankList = INFO.getUnits(Terran_Siege_Tank_Tank_Mode, S);
-
-				// 선두 탱크 포지션에서 탱크 방향 4타일 앞으로 이동
-				if (!tankList.empty())
-				{
-					b->action(get1stUnitFrontPosition(tankList));
-					// 추후 탱크에 전선형성 로직이 들어가면 이 함수가 좋음
-					//b->action(getAvgTankFrontPosition(tankList));
-				}
-				else
-					b->action(getBarrackEnemyChokePosition());
-			}
-
-		}
-		else if (INFO.enemyRace == Races::Protoss && SM.getMainStrategy() != WaitToBase && SM.getMainStrategy() != WaitToFirstExpansion)
-		{
-			uList tankList = INFO.getUnits(Terran_Siege_Tank_Tank_Mode, S);
-			uList vultureList = INFO.getUnits(Terran_Vulture, S);
-			uList goliathList = INFO.getUnits(Terran_Goliath, S);
-
-			// 선두 포지션 방향 4타일 앞으로 이동
-			if (!tankList.empty())
-				b->action(get1stUnitFrontPosition(tankList));
-			else if (!vultureList.empty())
-				b->action(get1stUnitFrontPosition(vultureList));
-			else if (!goliathList.empty())
-				b->action(get1stUnitFrontPosition(goliathList));
-			else
-				b->action(INFO.getSecondChokePosition(S));
-		}
-		else
-			b->action(INFO.getSecondChokePosition(S));
-	}
-}
-
-
-Position TrainManager::get1stUnitFrontPosition(uList unitList)
-{
-	int dist = INT_MAX;
-	UnitInfo *firstUnit = nullptr;
-
-	for (auto t : unitList)
-	{
-		int tempDist = INT_MAX;
-		theMap.GetPath(t->pos(), SM.getMainAttackPosition(), &tempDist);
-
-		if (tempDist >= 0 && dist > tempDist)
-		{
-			firstUnit = t;
-			dist = tempDist;
-		}
-	}
-
-	return targetPos;
-}
-*/
 bool TrainManager::isFirstFactory()
 {
 	if (INFO.getTypeBuildingsInRadius(Terran_Factory, S, INFO.getMainBaseLocation(S)->getPosition(), 0, true, true).size() <= 1)
@@ -1601,10 +1346,10 @@ void TrainManager::findAndSaveFirstFactoryPos(Unit factory)
 
 bool TrainManager::isTimeToMoveCommandCenter(UnitInfo *c)
 {
-	// 커맨드 센터 hp가 50% 이상이면 버틴다
+	
 	if (c->hp() < c->type().maxHitPoints() * 50 / 100)
 	{
-		// 50% 이하라도 당장 내가 맞고 있지 않다면 버틴다
+		
 		if (c->getVeryFrontEnemyUnit() != nullptr || c->unit()->isUnderAttack())
 			return true;
 	}
@@ -1639,21 +1384,17 @@ void TrainManager::setBarricadeBarrack(uList &bList)
 
 bool TrainManager::isSafeComsatPosition(UnitInfo *depot)
 {
-	// 본진, 앞마당 제외 나머지 위치의 커맨드센터에 컴샛 추가 시
-	// 해당 지역이 안전한지 판단 후 컴샛 추가
-	// (주로 탱크때문에 컴샛이 계속 파괴되는 것을 방지하기 위해 추가)
-
+	
 	if (isSameArea(depot->pos(), (Position)MYBASE))
 		return true;
 
 	if (INFO.getFirstExpansionLocation(S) && isSameArea(depot->pos(), INFO.getFirstExpansionLocation(S)->getPosition()))
 		return true;
 
-	// 컴샛 Center 위치
 	Position basePosition = (Position)(depot->unit()->getTilePosition() + TilePosition(5, 2));
 	uList enemyList = INFO.getUnitsInRadius(E, basePosition, 15 * TILE_SIZE, true, true, true, true);
 
-	// 컴샛 위치가 위험하면 false
+	
 	if (getDamageAtPosition(basePosition, Terran_Comsat_Station, enemyList, false))
 		return false;
 
@@ -1666,7 +1407,7 @@ bool TrainManager::needStopTrainToFactory()
 	int initialCombatUnitCreateCount = INFO.getAllCount(Terran_Vulture, S) + INFO.getDestroyedCount(Terran_Vulture, S)
 									   + INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) + INFO.getDestroyedCount(Terran_Siege_Tank_Tank_Mode, S);
 
-	// 초반 팩토리 공격 유닛 2기 생산할 때 까지 팩토리 최대한 쉬지 않도록 마린 생산 쉬는 로직 추가
+
 	if (initialCombatUnitCreateCount < 2)
 	{
 		for (auto f : INFO.getBuildings(Terran_Factory, S))
@@ -1674,28 +1415,28 @@ bool TrainManager::needStopTrainToFactory()
 			if (!f->isComplete())
 				continue;
 
-			// addon 이 있는 경우
+			
 			if (f->unit()->getAddon()) {
 				if (getAvailableMinerals() <= 150)
 				{
 					if (f->unit()->getAddon()->isCompleted()) {
-						// 병력을 안뽑고 있거나 생산 곧 완료 되는 경우 병력 생산 가능
+						
 						if (f->unit()->getTrainingQueue().empty() || f->unit()->isTraining() && f->unit()->getRemainingTrainTime() <= 130)
 							stopTrain = true;
 					}
-					// addon 이 곧 완성되는 경우 병력 생산 가능
+					
 					else if (!f->unit()->getAddon()->isCompleted() && f->unit()->getAddon()->getRemainingBuildTime() <= 130)
 						stopTrain = true;
 				}
 			}
-			// addon 이 없는 경우
+			
 			else {
 				if (getAvailableMinerals() <= 75)
 				{
-					// 생산중이거나 업그레이드 중이 아닌 경우
+					
 					if (f->unit()->getTrainingQueue().empty())
 						stopTrain = true;
-					// 생산 완료 전
+					
 					else if (f->unit()->isTraining() && f->unit()->getRemainingTrainTime() <= 130)
 						stopTrain = true;
 				}
@@ -1713,7 +1454,7 @@ bool TrainManager::needStopTrainToBarracks()
 	if (TIME < 24 * 60 * 5 && (EIB == Terran_4scv || EIB == Toss_4probes || EIB == Zerg_4_Drone_Real)
 			&& INFO.getCompletedCount(Terran_Barracks, S) && INFO.getAllCount(Terran_Marine, S) < 1 && INFO.getAllCount(Terran_SCV, S) >= 2)
 	{
-		// cout << "@@@ 배럭 병력좀 생산해야해서 일꾼 생산 쉴게 ㅠ" << endl;
+		
 		stopTrain = true;
 	}
 
@@ -1732,7 +1473,7 @@ Position TrainManager::getBarricadePosition()
 			secondChoke = (Position)INFO.getSecondChokePoint(S)->Pos(INFO.getSecondChokePoint(S)->end1);
 		}
 
-		// 앞마당과 세컨 초크포인트가 먼 경우 ( ex : 데스티네이션)
+		
 		const pair<const Area *, const Area *> &areas = INFO.getSecondChokePoint(S)->GetAreas();
 		const vector<ChokePoint> &secondCP = areas.first->ChokePoints(areas.second);
 		WalkPosition pos = WalkPositions::Origin;

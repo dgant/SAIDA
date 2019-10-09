@@ -34,7 +34,7 @@ namespace MyBot
 		}
 	};
 
-	//zergling, zealot병력 싸울때
+	
 	class ScvCombatState : public State
 	{
 	public:
@@ -43,7 +43,7 @@ namespace MyBot
 		}
 	};
 
-	//상대 일꾼 공격 대응 Combat
+	
 	class ScvWorkerCombatState : public State
 	{
 	public:
@@ -55,7 +55,7 @@ namespace MyBot
 		Unit targetUnit = nullptr;
 		Unit repairTarget = nullptr;
 		Position watingPos = Positions::None;
-		int waitingTime = 0;
+		int waitingTIME = 0;
 	};
 
 	class ScvCounterAttackState : public State
@@ -82,7 +82,7 @@ namespace MyBot
 		bool pre_carry;
 		int skip_cnt;
 		Unit healerScv;
-		int repairStartTime = 0;
+		int repairStartTIME = 0;
 		bool started = false;
 		int startHp = 0;
 	};
@@ -214,7 +214,7 @@ namespace MyBot
 	{
 	public:
 		State *action() {
-			if (prisonedTime + 24 * 60 < TIME)
+			if (prisonedTIME + 24 * 60 < TIME)
 				return nullptr;
 
 			return new ScvIdleState();

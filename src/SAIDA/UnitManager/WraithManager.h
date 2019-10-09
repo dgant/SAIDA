@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../UnitState/WraithState.h"
+#include "../UnitManager/WraithState.h"
 #include "../StrategyManager.h"
 
 namespace MyBot
@@ -14,7 +14,7 @@ namespace MyBot
 		void update();
 		Position getKillScvTargetBase();
 	private:
-		//UnitInfo *scoutWraith = nullptr;
+		
 		Unit oneTargetUnit = nullptr;
 		bool canCloak = false;
 	};

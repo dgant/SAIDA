@@ -2,7 +2,7 @@
 
 #include "../InformationManager.h"
 #include "DropshipManager.h"
-#include "../UnitState/TankState.h"
+#include "../UnitManager/TankState.h"
 #include "../StrategyManager.h"
 #include "../UnitData.h"
 
@@ -24,11 +24,7 @@ namespace MyBot
 		void assignSCV(Unit scv) {
 			myScv = scv;
 		}
-		//			for (auto &t : getUnits()) {
-		//				uVec.push_back(t->unit());
-		//			}
-		//			return uVec;
-		//		}
+		
 		void setMiddlePos(Position pos)
 		{
 			middlePos = pos;
@@ -49,7 +45,7 @@ namespace MyBot
 
 			bool gathered = true;
 
-			//			UnitInfo *frontUnit = getFrontUnitFromPosition(SM.getMainAttackPosition());
+			
 
 			for (auto t : getUnits())
 			{
@@ -73,7 +69,7 @@ namespace MyBot
 
 			return gathered;
 		}
-		// only Tank
+		
 		void siegeAll()
 		{
 			for (auto t : getUnits())
@@ -145,7 +141,7 @@ namespace MyBot
 		bool checkAllSiegeNeed();
 		void getClosestPosition();
 		UnitInfo *frontTankOfNotDefenceTank = nullptr;
-		// 초기 시즈탱크 위치
+		
 		map<Position, UnitInfo *> firstDefencePositions;
 		Position waitingPosition;
 		Position defencePositionOnTheHill = Positions::Unknown;
@@ -226,7 +222,6 @@ namespace MyBot
 			if (num == 1)
 				return keepMultiSet.getUnits();
 
-			// (num == 2)
 			return keepMultiSet2.getUnits();
 		}
 

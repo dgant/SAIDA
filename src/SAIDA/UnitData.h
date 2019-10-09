@@ -27,7 +27,6 @@ namespace MyBot
 			return allSpells;
 		}
 
-		// for UXManager
 		map<UnitType, vector<UnitInfo *> > &getUnitTypeMap() {
 			return unitTypeMap;
 		}
@@ -57,7 +56,7 @@ namespace MyBot
 
 		bool addUnitNBuilding(Unit);
 		void removeUnitNBuilding(Unit);
-		// frame 당 1회 실행
+		
 		void initializeAllInfo();
 		void updateAllInfo();
 		void updateNcheckTypeAllInfo();
@@ -70,12 +69,11 @@ namespace MyBot
 		map<Unit, UnitInfo *> allBuildings;
 		map<int, pair<int, Position>> allSpells;
 
-		// Count Map은 Only 아군에서만 사용한다. Version 1.0
-		// 생산 완료된 유닛 갯수
+		
 		map<UnitType, int> completedCount;
-		// 파괴된 유닛 갯수
+		
 		map<UnitType, int> destroyedCount;
-		// 생산중, 생산 완료된 유닛 갯수
+		
 		map<UnitType, int> allCount;
 
 		UnitType getUnitTypeDB(UnitType);
@@ -165,7 +163,7 @@ namespace MyBot
 			return frontUnit;
 		}
 
-		// 가까운 순서대로,(reverse = true, 먼 순서)
+		
 		uList getSortedUnitList(Position targetPos, bool reverseOrder = false) {
 
 			vector<pair<int, UnitInfo * >> sortList;
@@ -175,7 +173,7 @@ namespace MyBot
 				int tempDist = 0;
 				theMap.GetPath(t->pos(), targetPos, &tempDist);
 
-				// 길이 막힌 유닛이 방어로 포함된다면?
+				
 				if (tempDist < 0)
 					continue;
 

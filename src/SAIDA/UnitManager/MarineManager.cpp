@@ -1,7 +1,7 @@
 #include "MarineManager.h"
 #include "../InformationManager.h"
 #include "../StrategyManager.h"
-#include "../EnemyStrategyManager.h"
+#include "../HostileManager.h"
 
 using namespace MyBot;
 
@@ -53,10 +53,8 @@ void MarineManager::update()
 			setZealotDefenceMarine(marineList);
 		}
 
-		//if (INFO.getCompletedCount(Terran_Factory, S) == 0)
-
-		//setFirstChokeDefenceMarine(marineList); // new or Idle인 유닛상태만 변경
-		setDefenceMarine(marineList); // new or Idle인 유닛상태만 변경
+	
+		setDefenceMarine(marineList);
 
 		for (auto m : marineList)
 		{
@@ -139,7 +137,7 @@ void MarineManager::setFirstBunker()
 			bunker = bunkers.at(0)->unit();
 			checkRangeUnitNearBunker();
 		}
-		else // 2개
+		else 
 		{
 			for (auto b : bunkers) {
 				if (isSameArea(b->pos(), INFO.getFirstExpansionLocation(S)->Center()))
@@ -168,7 +166,7 @@ bool MarineManager::isZealotDefenceNeed()
 	return zealotDefenceNeed;
 }
 
-// 기본 방어 State 이므로, 특수한 State가 필요할 경우, 이 함수호출보다 먼저 해라.
+
 void MarineManager::setDefenceMarine(uList &marineList) {
 	if (ESM.getEnemyInitialBuild() == Toss_1g_forward || ESM.getEnemyInitialBuild() == Toss_2g_forward) {
 		if (INFO.getCompletedCount(Protoss_Zealot, E) <= 1 && INFO.getDestroyedCount(Protoss_Zealot, E) > 0
@@ -195,7 +193,6 @@ void MarineManager::setDefenceMarine(uList &marineList) {
 
 	int totEnemNum = enemyInMyYard.size() + enemyBuildingsInMyYard.size();
 
-	// 일꾼 포함 아무것도 없는 경우
 	if (totEnemNum == 0 && (TIME - lastSawScouterTime > 24 * 5)) {
 		for (auto m : marineList)
 		{
@@ -203,7 +200,7 @@ void MarineManager::setDefenceMarine(uList &marineList) {
 				m->setState(new MarineIdleState());
 		}
 	}
-	// 일꾼 혹은 적이 있는 경우
+	
 	else {
 		string state;
 
@@ -242,7 +239,7 @@ void MarineManager::setDefenceMarine(uList &marineList) {
 			state = m->getState();
 
 			if (state == "New" || state == "Idle" || state == "KillScouter" || state == "Defence") {
-				//일꾼 외에 다른 적 유닛이 없을 때
+			
 				if (ESM.getEnemyInitialBuild() == Toss_cannon_rush)
 					m->setState(new MarineAttackState(INFO.getSecondChokePosition(S)));
 				else if (goKillScouter) {
@@ -260,8 +257,7 @@ void MarineManager::setDefenceMarine(uList &marineList) {
 	return;
 }
 
-// 배럭과 바로 붙어있는 서플라이를 찾는 로직.
-// 파괴되거나 공중에 뜬 채로 이동하거나, 다시 지을 수 있기 때문에 매번 다시 선정함
+
 bool MarineManager::findFirstBarrackAndSupplyPosition()
 {
 	nextBarrackSupply = nullptr;
@@ -288,35 +284,7 @@ bool MarineManager::findFirstBarrackAndSupplyPosition()
 
 	return true;
 }
-//
-//void MarineManager::checkKitingMarine(UnitInfo *&m)
-//{
-//	Unit b = MarineManager::Instance().getBunker();
-//
-//	if (b != nullptr && b->isCompleted())
-//	{
-//		m->setState(new MarineDefenceState());
-//		return;
-//	}
-//
-//	UnitInfo *closeUnit = INFO.getClosestUnit(E, m->pos(), AllUnitKind);
-//
-//	int distanceFromMainBase = 0;
-//
-//	theMap.GetPath(m->pos(), INFO.getMainBaseLocation(S)->getPosition(), &distanceFromMainBase);
-//
-//	// 본진에서 너무 멀리간 마린은 DefenceMode로 변환
-//	if (distanceFromMainBase >= 1600) {
-//		m->setState(new MarineDefenceState());
-//	}
-//
-//	// 벙커가 완성되어 있거나 근처 유닛이 없으면 Defence Mode로 변환
-//	if ((b != nullptr && b->isCompleted()) || closeUnit == nullptr) {
-//		m->setState(new MarineDefenceState());
-//	}
-//
-//	return;
-//}
+
 
 void MarineManager::setZealotDefenceMarine(uList &marineList)
 {
@@ -325,10 +293,9 @@ void MarineManager::setZealotDefenceMarine(uList &marineList)
 
 	if (zealotDefenceMarineNeed && barrarckAndSupplyFound)
 	{
-		// zealotDefenceMarine 할당 작업
+		
 		if (zealotDefenceMarine == nullptr) {
-			// 정해져있지 않으면 다음 상태 중 하나인 마린에서 고른다.
-			// 굳이 여기서 정하지 않아도 되는데, 코드 가독성을 위해서 여기서 지정함.
+			
 			for (auto m : marineList) {
 				string state = m->getState();
 
@@ -341,7 +308,7 @@ void MarineManager::setZealotDefenceMarine(uList &marineList)
 		}
 	}
 	else {
-		// zealotDefenceMarine 할당 해제
+		
 		if (zealotDefenceMarine != nullptr) {
 			UnitInfo *marine = INFO.getUnitInfo(zealotDefenceMarine, S);
 
@@ -385,14 +352,14 @@ void MarineManager::getFirstDefensePos()
 	int y = cpEnd1Pos.y - cpMiddlePos.y;
 
 	double m = (double)y / (double)x;
-	double nm = -1 * (1 / m); // y = nm*x
+	double nm = -1 * (1 / m); 
 
 	Position pos1(cpMiddlePos.x - 100, cpMiddlePos.y - (int)(nm * 100));
 	Position pos2(cpMiddlePos.x + 100, cpMiddlePos.y + (int)(nm * 100));
 
 	int defence_gap = 15;
 
-	if (pos1.getDistance(mybase) < pos2.getDistance(mybase)) // pos 1 쪽이 본진이면
+	if (pos1.getDistance(mybase) < pos2.getDistance(mybase)) 
 		FirstDefensePos = Position(cpMiddlePos.x + defence_gap, cpMiddlePos.y + (int)(nm * defence_gap));
 	else
 		FirstDefensePos = Position(cpMiddlePos.x - defence_gap, cpMiddlePos.y - (int)(nm * defence_gap));
@@ -445,7 +412,7 @@ void MarineManager::checkRangeUnitNearBunker()
 
 void MarineManager::doKiting(Unit unit) {
 
-	// 상대가 에어 유닛이거나 나보다 사정거리가 길거나 같으면 벙커에서 대기하거나 그냥 공격한다.
+	
 	UnitInfo *closeUnit = INFO.getClosestUnit(E, unit->getPosition(), AllUnitKind);
 
 	if (closeUnit == nullptr || unit->getDistance(closeUnit->pos()) > 1600)
@@ -453,13 +420,13 @@ void MarineManager::doKiting(Unit unit) {
 
 	Unit bunker = MarineManager::Instance().getBunker();
 
-	// 벙커가 완성되어 있거나 근처 유닛이 없으면 Defence Mode로 변환
+	
 	if (bunker != nullptr && bunker->isCompleted() && bunker->getLoadedUnits().size() != 4) {
 		CommandUtil::rightClick(unit, bunker);
 		return;
 	}
 
-	if (ESM.getEnemyInitialBuild() <= Zerg_12_Pool) // 9발업 이하에서는 마린이 밖으로 나가지 않는다.
+	if (ESM.getEnemyInitialBuild() <= Zerg_12_Pool) 
 	{
 		if (INFO.getTypeUnitsInRadius(Zerg_Zergling, E, unit->getPosition(), 8 * TILE_SIZE).size()
 				> INFO.getTypeUnitsInRadius(Terran_Marine, S, unit->getPosition(), 8 * TILE_SIZE).size())
@@ -481,7 +448,7 @@ void MarineManager::doKiting(Unit unit) {
 	{
 		CommandUtil::attackUnit(unit, closeUnit->unit());
 	}
-	// 사거리 안이면
+	
 	else {
 		UnitInfo *me = INFO.getUnitInfo(unit, S);
 
@@ -493,18 +460,7 @@ void MarineManager::doKiting(Unit unit) {
 		else
 			kiting(me, closeUnit, dangerPoint, 4 * TILE_SIZE);
 
-		//uList Scvs = INFO.getTypeUnitsInRadius(Terran_SCV, S, (unit->getPosition() + closeUnit->pos()) / 2, 50);
-
-		//if (unit->getGroundWeaponCooldown() == 0 && (Scvs.size() >= 3 || unit->getDistance(closeUnit->unit()) > 2 * TILE_SIZE))
-		//{
-		//	CommandUtil::attackUnit(unit, closeUnit->unit());
-		//}
-		//else
-		//{
-		//	if (closeUnit->type().groundWeapon().maxRange() < 4 * TILE_SIZE) {
-		//		moveBackPostion(INFO.getUnitInfo(unit, S), closeUnit->vPos(), 2 * TILE_SIZE);
-		//	}
-		//}
+		
 
 	}
 
@@ -541,7 +497,7 @@ void MarineManager::setFirstChokeDefenceMarine(uList &marineList)
 			}
 		}
 		else {
-			// 모든 마린을 동원
+			
 			for (int i = 0; i < (int)marineList.size(); i++) {
 				UnitInfo *m = marineList.at(i);
 

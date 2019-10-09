@@ -46,7 +46,7 @@ void DropshipManager::update()
 	if (waitToBoardCnt == 3)
 		waitToBoarding = true;
 
-	if (boardingSuccessCnt == 3) // 이번 Frame에 Boarding으로 간다.
+	if (boardingSuccessCnt == 3) 
 	{
 		TM.initDropshipSet();
 		GM.initDropshipSet();
@@ -72,7 +72,7 @@ void DropshipManager::update()
 
 		if (state == "Boarding")
 		{
-			// 예외처리
+			
 			if (TIME % (24 * 5) == 0)
 				d->initspaceRemaining();
 

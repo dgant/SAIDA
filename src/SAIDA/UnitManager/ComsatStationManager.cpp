@@ -56,11 +56,10 @@ void ComsatStationManager::update()
 		}
 	}
 
-	// 사용할 수 있는 전체 스캔 횟수
+	
 	availableScanCount = scanCount;
 	INFO.setAvailableScanCount(scanCount);
 
-	// 스캔 없을 경우 예약 리스트 초기화, 스캔 사용할 수 있을때까지 해당 유닛의 위치가 바뀌므로
 	if (availableScanCount < 1)
 	{
 		reserveScanList.clear();
@@ -84,7 +83,6 @@ bool ComsatStationManager::inDetectedArea(UnitType targetType, Position targetPo
 		if (!m->isComplete())
 			continue;
 
-		// 터렛 범위내에 있는 유닛인지 확인 (a^2 + b^2 < c^2)
 		int distance = getAttackDistance(m->unit(), targetType, targetPosition);
 
 		if (distance < m->type().airWeapon().maxRange())
@@ -103,7 +101,7 @@ bool ComsatStationManager::inDetectedArea(UnitType targetType, Position targetPo
 			if (!s->isComplete())
 				continue;
 
-			// 베슬 범위내에 있는 유닛인지 확인 (a^2 + b^2 < c^2)
+			
 			if (inArea(s->pos(), targetPosition, s->type().sightRange()))
 			{
 				isExist = true;
@@ -123,7 +121,7 @@ bool ComsatStationManager::inTheScanArea(Position targetPosition)
 
 	for (auto s : scanList)
 	{
-		// 스캔 범위내에 있는 유닛인지 확인 (a^2 + b^2 < c^2)
+		
 		if (inArea(s->pos(), targetPosition, Spell_Scanner_Sweep.sightRange()))
 		{
 			isExist = true;
@@ -140,7 +138,7 @@ bool ComsatStationManager::isReservedPosition(Position targetPosition)
 
 	for (auto rs : reserveScanList)
 	{
-		// 예약된 스캔 위치에 있는 유닛인지 확인 (a^2 + b^2 < c^2)
+		
 		if (inArea(rs, targetPosition, Spell_Scanner_Sweep.sightRange()))
 		{
 			isExist = true;
@@ -153,19 +151,19 @@ bool ComsatStationManager::isReservedPosition(Position targetPosition)
 
 bool ComsatStationManager::checkScan(Unit targetUnit)
 {
-	// 해당 위치에 스캔이 이미 사용되었거나, 예약되어 있거나, 디텍트 지역이라면 스캔 필요 X
+	
 	if (inTheScanArea(targetUnit->getPosition()) || isReservedPosition(targetUnit->getPosition()) || inDetectedArea(targetUnit))
 	{
 		return false;
 	}
 
-	// targetUnit 공격 가능한 내 유닛
+	
 	uList myAttackableUnits = getMyAttackableUnitsForScan(targetUnit);
 
 	if (myAttackableUnits.empty())
 		return false;
 
-	// 타겟 유닛이 지상
+	
 	if (!targetUnit->getType().isFlyer())
 	{
 		double scanValue = 0;
@@ -207,7 +205,7 @@ bool ComsatStationManager::checkScan(Unit targetUnit)
 				return true;
 		}
 
-		// 클로킹 레이스
+		
 		else if (myAttackableUnits.size() >= 1)
 			return true;
 	}
@@ -233,13 +231,13 @@ bool ComsatStationManager::useScan(Position targetPosition)
 	if (!targetPosition.isValid())
 		return false;
 
-	// 해당 위치에 스캔이 이미 사용되었거나, 예약되어 있다면 스캔 필요 X
+	
 	if (inTheScanArea(targetPosition) || isReservedPosition(targetPosition))
 	{
 		return false;
 	}
 
-	// 사용된 곳이 아니라면 추가
+	
 	if (!isExist)
 	{
 		reserveScanList.push_back(targetPosition);
@@ -252,7 +250,7 @@ void ComsatStationManager::updateReserveScanList()
 {
 	uList scanList = INFO.getUnits(Spell_Scanner_Sweep, S);
 
-	// 기존 스캔 사용된 지역 확인
+	
 	for (auto s : scanList)
 	{
 		auto existPosition = find_if(reserveScanList.begin(), reserveScanList.end(), [s](Position pos) {
@@ -265,7 +263,7 @@ void ComsatStationManager::updateReserveScanList()
 		}
 	}
 
-	// 적 공격 유닛 수 카운트 (인구 기준)
+
 	uMap enemyUnits = INFO.getUnits(E);
 
 	for (auto &eu : enemyUnits)
@@ -278,7 +276,7 @@ void ComsatStationManager::updateReserveScanList()
 
 		bool needScan = false;
 
-		// 럴커가 땅파고 있거나 레이스/고스트가 투명 상태로 전환될 때 스캔 사용하도록 체크
+		
 		if (eu.second->unit()->isDetected())
 		{
 			if (eu.second->type() == Zerg_Lurker)
@@ -288,8 +286,7 @@ void ComsatStationManager::updateReserveScanList()
 			}
 			else if (eu.second->type().isCloakable())
 			{
-				//if (!eu.second->unit()->canCloak(false) && !eu.second->unit()->canDecloak(false))
-				//	needScan = true;
+				
 			}
 		}
 		else
@@ -299,7 +296,7 @@ void ComsatStationManager::updateReserveScanList()
 
 		if (needScan)
 		{
-			// 스캔 뿌려져 있는지 확인 및 적 유닛 근처 내 유닛이 존재하는지 확인
+			
 			if (checkScan(eu.second->unit()))
 			{
 				reserveScanList.push_back(eu.second->pos());
@@ -313,7 +310,7 @@ void ComsatStationManager::updateReserveScanList()
 
 				uList ghost = INFO.getTypeUnitsInRadius(Terran_Ghost, E, p, 12 * TILE_SIZE, true);
 
-				// 만약 NukeDot 주변에 고스트가 안보이면, dot의 좌우 조금 빗겨나간 타일에 스캔을 뿌린다.
+				
 				if (ghost.empty()) {
 					Position left = Position(p.x - 32 * 5, p.y);
 					Position right = Position(p.x + 32 * 5, p.y);

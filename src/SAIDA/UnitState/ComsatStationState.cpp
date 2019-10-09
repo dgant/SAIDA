@@ -10,7 +10,7 @@ State *ComsatStationIdleState::action()
 	if (unit->getSpellCooldown() > 0)
 		return nullptr;
 
-	// 에너지 50 이상, 쿨타임이 0일 때 활성화
+	
 	return new ComsatStationActivationState();
 }
 

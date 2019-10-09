@@ -5,7 +5,7 @@
 #include "State.h"
 #include "../UnitManager/MarineManager.h"
 #include "../InformationManager.h"
-#include "../EnemyStrategyManager.h"
+#include "../HostileManager.h"
 
 namespace MyBot
 {

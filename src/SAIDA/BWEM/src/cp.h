@@ -174,7 +174,7 @@ namespace BWEM {
 			m_pPathBackTrace = p;
 		}
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		// SAIDA Ãß°¡
+		
 		int								GetMineCount() const {
 			return m_mineCount;
 		}

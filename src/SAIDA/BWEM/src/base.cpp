@@ -86,7 +86,6 @@ namespace BWEM {
 	}
 
 	////////////////////////////////////////////////////////////////////////////
-	// SAIDA Ãß°¡
 	bool Base::isIsland() const {
 		return m_pArea->isIsland();
 	}
@@ -99,7 +98,7 @@ namespace BWEM {
 		m_isBaseTopOfArea = m_pArea->BottomRight().y - m_location.y > m_location.y + 2 - m_pArea->TopLeft().y;
 	}
 
-} // namespace BWEM
+} 
 
 
 

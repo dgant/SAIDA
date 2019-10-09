@@ -23,7 +23,7 @@ namespace MyBot
 		}
 		virtual State *action() override;
 	private:
-		int waitBoardTime = 0;
+		int waitBoardTIME = 0;
 		int preRemainSpace = Terran_Dropship.spaceProvided();
 	};
 

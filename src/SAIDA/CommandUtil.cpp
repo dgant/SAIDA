@@ -19,7 +19,6 @@ bool CommandUtil::attackUnit(Unit attacker, Unit target, bool repeat)
 		return false;
 	}
 
-	// if we have issued a command to this unit already this frame, ignore this one
 	if (attacker->getLastCommandFrame() >= TIME)
 	{
 		return false;
@@ -32,23 +31,19 @@ bool CommandUtil::attackUnit(Unit attacker, Unit target, bool repeat)
 	if (cooldown > (int)(maxCooldown * 0.8))
 		return false;
 
-	// 명령 받은지 5초 이상 지났으면 동일 명령이라도 다시 내려준다.
 	if (TIME - attacker->getLastCommandFrame() > 5 * 24)
 		repeat = true;
 
-	// get the unit's current command
 	if (!repeat)
 	{
 		UnitCommand currentCommand(attacker->getLastCommand());
 
-		// if we've already told this unit to attack this target, ignore this command
 		if (currentCommand.getType() == UnitCommandTypes::Attack_Unit && currentCommand.getTarget() == target)
 		{
 			return false;
 		}
 	}
 
-	// if nothing prevents it, attack the target
 	return attacker->attack(target);
 }
 
@@ -59,7 +54,6 @@ bool CommandUtil::attackMove(Unit attacker, const Position &targetPosition, bool
 		return false;
 	}
 
-	// if we have issued a command to this unit already this frame, ignore this one
 	if (attacker->getLastCommandFrame() >= TIME)
 	{
 		return false;
@@ -72,23 +66,19 @@ bool CommandUtil::attackMove(Unit attacker, const Position &targetPosition, bool
 	if (cooldown > (int)(maxCooldown * 0.8))
 		return false;
 
-	// 명령 받은지 5초 이상 지났으면 동일 명령이라도 다시 내려준다.
 	if (TIME - attacker->getLastCommandFrame() > 5 * 24)
 		repeat = true;
 
-	// get the unit's current command
 	if (!repeat)
 	{
 		UnitCommand currentCommand(attacker->getLastCommand());
 
-		// if we've already told this unit to attack this target, ignore this command
 		if (currentCommand.getType() == UnitCommandTypes::Attack_Move && currentCommand.getTargetPosition() == targetPosition)
 		{
 			return false;
 		}
 	}
 
-	// if nothing prevents it, attack the target
 	return attacker->attack(targetPosition);
 }
 
@@ -99,29 +89,24 @@ void CommandUtil::move(Unit attacker, const Position &targetPosition, bool repea
 		return;
 	}
 
-	// if we have issued a command to this unit already this frame, ignore this one
 	if (attacker->getLastCommandFrame() >= TIME)
 	{
 		return;
 	}
 
-	// 명령 받은지 5초 이상 지났으면 동일 명령이라도 다시 내려준다.
 	if (TIME - attacker->getLastCommandFrame() > 5 * 24)
 		repeat = true;
 
-	// get the unit's current command
 	if (!repeat)
 	{
 		UnitCommand currentCommand(attacker->getLastCommand());
 
-		// if we've already told this unit to move to this position, ignore this command
 		if ((currentCommand.getType() == UnitCommandTypes::Move) && (currentCommand.getTargetPosition() == targetPosition) && attacker->isMoving())
 		{
 			return;
 		}
 	}
 
-	// if nothing prevents it, attack the target
 	attacker->move(targetPosition);
 }
 
@@ -132,41 +117,34 @@ void CommandUtil::rightClick(Unit unit, Unit target, bool repeat, bool rightClic
 		return;
 	}
 
-	// if we have issued a command to this unit already this frame, ignore this one
 	if (unit->getLastCommandFrame() >= Broodwar->getFrameCount())
 	{
 		return;
 	}
 
-	// 명령 받은지 5초 이상 지났으면 동일 명령이라도 다시 내려준다.
 	if (TIME - unit->getLastCommandFrame() > 5 * 24)
 		repeat = true;
 
 	CPPath path = theMap.GetPath(unit->getPosition(), target->getPosition());
 
 	if (rightClickOnly || path.size() < 2) {
-		// get the unit's current command
 		if (!repeat)
 		{
 			UnitCommand currentCommand(unit->getLastCommand());
 
-			// if we've already told this unit to move to this position, ignore this command
 			if (currentCommand.getType() == UnitCommandTypes::Right_Click_Unit && (currentCommand.getTargetPosition() == target->getPosition() || currentCommand.getTarget() == target))
 			{
 				return;
 			}
 		}
 
-		// if nothing prevents it, attack the target
 		unit->rightClick(target);
 	}
 	else {
-		// get the unit's current command
 		if (!repeat)
 		{
 			UnitCommand currentCommand(unit->getLastCommand());
 
-			// if we've already told this unit to move to this position, ignore this command
 			if (currentCommand.getType() == UnitCommandTypes::Right_Click_Unit && currentCommand.getTargetPosition() == (Position)path.at(1)->Center())
 			{
 				return;
@@ -184,7 +162,6 @@ void CommandUtil::rightClick(Unit unit, Position target, bool repeat)
 		return;
 	}
 
-	// if we have issued a command to this unit already this frame, ignore this one
 	if (unit->getLastCommandFrame() >= Broodwar->getFrameCount())
 	{
 		return;
@@ -193,28 +170,28 @@ void CommandUtil::rightClick(Unit unit, Position target, bool repeat)
 	CPPath path = theMap.GetPath(unit->getPosition(), target);
 
 	if (path.size() < 2) {
-		// get the unit's current command
+
 		if (!repeat)
 		{
 			UnitCommand currentCommand(unit->getLastCommand());
 
-			// if we've already told this unit to move to this position, ignore this command
+	
 			if (currentCommand.getType() == UnitCommandTypes::Right_Click_Unit && currentCommand.getTargetPosition() == target && (unit->isMoving() || unit->isConstructing() || unit->isAttacking() || unit->isGatheringGas() || unit->isGatheringMinerals()))
 			{
 				return;
 			}
 		}
 
-		// if nothing prevents it, attack the target
+	
 		unit->rightClick(target);
 	}
 	else {
-		// get the unit's current command
+	
 		if (!repeat)
 		{
 			UnitCommand currentCommand(unit->getLastCommand());
 
-			// if we've already told this unit to move to this position, ignore this command
+		
 			if (currentCommand.getType() == UnitCommandTypes::Right_Click_Unit && currentCommand.getTargetPosition() == (Position)path.at(1)->Center() && unit->isMoving())
 			{
 				return;
@@ -232,29 +209,28 @@ void CommandUtil::repair(Unit unit, Unit target, bool repeat)
 		return;
 	}
 
-	// if we have issued a command to this unit already this frame, ignore this one
+	
 	if (unit->getLastCommandFrame() >= Broodwar->getFrameCount() || unit->isAttackFrame())
 	{
 		return;
 	}
 
-	// 명령 받은지 5초 이상 지났으면 동일 명령이라도 다시 내려준다.
+	
 	if (TIME - unit->getLastCommandFrame() > 5 * 24)
 		repeat = true;
 
-	// get the unit's current command
+
 	if (!repeat)
 	{
 		UnitCommand currentCommand(unit->getLastCommand());
 
-		// if we've already told this unit to move to this position, ignore this command
+
 		if (currentCommand.getType() == UnitCommandTypes::Repair && currentCommand.getTarget() == target && unit->isRepairing())
 		{
 			return;
 		}
 	}
 
-	// if nothing prevents it, attack the target
 	unit->repair(target);
 }
 
@@ -309,7 +285,7 @@ void CommandUtil::backMove(Unit attacker, Unit target, bool attackingMove, bool 
 		int eDist = 0;
 		theMap.GetPath(enemy->pos(), INFO.getMainBaseLocation(S)->Center(), &eDist);
 
-		// 적이 나보다 더 본진에 가깝게 있으면 위치를 바꿔준다.
+	
 		if (dist + TILE_SIZE > eDist || path.empty()) {
 			Position back_pos = { 0, 0 };
 			Position myPos = attacker->getPosition();
@@ -355,7 +331,6 @@ void CommandUtil::patrol(Unit patroller, const Position &targetPosition, bool re
 		return;
 	}
 
-	// if we have issued a command to this unit already this frame, ignore this one
 	if (patroller->getLastCommandFrame() >= Broodwar->getFrameCount())
 	{
 		return;
@@ -365,7 +340,6 @@ void CommandUtil::patrol(Unit patroller, const Position &targetPosition, bool re
 	{
 		UnitCommand currentCommand(patroller->getLastCommand());
 
-		// if we've already told this unit to move to this position, ignore this command
 		if ((currentCommand.getType() == UnitCommandTypes::Patrol) && (currentCommand.getTargetPosition() == targetPosition) && patroller->isPatrolling())
 		{
 			return;
@@ -376,7 +350,6 @@ void CommandUtil::patrol(Unit patroller, const Position &targetPosition, bool re
 }
 
 void CommandUtil::goliathHold(Unit holder, BWAPI::Unit target, bool repeat) {
-	// 골리앗 사업을 했으면 사거리 내의 유닛 공격.
 	if (S->getUpgradeLevel(UpgradeTypes::Charon_Boosters)) {
 		Unit enemy = nullptr;
 
@@ -389,14 +362,12 @@ void CommandUtil::goliathHold(Unit holder, BWAPI::Unit target, bool repeat) {
 				enemy = closest->unit();
 		}
 
-		// 적을 공격할수 있을때만 공격. 아니면 홀드.
 		if (target != nullptr && holder->isInWeaponRange(target) && holder->getGroundWeaponCooldown() + holder->getAirWeaponCooldown() == 0) {
 			holder->attack(enemy);
 			return;
 		}
 	}
 
-	// 골리앗 사업을 안했으면 기존처럼 홀드.
 	hold(holder, repeat);
 }
 
@@ -407,7 +378,7 @@ void CommandUtil::hold(Unit holder, bool repeat)
 		return;
 	}
 
-	// if we have issued a command to this unit already this frame, ignore this one
+
 	if (holder->getLastCommandFrame() >= Broodwar->getFrameCount())
 	{
 		return;
@@ -417,7 +388,7 @@ void CommandUtil::hold(Unit holder, bool repeat)
 	{
 		UnitCommand currentCommand(holder->getLastCommand());
 
-		// if we've already told this unit to move to this position, ignore this command
+
 		if ((currentCommand.getType() == UnitCommandTypes::Hold_Position) && (holder->isHoldingPosition() || holder->isAttacking()))
 			return;
 	}
@@ -460,13 +431,11 @@ bool CommandUtil::build(Unit builder, UnitType building, TilePosition buildPosit
 
 		return true;
 	}
-	// 지으러 가는데 여러 area를 거쳐서 가야 하는 경우
 	else {
 		Position targetPosition = (Position)path.at(1)->Center();
 
 		UnitCommand currentCommand(builder->getLastCommand());
 
-		// if we've already told this unit to move to this position, ignore this command
 		if (currentCommand.getType() == UnitCommandTypes::Move && currentCommand.getTargetPosition() == targetPosition && builder->isMoving()) {
 			return false;
 		}
@@ -483,13 +452,11 @@ void CommandUtil::gather(Unit worker, Unit target) {
 	if (path.size() < 2) {
 		worker->gather(target);
 	}
-	// 지으러 가는데 여러 area를 거쳐서 가야 하는 경우
 	else {
 		Position targetPosition = (Position)path.at(1)->Center();
 
 		UnitCommand currentCommand(worker->getLastCommand());
 
-		// if we've already told this unit to move to this position, ignore this command
 		if (currentCommand.getType() == UnitCommandTypes::Move && currentCommand.getTargetPosition() == targetPosition && worker->isMoving()) {
 			return ;
 		}
@@ -505,13 +472,11 @@ bool UnitUtil::IsCombatUnit(Unit unit)
 		return false;
 	}
 
-	// no workers or buildings allowed
 	if (unit && unit->getType().isWorker() || unit->getType().isBuilding())
 	{
 		return false;
 	}
 
-	// check for various types of combat units
 	if (unit->getType().canAttack() ||
 			unit->getType() == UnitTypes::Terran_Medic ||
 			unit->getType() == UnitTypes::Protoss_High_Templar ||
@@ -611,19 +576,17 @@ size_t UnitUtil::GetAllUnitCount(UnitType type)
 
 	for (const auto &unit : Broodwar->self()->getUnits())
 	{
-		// trivial case: unit which exists matches the type
 		if (unit->getType() == type)
 		{
 			count++;
 		}
 
-		// case where a zerg egg contains the unit type
+
 		if (unit->getType() == UnitTypes::Zerg_Egg && unit->getBuildType() == type)
 		{
 			count += type.isTwoUnitsInOneEgg() ? 2 : 1;
 		}
 
-		// case where a building has started constructing a unit but it doesn't yet have a unit associated with it
 		if (unit->getRemainingTrainTime() > 0)
 		{
 			UnitType trainType = unit->getLastCommand().getUnitType();
@@ -638,7 +601,7 @@ size_t UnitUtil::GetAllUnitCount(UnitType type)
 	return count;
 }
 
-// 전체 순차탐색을 하기 때문에 느리다
+
 Unit UnitUtil::GetClosestUnitTypeToTarget(UnitType type, Position target)
 {
 	Unit closestUnit = nullptr;
@@ -662,7 +625,6 @@ Unit UnitUtil::GetClosestUnitTypeToTarget(UnitType type, Position target)
 }
 
 
-// unit들의 평균 위치를 구한다.
 Position UnitUtil::GetAveragePosition(vector<Unit>  units)
 {
 	Position pos = { 0, 0 };
@@ -683,7 +645,6 @@ Position UnitUtil::GetAveragePosition(vector<Unit>  units)
 		return Positions::None;
 }
 
-// 넘겨받은 무리 중 myUnit과 가장 가까운 unit을 구한다.
 Unit UnitUtil::GetClosestEnemyTargetingMe(Unit myUnit, vector<Unit>  units)
 {
 	int distance = 999999;
@@ -703,9 +664,6 @@ Unit UnitUtil::GetClosestEnemyTargetingMe(Unit myUnit, vector<Unit>  units)
 
 BWAPI::Position UnitUtil::getPatrolPosition(BWAPI::Unit attacker, BWAPI::WeaponType weaponType, BWAPI::Position targetPos)
 {
-	/*
-	int minDistance = attacker->getDistance(defenser) - weaponType.maxRange();
-	*/
 	int x1 = attacker->getPosition().x;
 	int y1 = attacker->getPosition().y;
 	int x2 = targetPos.x;

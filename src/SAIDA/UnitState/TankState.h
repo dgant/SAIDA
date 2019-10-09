@@ -107,7 +107,7 @@ namespace MyBot
 		virtual State *action() override;
 	};
 
-	// 탱크가 서로를 엄호하면서 앞마당에 커맨드를 내릴 때 까지 보호한다.
+	
 	class TankFirstExpansionSecureState : public State {
 	private:
 	public:
@@ -163,7 +163,7 @@ namespace MyBot
 	private:
 		bool firstBoard = false;
 		Position targetPosition = Positions::Unknown;
-		int timeToClear = 0;
+		int TIMEToClear = 0;
 	};
 
 	class TankProtectAdditionalMultiState : public State {

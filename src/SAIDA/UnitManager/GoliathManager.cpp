@@ -32,8 +32,8 @@ void GoliathManager::update()
 
 	if (INFO.enemyRace == Races::Terran)
 	{
-		setKeepMultiGoliath2(); // 일단은 Terran전만...
-		setMultiBreakGoliath(); // 일단은 Terran전만...
+		setKeepMultiGoliath2(); 
+		setMultiBreakGoliath(); 
 	}
 
 	for (auto g : goliathList)
@@ -43,7 +43,7 @@ void GoliathManager::update()
 
 		string state = g->getState();
 
-		// 테란전
+		
 		if (INFO.enemyRace == Races::Terran)
 		{
 			if (state == "New" && g->isComplete()) {
@@ -72,7 +72,7 @@ void GoliathManager::update()
 			continue;
 		}
 
-		// 저그 프로
+		
 		if (SM.getMainStrategy() == AttackAll || SM.getMainStrategy() == Eliminate)
 		{
 			if (INFO.enemyRace == Races::Zerg)
@@ -88,7 +88,7 @@ void GoliathManager::update()
 				if (allAttackFrame + 20 * 24 < TIME && removeOurTurret(g))
 					continue;
 			}
-			else // (INFO.enemyRace == Races::Protoss)
+			else 
 			{
 				if (state != "Attack" && state != "CarrierDefence" && state != "CarrierAttack" && state != "KeepMulti") {
 					g->setState(new GoliathProtossAttackState());
@@ -113,7 +113,7 @@ void GoliathManager::update()
 					g->setState(new GoliathIdleState(INFO.getSecondChokePosition(S)));
 				}
 			}
-			else //(INFO.enemyRace == Races::Protoss)
+			else 
 			{
 				if (state == "New") {
 					g->setState(new GoliathIdleState(INFO.getSecondChokePosition(S)));
@@ -140,18 +140,18 @@ bool GoliathManager::removeOurTurret(UnitInfo *g) {
 
 		int outsideG = INFO.getCompletedCount(Terran_Goliath, S) - INFO.getTypeUnitsInArea(Terran_Goliath, S, MYBASE).size() - INFO.getTypeUnitsInArea(Terran_Goliath, S, INFO.getFirstExpansionLocation(S)->Center()).size();
 
-		// 50%가 나가지 못한 상황
+		
 		if ((double) outsideG / INFO.getCompletedCount(Terran_Goliath, S) < 0.5) {
-			// 내가 초크 근처인가
+			
 			if (g->pos().getApproxDistance(INFO.getSecondAverageChokePosition(S)) < 10 * TILE_SIZE) {
 
-				// 근처에 적이 없는가?
+				
 				if (!INFO.getClosestUnit(E, g->pos(), AllUnitKind, 15 * TILE_SIZE, false, false, false)) {
 
-					// 초크 근처에 터렛이 두개인가?
+					
 					uList turrets = INFO.getTypeBuildingsInRadius(Terran_Missile_Turret, S, INFO.getSecondAverageChokePosition(S), 10 * TILE_SIZE, true);
 
-					//아무거나 하나 깨자.
+					
 					if (turrets.size() > 1 && turrets.at(0) && turrets.at(0)->unit()) {
 						CommandUtil::attackUnit(g->unit(), turrets.at(0)->unit());
 						return true;
@@ -171,7 +171,7 @@ Position GoliathManager::getDefaultMovePosition() {
 	if (defaultMovePositionFrame < TIME) {
 		defaultMovePositionFrame = TIME;
 
-		//Position targetPosition = INFO.getMainBaseLocation(E)->Center();
+	
 		Position targetPosition = SM.getMainAttackPosition();
 		firstTankPosition = Positions::Unknown;
 
@@ -184,8 +184,7 @@ Position GoliathManager::getDefaultMovePosition() {
 	return firstTankPosition;
 }
 
-// 저그인 경우만 실행됨.
-// 0 : nothing, 1 : wait, 2 : move back, 3 : force attack
+
 int GoliathManager::getWaitOrMoveOrAttack() {
 	if (isNeedToWaitAttackFrame < TIME) {
 		isNeedToWaitAttackFrame = TIME;
@@ -204,7 +203,7 @@ int GoliathManager::getWaitOrMoveOrAttack() {
 
 		const ChokePoint *cp = path.at(0);
 
-		// mainAttackPosition 과 나 사이에 있는 기지 찾기.
+		
 		for (word i = 1; i < path.size() && cp == path.at(i - 1); i++) {
 			const pair<const Area *, const Area *> &p1 = cp->GetAreas();
 			const pair<const Area *, const Area *> &p2 = path.at(i)->GetAreas();
@@ -239,7 +238,7 @@ int GoliathManager::getWaitOrMoveOrAttack() {
 		}
 
 		if (INFO.getOccupiedBaseLocations(E).size() == 1) {
-			// 내 병력이 적의 2배가 넘고 내 병력이 성큰 갯수의 3배가 넘거나, 인구수가 190 이상이면 공격
+			
 			if (S->supplyUsed() > 380 ||
 					(INFO.getCompletedCount(Terran_Goliath, S) + INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S)
 					 + INFO.getCompletedCount(Terran_Vulture, S)
@@ -252,32 +251,32 @@ int GoliathManager::getWaitOrMoveOrAttack() {
 			}
 		}
 
-		// 성큰이 있고 공격 시즈가 있으면 일단 대기
+	
 		uList tanks = INFO.getUnits(Terran_Siege_Tank_Tank_Mode, S);
 
 		bool isExistBlockingTank = false;
 
 		for (auto t : tanks) {
 			if (t->getState() == "SiegeMovingState") {
-				// 탱크가 길막을 당하고 있고 적 본진 근처에 있다.
+				
 				if (t->isBlocked() && t->pos().getApproxDistance((Position)cp->Center()) < 10 * TILE_SIZE)
 					isExistBlockingTank = true;
 
-				// 일단 탱크가 있으면 기다린다.
+				
 				isNeedToWaitAttack = 1;
 			}
 		}
 
-		// 입구가 매우 좁고 (WalkPosition 길이로 20) 성큰이 4개 이상이면 위험.
+		
 		if (cp->Pos(ChokePoint::end1).getApproxDistance(cp->Pos(ChokePoint::end1)) < 20) {
 			if (sunken.size() >= 4)
 				isNeedToWaitAttack = 1;
 		}
-		// 입구가 넓고 성큰이 6개 이상이면 위험.
+		
 		else if (sunken.size() >= 6)
 			isNeedToWaitAttack = 1;
 
-		// 기다리는데 isExistBlockingTank 이면
+		
 		if (isNeedToWaitAttack && isExistBlockingTank) {
 			if (INFO.getCompletedCount(Terran_Goliath, S) > 30 && sunken.size() < 4)
 				isNeedToWaitAttack = 3;
@@ -307,7 +306,7 @@ void GoliathManager::setDefenceGoliath(uList &gList) {
 
 			if (S->hasResearched(TechTypes::Tank_Siege_Mode))
 				sortedList = goliathTerranSet.getSortedUnitList(MYBASE);
-			else // 테란전 시즈업 되기 전까지는 Fight로 유지하기 때문에 여기서 Defence로 보내도록
+			else 
 			{
 				UListSet allGol;
 
@@ -357,7 +356,7 @@ void GoliathManager::setDefenceGoliath(uList &gList) {
 
 		carrcarrierCnt = INFO.getTypeUnitsInRadius(Protoss_Carrier, E, MYBASE, 50 * TILE_SIZE).size();
 
-		// 캐리어가 많으면 비율을 계산해서 방어에 할당
+		
 		if (interceptorCnt >= 20 && carrcarrierCnt != 0) {
 			carrierCntRatio = ((double)interceptorCntInMyArea) / interceptorCnt;
 			defenceUnitSize += (word)ceil(INFO.getCompletedCount(Terran_Goliath, S) * carrierCntRatio);
@@ -383,7 +382,7 @@ void GoliathManager::setDefenceGoliath(uList &gList) {
 		}
 
 	}
-	else { // 저그
+	else { 
 		double zergUnits = 0.0;
 
 		for (auto z : INFO.enemyInMyYard())
@@ -405,7 +404,7 @@ void GoliathManager::setDefenceGoliath(uList &gList) {
 		defenceUnitSize = (word)ceil(zergUnits);
 	}
 
-	// 너무 많으니 제거
+	
 	if (defenceUnitSize < goliathDefenceSet.size()) {
 		uList sorted = goliathDefenceSet.getSortedUnitList(INFO.getMainBaseLocation(S)->getPosition(), true);
 
@@ -413,13 +412,13 @@ void GoliathManager::setDefenceGoliath(uList &gList) {
 			setStateToGoliath(sorted.at(i), new GoliathIdleState());
 		}
 	}
-	// 너무 적으니 추가
+	
 	else if (defenceUnitSize > goliathDefenceSet.size()) {
 		vector<pair<int, UnitInfo * >> sortList;
 
 		for (auto t : gList)
 		{
-			// 캐리어 있으면
+			
 			if (carrierCntRatio != 0.0) {
 				if (t->getState() == "CarrierDefence" || t->getState() == "KeepMulti" || t->getState() == "Dropship" || t->getState() == "MultiBreak")
 					continue;
@@ -468,7 +467,7 @@ void GoliathManager::setKeepMultiGoliath()
 	if (!SM.getNeedSecondExpansion())
 		return;
 
-	//base에 미네랄 다 캣으면 더이상 지키도록 할당하지 않습니다
+
 	Base *base = INFO.getSecondExpansionLocation(S);
 
 	if (base == nullptr || base->Minerals().size() == 0)
@@ -483,10 +482,7 @@ void GoliathManager::setKeepMultiGoliath()
 
 	if (INFO.enemyRace == Races::Terran)
 	{
-		// 일단 4마리 안되면 Multi Goliath도 안간다.
-		// Tank와 동일하게
-		//if (goliathTerranSet.size() < 3)
-		//	return;
+		
 
 		if (multiBase == Positions::Unknown)
 			multiBase = INFO.getSecondExpansionLocation(S)->getPosition();
@@ -521,7 +517,7 @@ void GoliathManager::setKeepMultiGoliath()
 			{
 				if (g->getState() == "New" && g->isComplete())
 				{
-					setStateToGoliath(g, new GoliathKeepMultiState());// action에서 target Position을 잡음.
+					setStateToGoliath(g, new GoliathKeepMultiState());
 				}
 			}
 		}
@@ -561,7 +557,7 @@ void GoliathManager::setKeepMultiGoliath2()
 	}
 	else
 	{
-		//base에 미네랄 다 캣으면 더이상 지키도록 할당하지 않습니다
+		
 		Base *base = INFO.getThirdExpansionLocation(S);
 
 		if (base == nullptr || base->Minerals().size() == 0)
@@ -611,10 +607,6 @@ void GoliathManager::setKeepMultiGoliath2()
 			return;
 	}
 
-	// 일단 4마리 안되면 Multi Goliath도 안간다.
-	// Tank와 동일하게
-	//if (goliathTerranSet.size() < 3)
-	//	return;
 
 	if (!multiBase2.isValid())
 		return;
@@ -626,7 +618,7 @@ void GoliathManager::setKeepMultiGoliath2()
 
 	for (auto g : sortedGoliath)
 	{
-		//setStateToGoliath(g, new GoliathKeepMultiState(multiBase2));
+		
 		goliathTerranSet.del(g);
 		goliahtKeepMultiSet2.add(g);
 		g->setState(new GoliathKeepMultiState(multiBase2));
@@ -661,7 +653,7 @@ void GoliathManager::setMultiBreakGoliath()
 
 	int needGolCnt = needCountForBreakMulti(Terran_Goliath);
 
-	// 이부분에서 Multi Break 병력을 빼준다.
+
 	if (SM.getNeedAttackMulti() && (int)goliathMultiBreakSet.size() < needGolCnt)
 	{
 		uList sortedList;
@@ -730,7 +722,6 @@ void vsTerranSet::action()
 	if (size() == 0)
 		return;
 
-	// 탱크 시즈모드 푸는 시간을 기다린다.
 	if (changedTime != 0 && changedTime + 100 > TIME)
 		return;
 
@@ -748,7 +739,7 @@ void vsTerranSet::action()
 		if (isStuckOrUnderSpell(g))
 			continue;
 
-		//마인 공격로직 추가
+	
 		uList mines = INFO.getTypeUnitsInRadius(Terran_Vulture_Spider_Mine, E, g->pos(), 6 * TILE_SIZE, false);
 
 		if (!mines.empty())
@@ -858,7 +849,7 @@ void GoliathManager::checkDropship()
 
 		for (auto g : sortedGoliath)
 		{
-			//Dropship TEST
+			
 			if (dropshipSet.size() < dropshipSetNum)
 			{
 				setStateToGoliath(g, new GoliathDropshipState(availDropship->unit()));
@@ -876,7 +867,7 @@ bool GoliathManager::enoughGoliathForDrop()
 {
 	if (INFO.enemyRace == Races::Terran)
 	{
-		//bw->drawTextScreen(Position(200, 100), " GoliathSet : %d", goliathTerranSet.size());
+		
 
 		if (goliathTerranSet.size() + dropshipSet.size() >= 4)
 		{
@@ -899,13 +890,13 @@ void GoliathManager::setStateToGoliath(UnitInfo *t, State *state)
 	string oldState = t->getState();
 	string newState = state->getName();
 
-	/* 이전 스테이트 제거*/
+	
 
 	if (oldState == "Idle") {
-		// Do nothing
+		
 	}
 	else if (oldState == "AttackMove") {
-		// Do nothing
+		
 	}
 	else if (oldState == "VsTerran") {
 		goliathTerranSet.del(t);
@@ -927,15 +918,15 @@ void GoliathManager::setStateToGoliath(UnitInfo *t, State *state)
 		goliathProtectTankSet.del(t);
 	}
 	else if (oldState == "Fight") {
-		//
+		
 	}
 
-	///////////////////
+	
 	if (newState == "Idle") {
-		// Do nothing
+		
 	}
 	else if (newState == "AttackMove") {
-		// Do nothing
+		
 	}
 	else if (newState == "VsTerran") {
 		goliathTerranSet.add(t);
@@ -956,7 +947,7 @@ void GoliathManager::setStateToGoliath(UnitInfo *t, State *state)
 		goliathProtectTankSet.add(t);
 	}
 	else if (newState == "Fight") {
-		//
+		
 	}
 
 	t->setState(state);

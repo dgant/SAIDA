@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../UnitState/ComsatStationState.h"
+#include "../UnitManager/ComsatStationState.h"
 #include "../StrategyManager.h"
 
 namespace MyBot
