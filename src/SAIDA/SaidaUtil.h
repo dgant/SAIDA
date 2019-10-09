@@ -119,6 +119,8 @@ namespace MyBot
 
 	// Need Kiting Unit Type
 	bool isNeedKitingUnitType(UnitType uType);
+	bool isNeedKitingUnitTypeforMarine(UnitType uType);
+	bool isNeedKitingUnitTypeinAir(UnitType uType);
 	// 적이 섬 지역이거나 FirstExpansionLocation 에 멀티(리소스디팟)를 지었으면 true, 멀티가 없으면 false
 	bool HasEnemyFirstExpansion();
 

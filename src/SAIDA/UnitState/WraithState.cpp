@@ -1,6 +1,7 @@
 #include "WraithState.h"
 #include "../InformationManager.h"
 #include "../UnitManager/TankManager.h"
+#include "../UnitManager/VultureManager.h"
 
 using namespace MyBot;
 
@@ -49,40 +50,23 @@ State *WraithScoutState::action(Position targetPos)
 //////////////////////////////////// Idle ///////////////////////////////////////////////////
 State *WraithIdleState::action()
 {
-	/*if (unit->isCloaked() && !unit->isUnderAttack())
+	if (unit->isCloaked() && !unit->isUnderAttack())
 	{
 		unit->decloak();
-	}*/
+	}
 
 	if (!INFO.getUnitInfo(unit, S)->getEnemiesTargetMe().empty() && unit->canCloak() && unit->getEnergy() > 30)
 	{
 		unit->cloak();
 	}
 
-	if (isBeingRepaired(unit)) return nullptr;
-
-	Position movePosition = Positions::None;
-
-	//movePosition = (INFO.getFirstExpansionLocation(S)->Center() + (Position)INFO.getSecondChokePoint(S)->Center()) / 2;
-
-	Base *enemyFirstExpansion = INFO.getBaseLocation(INFO.getFirstExpansionLocation(E)->getTilePosition());
-
-	if (enemyFirstExpansion->GetEnemyAirDefenseBuildingCount() || enemyFirstExpansion->GetEnemyAirDefenseUnitCount())
-	{
-		movePosition = (Position(INFO.getSecondChokePoint(S)->Center()) + INFO.getFirstExpansionLocation(S)->getPosition()) / 2;//INFO.getFirstChokePosition(S);
-	}
-	else
-	{
-		movePosition = enemyFirstExpansion->getPosition();
-	}
-
-	if (unit->getDistance(movePosition) > 8 * TILE_SIZE)
-	{
-		//cout << "Idle»óÅÂ Move ¸í·É" << movePosition << endl;
-		//CommandUtil::move(unit, movePosition);
-		goWithoutDamage(unit, movePosition, 1);
-
-	}
+	if (isBeingRepaired(unit))
+		return nullptr;
+	Unit mineral = bw->getClosestUnit(MYBASE, Filter::IsMineralField);
+	Position movePosition = (MYBASE + mineral->getPosition()) / 2;
+	if (unit->getDistance(movePosition) > 4 * TILE_SIZE)
+	CommandUtil::move(unit, movePosition);
+		
 
 	return nullptr;
 }
@@ -100,7 +84,7 @@ State *WraithAttackWraithState::action()
 
 State *WraithAttackWraithState::action(Unit targetUnit)
 {
-	//cout << "attack wraith state" << endl;
+	
 
 	if (targetUnit == nullptr) return nullptr;
 
@@ -113,7 +97,7 @@ State *WraithAttackWraithState::action(Unit targetUnit)
 		break;
 	}
 
-	//ÅÍ·¿ÀÌ ÀÖÀ¸¸é µµ¸Á°¡±â
+	//Èç¹û´æÔÚËþ£¬³·»Øµ½µÚÒ»¶ÂÂ·µã
 	if (!INFO.getTypeBuildingsInRadius(Terran_Missile_Turret, E, unit->getPosition(), TILE_SIZE * 10).empty())
 	{
 		//ÀÏ´Ü Idle»óÅÂÀÏ ¶§ °¡´Â Ã¹¹øÂ° ÃÊÅ©Æ÷ÀÎÆ®·Î µµ¸Á°¡±â..
@@ -178,118 +162,156 @@ State *WraithAttackWraithState::action(Unit targetUnit)
 
 State *WraithKillScvState::action(Position targetPosition)
 {
-	uList enemyWraithList = INFO.getUnits(Terran_Wraith, E);
-
-	// Àû ·¹ÀÌ½º°¡ ÀÖÀ» °æ¿ì Idle ·Î ¹Ù²Û ÈÄ AttackWraith °¡ µÇµµ·Ï
-	if (!enemyWraithList.empty())
-	{
-		return new WraithIdleState();
-	}
-
+	//Èç¹ûÕÒ²»µ½Ä¿±ê
 	if (targetPosition == Positions::Unknown)
 	{
 		return new WraithIdleState();
 	}
-
+	//Èç¹ûÊÕµ½¹¥»÷
 	if (!INFO.getUnitInfo(unit, S)->getEnemiesTargetMe().empty())
 	{
+		//Èç¹ûÔÚÒþÐÎ×´Ì¬£¬³·ÍË
 		if (unit->isCloaked())
 		{
 			return new WraithIdleState();
 		}
 		else
-		{
+		{//ÇÐ»»µ½ÒþÐÎ×´Ì¬
 			if (unit->canCloak() && unit->getEnergy() > 40 && unit->getHitPoints() > 50)
 			{
 				unit->cloak();
 			}
 			else
-			{
+			{//²»ÐÐµÄ»°¾Í³·ÁË
 				return new WraithIdleState();
 			}
 		}
 	}
-
-	// targetPosition ±îÁö ÀÌµ¿ ½Ã ¾ÈÀüÇÏ°Ô µ¹¾Æ¼­ ÀÌµ¿
-	if (unit->getPosition().getDistance(targetPosition) > 10 * TILE_SIZE)
+	//Èç¹û²»ÔÚ´ÌÉ±µã£¬µ½ÄÇ±ßÈ¥
+	if (unit->getPosition().getDistance(targetPosition) > 6 * TILE_SIZE)
 	{
-		//printf("----------GoWithoutDamage\n");
 		goWithoutDamage(unit, targetPosition, 1);
 		return nullptr;
 	}
 
-	// targetPosition ³»¿¡¼­ °¡±îÀÌ ÀÖ´Â º¡Ä¿±îÁö °¡Áö ¾Êµµ·Ï (Å¬·ÎÅ· ¾ÈµÇ¾î ÀÖÀ» ¶§)
-	UnitInfo *closestBunker = INFO.getClosestTypeUnit(E, unit->getPosition(), Terran_Bunker, 10 * TILE_SIZE, false);
+	
+		UnitInfo *closestDefense = INFO.getClosestTypeUnit(E, unit->getPosition(), Terran_Bunker, 10 * TILE_SIZE, false);
 
-	// Å¬·ÎÅ· ¾ÈµÇ¾î ÀÖ°Å³ª Å¬·ÎÅ·ÇßÁö¸¸ ¸¶³ª°¡ ÀÛÀ» ¶§ º¡Ä¿ µÚ·Î
-	if (closestBunker != nullptr && unit->getDistance(closestBunker->pos()) < 8 * TILE_SIZE)
+	if (closestDefense != nullptr && unit->getDistance(closestDefense->pos()) < 8 * TILE_SIZE)
 	{
 		if (!unit->isCloaked())
 		{
 			//printf("[%d] µÚ·Î µµ¸Á°¡¾ßÇØ (%d, %d)\n", unit->getID(), unit->getPosition().x / TILE_SIZE, unit->getPosition().y / TILE_SIZE);
-			moveBackPostion(INFO.getUnitInfo(unit, S), closestBunker->pos(), 1 * TILE_SIZE);
+			moveBackPostion(INFO.getUnitInfo(unit, S), closestDefense->pos(), 1 * TILE_SIZE);
 			//CommandUtil::backMove(unit, getBackPostion(unit->getPosition(), closestBunker->pos(), 2));
 			return nullptr;
 		}
 
 		else if ((unit->isCloaked() && unit->getEnergy() < 10) && (TIME % 24 * 2 == 0))
 		{
-			//printf("[%d] µÚ·Î µµ¸Á°¡¾ßÇØ\n", unit->getID());
-			moveBackPostion(INFO.getUnitInfo(unit, S), closestBunker->pos(), 6 * TILE_SIZE);
+			
+			moveBackPostion(INFO.getUnitInfo(unit, S), closestDefense->pos(), 6 * TILE_SIZE);
 			return nullptr;
 		}
 	}
+	uList enemyWorkerList;
+	if (INFO.enemyRace == Races::Terran)
+	 enemyWorkerList = INFO.getTypeUnitsInRadius(Terran_SCV, E, targetPosition, TILE_SIZE * 18, false);
 
-	// ÀÏ²Û °­Á¦¾îÅÃ
-	uList enemyWorkerList = INFO.getTypeUnitsInRadius(INFO.getWorkerType(), E, targetPosition, TILE_SIZE * 12, false);
+
+	if (INFO.enemyRace == Races::Protoss)
+	enemyWorkerList = INFO.getTypeUnitsInRadius(Protoss_Probe, E, targetPosition, TILE_SIZE * 18, false);
+
+	if (INFO.enemyRace == Races::Zerg)
+	enemyWorkerList = INFO.getTypeUnitsInRadius(Zerg_Drone, E, targetPosition, TILE_SIZE * 18, false);
+
 	uList enemyMedicList = INFO.getTypeUnitsInRadius(Terran_Medic, E, targetPosition, TILE_SIZE * 8, false);
 	uList turretList = INFO.getTypeBuildingsInRadius(Terran_Missile_Turret, E, targetPosition, TILE_SIZE * 12, true, true);
+	uList CannonList = INFO.getTypeBuildingsInRadius(Protoss_Photon_Cannon, E, targetPosition, TILE_SIZE * 12, true, true);
+	uList ColonyList = INFO.getTypeBuildingsInRadius(Zerg_Spore_Colony, E, targetPosition, TILE_SIZE * 12, true, true);
+	
 	Unit targetUnit = nullptr;
 	int targetId = INT_MAX;
 
-	// ÅÍ·¿ °Ç¼³ÁßÀÎ ÀÏ²Û ¿ì¼± °ø°Ý
-	for (auto turret : turretList)
+	if (INFO.enemyRace == Races::Terran)
 	{
-		if (turret->isComplete())
+		for (auto turret : turretList)
 		{
-			return new WraithIdleState();
+			if (turret->isComplete())
+			{
+				return new WraithIdleState();
+			}
+			else if (turret->hp() > 150)
+			{
+				return new WraithIdleState();
+			}
+			else
+			{
+				targetUnit = turret->unit()->getBuildUnit();
+			}
 		}
-		else if (turret->hp() > 150)
+	}
+	if (INFO.enemyRace == Races::Protoss)
+	{
+		for (auto Cannon : CannonList)
 		{
-			return new WraithIdleState();
-		}
-		else
-		{
-			targetUnit = turret->unit()->getBuildUnit();
+			if (Cannon->isComplete())
+			{
+				return new WraithIdleState();
+			}
+			else if (Cannon->hp() > 150)
+			{
+				return new WraithIdleState();
+			}
+			else
+			{
+				targetUnit = Cannon->unit()->getBuildUnit();
+			}
 		}
 	}
 
-	// ÅÍ·¿ °Ç¼³ÁßÀÎ ÀÏ²Û °ø°Ý
+	if (INFO.enemyRace == Races::Zerg)
+	{
+		for (auto Colony : ColonyList)
+		{
+			if (Colony->isComplete())
+			{
+				return new WraithIdleState();
+			}
+			else if (Colony->hp() > 150)
+			{
+				return new WraithIdleState();
+			}
+			else
+			{
+				targetUnit = Colony->unit()->getBuildUnit();
+			}
+		}
+	}
+
+
+
+	// Èç¹û¿ÉÒÔ´òËþµÄ»°
 	if (targetUnit != nullptr)
 	{
 		CommandUtil::attackUnit(unit, targetUnit);
 		return nullptr;
 	}
 
-	// º¡Ä¿¿¡ ¸¶¸°ÀÌ ÀÖÀ¸¸é µµ¸Á, º¡Ä¿ °Ç¼³ÁßÀÎ ÀÏ²Û °ø°Ý
+	// ÕÒÕÒ¿´ÓÐÃ»ÓÐÓÐÇ¹±øµÄµï±¤
 	uList enemyBuildingList = INFO.getBuildingsInRadius(E, unit->getPosition(), 10 * TILE_SIZE, true, false, true);
 	bool isExistMarineInBunker = false;
 
 	for (auto eb : enemyBuildingList)
 	{
-		if (!eb->isComplete())
-		{
-			targetUnit = eb->unit()->getBuildUnit();
-		}
-		else if (eb->type() == Terran_Bunker && eb->getMarinesInBunker())
-		{
-			isExistMarineInBunker = true;
-		}
+	      if (eb->type() == Terran_Bunker && eb->getMarinesInBunker())
+		  isExistMarineInBunker = true;
+		
 	}
 
 	if (isExistMarineInBunker)
 	{
-		// Å¬·ÎÅ· ÇÏ°í ÀÖ´Âµ¥ °ø°ÝÀ» ¹Þ°í ÀÖ´Ù¸é ¤¼¤¼
+		//Èç¹ûÓÐµØ±¤µÄ»°
 		if (unit->isCloaked())
 		{
 			if (unit->isUnderAttack())
@@ -311,14 +333,14 @@ State *WraithKillScvState::action(Position targetPosition)
 		}
 	}
 
-	// °Ç¹° °Ç¼³ÁßÀÎ ÀÏ²Û °ø°Ý
+	// ¹¥»÷µØ±¤
 	if (targetUnit != nullptr)
 	{
 		CommandUtil::attackUnit(unit, targetUnit);
 		return nullptr;
 	}
 
-	//ÇØ´ç Áö¿ª¿¡ Àû ÀÏ²ÛÀÌ ¾ø´Â °æ¿ì Idle·Î State ÇØÁ¦
+	//Ã»ÓÐÅ©Ãñ
 	if (enemyWorkerList.empty())
 		return new WraithIdleState();
 
@@ -338,11 +360,11 @@ State *WraithKillScvState::action(Position targetPosition)
 			}
 		}
 		else
-		{
+		{//ÓÐÅ©Ãñ
 			for (auto worker : enemyWorkerList)
 			{
 				// Å¬·ÎÅ· ¾ÈµÇ¾î ÀÖÀ» ¶§ º¡Ä¿ °¡±îÀÌ ÀÖ´Â SCV ´Â Á¦¿Ü
-				if (!unit->isCloaked() && closestBunker != nullptr && worker->unit()->getDistance(closestBunker->pos()) < 5 * TILE_SIZE)
+				if (!unit->isCloaked() && closestDefense != nullptr && worker->unit()->getDistance(closestDefense->pos()) < 5 * TILE_SIZE)
 				{
 					continue;
 				}
@@ -416,38 +438,93 @@ State *WraithKillScvState::action(Position targetPosition)
 State *WraithFollowTankState::action()
 {
 	UnitInfo *w = INFO.getUnitInfo(unit, S);
+	//Èç¹ûÊÕµ½¹¥»÷
+	if (!INFO.getUnitInfo(unit, S)->getEnemiesTargetMe().empty())
+	{
+		//Èç¹ûÔÚÒþÐÎ×´Ì¬£¬³·ÍË
+		if (!(unit->isCloaked()))
+		{//ÇÐ»»µ½ÒþÐÎ×´Ì¬
+			if (unit->canCloak() && unit->getEnergy() > 40 && unit->getHitPoints() > 50)
+			{
+				unit->cloak();
+			}
+			
+		}
+	}
 
 	int dangerPoint = 0;
 	UnitInfo *dangerUnit = getDangerUnitNPoint(w->pos(), &dangerPoint, true);
 
 	UnitInfo *frontTank = TM.getFrontTankFromPos(SM.getMainAttackPosition());
-
-	if (dangerPoint < 6 * TILE_SIZE)
+	if (frontTank != nullptr)
 	{
-		if (frontTank != nullptr)
+		if (getGroundDistance(frontTank->pos(), w->pos()) > 15 * TILE_SIZE)
+
 		{
-			CommandUtil::move(unit,	getDirectionDistancePosition(frontTank->pos(), MYBASE, 6 * TILE_SIZE));
+			CommandUtil::attackMove(unit, frontTank->pos());
+			return nullptr;
+		}
+	}
+	if (dangerUnit == nullptr)
+	{
+		
+		UnitInfo *closestAttack = INFO.getClosestUnit(E, unit->getPosition(), GroundCombatKind, 10 * TILE_SIZE, false, false, true);
+		if (closestAttack != nullptr)
+		{
+			kiting(w, closestAttack, dangerPoint, 3 * TILE_SIZE);
+			return nullptr;
+		}
+
+	}
+
+	if (dangerPoint < 6 * TILE_SIZE)//Èç¹ûÓÐdangerÇÒÓÐÌ¹¿Ë£¬³¯×ÅÌ¹¿ËÒÆ¶¯
+	{
+		UnitInfo *closestAttack = INFO.getClosestUnit(E, unit->getPosition(), AirUnitKind, 10 * TILE_SIZE, false, false, true);
+		if (closestAttack != nullptr)
+		{
+			kiting(w, closestAttack, dangerPoint, 3 * TILE_SIZE);
+			return nullptr;
 		}
 		else
-			CommandUtil::move(unit, MYBASE);
-
-		return nullptr;
+		{
+			UnitInfo *closestground = INFO.getClosestUnit(E, unit->getPosition(), GroundCombatKind, 10 * TILE_SIZE, false, false, true);
+			if (closestground != nullptr)
+			{
+				kiting(w, closestground, dangerPoint, 3 * TILE_SIZE);
+				return nullptr;
+			}
+		}
 	}
-	else // DangerUnit ¾øÀ½.
+	else // DangerUnit > 6 * TILE_SIZEµÄÊ±ºò£¬ÎÒÃÇ¸ÉÂïÄØ
 	{
+		if (INFO.enemyRace == Races::Terran)
+	 {
 		if (w->unit()->exists() && w->unit()->getTarget() != nullptr)
 		{
 			if (w->unit()->getTarget()->getType() == Terran_Siege_Tank_Tank_Mode) return nullptr;
 		}
 
-		for (auto et : INFO.getTypeUnitsInRadius(Terran_Siege_Tank_Tank_Mode, E, w->pos(), 15 * TILE_SIZE, false))
+		for (auto et : INFO.getTypeUnitsInRadius(Terran_Siege_Tank_Tank_Mode, E, w->pos(), 10 * TILE_SIZE, false))
 		{
 			w->unit()->attack(et->unit());
 			break;
 		}
+	 }
+		if (INFO.enemyRace == Races::Protoss)
+		{
+			if (w->unit()->exists() && w->unit()->getTarget() != nullptr)
+			{
+				if (w->unit()->getTarget()->getType() ==Protoss_Dragoon) return nullptr;
+			}
 
+			for (auto et : INFO.getTypeUnitsInRadius(Protoss_Dragoon, E, w->pos(), 10 * TILE_SIZE, false))
+			{
+				w->unit()->attack(et->unit());
+				break;
+			}
+		}
 		UnitInfo *enemyBarrack = INFO.getClosestTypeUnit(E, w->pos(), Terran_Barracks);
-
+		UnitInfo *Overlord = INFO.getClosestTypeUnit(E, w->pos(), Zerg_Overlord);
 		// ¶°ÀÖÁö ¾ÊÀº°ÍÀº Å¸°ÙÆÃ ÇÏÁö ¾Ê´Â´Ù.
 		if (enemyBarrack != nullptr && !enemyBarrack->getLift())
 			enemyBarrack = nullptr;
@@ -458,32 +535,55 @@ State *WraithFollowTankState::action()
 		if (enemyEngineering != nullptr && !enemyEngineering->getLift())
 			enemyEngineering = nullptr;
 
-
-		if (enemyBarrack == nullptr &&  enemyEngineering == nullptr)
+		if (INFO.enemyRace == Races::Terran)
 		{
-			if (frontTank != nullptr)
+			if (enemyBarrack == nullptr &&  enemyEngineering == nullptr)
 			{
-				UnitInfo *closestTarget = INFO.getClosestUnit(E, frontTank->pos(), GroundUnitKind, 15 * TILE_SIZE, true, true);
-				Position TargetPos = (closestTarget == nullptr) ? SM.getMainAttackPosition() : closestTarget->pos();
+				if (frontTank != nullptr)
+				{
+					UnitInfo *closestTarget = INFO.getClosestUnit(E, frontTank->pos(), GroundUnitKind, 15 * TILE_SIZE, true, true);
+					Position TargetPos = (closestTarget == nullptr) ? SM.getMainAttackPosition() : closestTarget->pos();
 
-				CommandUtil::move(unit, getDirectionDistancePosition(frontTank->pos(), TargetPos, 4 * TILE_SIZE) );
+					CommandUtil::move(unit, getDirectionDistancePosition(frontTank->pos(), TargetPos, 4 * TILE_SIZE));
+				}
+				else
+					CommandUtil::move(unit, MYBASE);
 			}
-			else
-				CommandUtil::move(unit, MYBASE);
-		}
-		else if (enemyBarrack != nullptr && enemyEngineering != nullptr)
-		{
-			if (enemyBarrack->pos().getApproxDistance(w->pos()) > enemyEngineering->pos().getApproxDistance(w->pos()))
+			else if (enemyBarrack != nullptr && enemyEngineering != nullptr)
+			{
+				if (enemyBarrack->pos().getApproxDistance(w->pos()) > enemyEngineering->pos().getApproxDistance(w->pos()))
+					CommandUtil::attackUnit(unit, enemyEngineering->unit());
+				else
+					CommandUtil::attackUnit(unit, enemyBarrack->unit());
+			}
+			else if (enemyBarrack == nullptr)
+			{
 				CommandUtil::attackUnit(unit, enemyEngineering->unit());
+			}
 			else
 				CommandUtil::attackUnit(unit, enemyBarrack->unit());
 		}
-		else if (enemyBarrack == nullptr)
+		if (INFO.enemyRace == Races::Zerg)
 		{
-			CommandUtil::attackUnit(unit, enemyEngineering->unit());
+			if (Overlord == nullptr)
+			{
+				if (frontTank != nullptr)
+				{
+					UnitInfo *closestTarget = INFO.getClosestUnit(E, frontTank->pos(), GroundUnitKind, 15 * TILE_SIZE, true, true);
+					Position TargetPos = (closestTarget == nullptr) ? SM.getMainAttackPosition() : closestTarget->pos();
+
+					CommandUtil::move(unit, getDirectionDistancePosition(frontTank->pos(), TargetPos, 4 * TILE_SIZE));
+				}
+				else
+					CommandUtil::move(unit, MYBASE);
+			}
+			else
+				CommandUtil::attackUnit(unit, Overlord->unit());
 		}
-		else
-			CommandUtil::attackUnit(unit, enemyBarrack->unit());
+
+
+
+
 
 		if (!unit->isIdle()) return nullptr;
 
@@ -527,6 +627,377 @@ State *WraithFollowTankState::action()
 	if (fTank != nullptr && unit->getDistance(fTank->unit()) > 3 * TILE_SIZE)
 	{
 		GoWithoutDamage(unit, fTank->pos());
+	}
+	*/
+	return nullptr;
+}
+
+State *WraithCloakState::action()
+{
+	
+	if (unit->canCloak())
+	{
+		unit->cloak();
+	}
+	if (unit->isCloaked() && unit->getEnergy() >7)
+	{
+		uList turretList = INFO.getTypeBuildingsInRadius(Terran_Missile_Turret, E, unit->getPosition(), TILE_SIZE * 10, true, true);
+		uList CannonList = INFO.getTypeBuildingsInRadius(Protoss_Photon_Cannon, E, unit->getPosition(), TILE_SIZE * 10, true, true);
+		uList ColonyList = INFO.getTypeBuildingsInRadius(Zerg_Spore_Colony, E, unit->getPosition(), TILE_SIZE * 10, true, true);
+
+		if (INFO.enemyRace == Races::Terran &&  turretList.size())
+		{
+			for (auto turret : turretList)
+			{
+				if (turret->isComplete())
+				{
+					return new WraithRetreatState();
+				}
+				else if (turret->hp() > 150)
+				{
+					return new WraithRetreatState();
+				}
+				else
+				{
+					CommandUtil::attackUnit(unit, turret->unit());
+					return nullptr;
+				}
+			}
+		}
+		else if (INFO.enemyRace == Races::Protoss && CannonList.size())
+		{
+			for (auto Cannon : CannonList)
+			{
+				if (Cannon->isComplete())
+				{
+					return new WraithRetreatState();
+				}
+				else if (Cannon->hp() > 150)
+				{
+					return new WraithRetreatState();
+				}
+				else
+				{
+					CommandUtil::attackUnit(unit, Cannon->unit());
+					return nullptr;
+				}
+			}
+		}
+
+		else if (INFO.enemyRace == Races::Zerg && ColonyList.size())
+		{
+			for (auto Colony : ColonyList)
+			{
+				if (Colony->isComplete())
+				{
+					return new WraithRetreatState();
+				}
+				else if (Colony->hp() > 150)
+				{
+					return new WraithRetreatState();
+				}
+				else
+				{
+					CommandUtil::attackUnit(unit, Colony->unit());
+					return nullptr;
+				}
+			}
+		}
+		else
+		{
+			UnitInfo *closestWorker = INFO.getClosestTypeUnit(E, unit->getPosition(), INFO.getWorkerType(INFO.enemyRace), 10 * TILE_SIZE);
+
+			if (closestWorker != nullptr)
+			{
+				CommandUtil::attackUnit(unit, closestWorker->unit());
+			}
+			else
+			{
+
+				UnitInfo *closestAttack = INFO.getClosestUnit(E, unit->getPosition(), GroundCombatKind, 20 * TILE_SIZE, true, false, true);
+				if (closestAttack == nullptr)
+				{
+					CommandUtil::attackMove(unit, SM.getMainAttackPosition());
+					return nullptr;
+				}
+				else
+				{
+					CommandUtil::attackUnit(unit, closestAttack->unit());
+					return nullptr;
+				}
+			}
+		}
+	}
+	else if ((unit->isCloaked() && unit->getEnergy() <= 7))
+	{
+		return new WraithRetreatState();
+	}
+	
+	return nullptr;
+}
+
+State *WraithRetreatState::action()
+{
+	if (unit->getDistance(MYBASE) < 90 * TILE_SIZE)
+	{
+		if (unit->isCloaked() && !unit->isUnderAttack())
+		{
+			unit->decloak();
+		}
+	}
+
+
+	if (unit->getDistance(MYBASE) > 25 * TILE_SIZE)
+	{
+         CommandUtil::move(unit, MYBASE);
+		 return nullptr;
+	}
+	else
+	{
+		return new WraithIdleState();
+	}
+	
+
+	return nullptr;
+
+}
+
+State *WraithBattleAssistState::action()
+{
+	uList enemyWorkerList;
+	if (INFO.enemyRace == Races::Terran)
+		enemyWorkerList = INFO.getTypeUnitsInRadius(Terran_SCV, E, unit->getPosition(), TILE_SIZE * 8, false);
+
+
+	if (INFO.enemyRace == Races::Protoss)
+		enemyWorkerList = INFO.getTypeUnitsInRadius(Protoss_Probe, E, unit->getPosition(), TILE_SIZE * 10, false);
+
+	if (INFO.enemyRace == Races::Zerg)
+		enemyWorkerList = INFO.getTypeUnitsInRadius(Zerg_Drone, E, unit->getPosition(), TILE_SIZE * 10, false);
+
+	uList enemyMedicList = INFO.getTypeUnitsInRadius(Terran_Medic, E, unit->getPosition(), TILE_SIZE * 10, false);
+	uList turretList = INFO.getTypeBuildingsInRadius(Terran_Missile_Turret, E, unit->getPosition(), TILE_SIZE * 12, true, true);
+	uList CannonList = INFO.getTypeBuildingsInRadius(Protoss_Photon_Cannon, E, unit->getPosition(), TILE_SIZE * 12, true, true);
+	uList ColonyList = INFO.getTypeBuildingsInRadius(Zerg_Spore_Colony, E, unit->getPosition(), TILE_SIZE * 12, true, true);
+	uList AroundVultureList = INFO.getTypeBuildingsInRadius(Terran_Vulture, S, unit->getPosition(), TILE_SIZE * 12, true, true);
+	uList AroundMarineList = INFO.getTypeBuildingsInRadius(Terran_Marine, S, unit->getPosition(), TILE_SIZE * 12, true, true);
+	Unit targetUnit = nullptr;
+	UnitInfo *w = INFO.getUnitInfo(unit, S);//½ÓÊÜµ¥Î»ÐÅÏ¢
+	
+	if (INFO.enemyRace == Races::Terran)
+	{
+		for (auto turret : turretList)
+		{
+			if (turret->isComplete())
+			{
+				return new WraithRetreatState();
+			}
+			else if (turret->hp() > 150)
+			{
+				return new WraithRetreatState();
+			}
+			else
+			{
+				targetUnit = turret->unit()->getBuildUnit();
+			}
+		}
+	}
+	if (INFO.enemyRace == Races::Protoss)
+	{
+		for (auto Cannon : CannonList)
+		{
+			if (Cannon->isComplete())
+			{
+				return new WraithRetreatState();
+			}
+			else if (Cannon->hp() > 150)
+			{
+				return new WraithRetreatState();
+			}
+			else
+			{
+				targetUnit = Cannon->unit()->getBuildUnit();
+			}
+		}
+	}
+
+	if (INFO.enemyRace == Races::Zerg)
+	{
+		for (auto Colony : ColonyList)
+		{
+			if (Colony->isComplete())
+			{
+				return new WraithRetreatState();
+			}
+			else if (Colony->hp() > 150)
+			{
+				return new WraithRetreatState();
+			}
+			else
+			{
+				targetUnit = Colony->unit()->getBuildUnit();
+			}
+		}
+	}
+	if (targetUnit != nullptr)
+	{
+		CommandUtil::attackUnit(unit, targetUnit);
+		return nullptr;
+	}
+	if (!enemyWorkerList.empty())
+		return new WraithKillScvState();
+
+	int dangerPoint = 0;
+	UnitInfo *dangerUnit = getDangerUnitNPoint(w->pos(), &dangerPoint, true);
+	UnitInfo *frontVulture = VultureManager::Instance().getFrontVultureFromPos(SM.getMainAttackPosition());
+	if (frontVulture != nullptr)
+	{
+		if (getGroundDistance(frontVulture->pos(), w->pos()) > 15 * TILE_SIZE && (AroundVultureList.size() <= 1) && (AroundMarineList.size() <= 2))
+
+		{
+			CommandUtil::attackMove(unit, frontVulture->pos());
+			return nullptr;
+		}
+	}
+
+	if (dangerUnit == nullptr)
+	{
+
+		UnitInfo *closestAttack = INFO.getClosestUnit(E, unit->getPosition(), GroundCombatKind, 10 * TILE_SIZE, false, false, true);
+		if (closestAttack != nullptr)
+		{
+			kiting(w, closestAttack, dangerPoint, 3 * TILE_SIZE);
+			return nullptr;
+		}
+
+	}
+
+	if (dangerPoint < 6 * TILE_SIZE)//Èç¹ûÓÐdangerÇÒÓÐÌ¹¿Ë£¬³¯×ÅÌ¹¿ËÒÆ¶¯
+	{
+		UnitInfo *closestAttack = INFO.getClosestUnit(E, unit->getPosition(), AirUnitKind, 10 * TILE_SIZE, false, false, true);
+		if (closestAttack != nullptr)
+		{
+			kiting(w, closestAttack, dangerPoint, 3 * TILE_SIZE);
+			return nullptr;
+		}
+		else
+		{
+			UnitInfo *closestground = INFO.getClosestUnit(E, unit->getPosition(), GroundCombatKind, 10 * TILE_SIZE, false, false, true);
+			if (closestground != nullptr)
+			{
+				kiting(w, closestground, dangerPoint, 3 * TILE_SIZE);
+				return nullptr;
+			}
+		}
+	}
+	else // DangerUnit > 6 * TILE_SIZEµÄÊ±ºò£¬ÎÒÃÇ¸ÉÂïÄØ
+	{
+		if (INFO.enemyRace == Races::Terran)
+		{
+			if (w->unit()->exists() && w->unit()->getTarget() != nullptr)
+			{
+				if (w->unit()->getTarget()->getType() == Terran_Siege_Tank_Tank_Mode) return nullptr;
+			}
+
+			for (auto et : INFO.getTypeUnitsInRadius(Terran_Siege_Tank_Tank_Mode, E, w->pos(), 10 * TILE_SIZE, false))
+			{
+				w->unit()->attack(et->unit());
+				break;
+			}
+		}
+		if (INFO.enemyRace == Races::Protoss)
+		{
+			if (w->unit()->exists() && w->unit()->getTarget() != nullptr)
+			{
+				if (w->unit()->getTarget()->getType() == Protoss_Dragoon) return nullptr;
+			}
+
+			for (auto et : INFO.getTypeUnitsInRadius(Protoss_Dragoon, E, w->pos(), 10 * TILE_SIZE, false))
+			{
+				w->unit()->attack(et->unit());
+				break;
+			}
+		}
+		UnitInfo *enemyBarrack = INFO.getClosestTypeUnit(E, w->pos(), Terran_Barracks);
+		UnitInfo *Overlord = INFO.getClosestTypeUnit(E, w->pos(), Zerg_Overlord);
+		// ¶°ÀÖÁö ¾ÊÀº°ÍÀº Å¸°ÙÆÃ ÇÏÁö ¾Ê´Â´Ù.
+		if (enemyBarrack != nullptr && !enemyBarrack->getLift())
+			enemyBarrack = nullptr;
+
+		UnitInfo *enemyEngineering = INFO.getClosestTypeUnit(E, w->pos(), Terran_Engineering_Bay);
+
+		// ¶°ÀÖÁö ¾ÊÀº°ÍÀº Å¸°ÙÆÃ ÇÏÁö ¾Ê´Â´Ù.
+		if (enemyEngineering != nullptr && !enemyEngineering->getLift())
+			enemyEngineering = nullptr;
+
+		if (INFO.enemyRace == Races::Terran)
+		{
+			 if (enemyBarrack != nullptr && enemyEngineering != nullptr)
+			{
+				if (enemyBarrack->pos().getApproxDistance(w->pos()) > enemyEngineering->pos().getApproxDistance(w->pos()))
+					CommandUtil::attackUnit(unit, enemyEngineering->unit());
+				else
+					CommandUtil::attackUnit(unit, enemyBarrack->unit());
+			}
+			else if (enemyBarrack == nullptr)
+			{
+				CommandUtil::attackUnit(unit, enemyEngineering->unit());
+			}
+			else
+				CommandUtil::attackUnit(unit, enemyBarrack->unit());
+		}
+		if (INFO.enemyRace == Races::Zerg)
+		{
+			if (Overlord != nullptr)
+				CommandUtil::attackUnit(unit, Overlord->unit());
+		}
+
+
+
+
+
+		if (!unit->isIdle()) return nullptr;
+
+		for (auto eFloatingB : INFO.getBuildingsInRadius(E, w->pos(), 12 * TILE_SIZE, false, true, false))
+		{
+			CommandUtil::attackUnit(unit, eFloatingB->unit());
+			break;
+		}
+	}
+
+	/*
+	if (unit->getHitPoints() < 50)
+	{
+	return new WraithIdleState();
+	}
+
+	if (!INFO.getUnitInfo(unit, S)->getEnemiesTargetMe().empty())
+	{
+	if (unit->isCloaked())
+	{
+	return new WraithIdleState();
+	}
+	else
+	{
+	if (unit->canCloak() && unit->getEnergy() > 40 && unit->getHitPoints() > 50)
+	{
+	unit->cloak();
+	}
+	else
+	{
+	return new WraithIdleState();
+	}
+	}
+	}
+
+	UnitInfo *fTank = nullptr;
+
+	//fTank = TankManager::Instance().getCloseTankFromPosition(INFO.getMainBaseLocation(E)->Center());
+	fTank = TankManager::Instance().getCloseTankFromPosition(SM.getMainAttackPosition());
+
+	if (fTank != nullptr && unit->getDistance(fTank->unit()) > 3 * TILE_SIZE)
+	{
+	GoWithoutDamage(unit, fTank->pos());
 	}
 	*/
 	return nullptr;

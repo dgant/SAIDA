@@ -2,16 +2,11 @@
 #include "../InformationManager.h"
 
 using namespace MyBot;
-
-////////////////////////////////////Idle////////////////////////////////////////////
-State *VultureIdleState::action()
+State *VultureIdleState::action() 
 {
 	Position movePosition = (INFO.getSecondChokePosition(S) + INFO.getFirstExpansionLocation(S)->getPosition()) / 2;
 
-	//if (unit->getPosition().getApproxDistance(movePosition) > 6 * TILE_SIZE)
-	//	CommandUtil::move(unit, movePosition);
-	//else
-	// ³ªÁß¿¡...
+
 	if (unit->getDistance(movePosition) > 3 * TILE_SIZE)
 	{
 		unit->attack(movePosition);

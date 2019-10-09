@@ -208,6 +208,14 @@ namespace BWAPI
 			enum Enum {
 				Terran_VultureTankWraith,
 				Terran_TankGoliath,
+				Protoss_MineKiller,
+				Protoss_ZealotKiller,
+				Protoss_CannonKiller,
+				Protoss_CarrierKiller,
+				Protoss_DragoonKiller,
+				Protoss_TemplarKiller,
+				Zerg_MMtoMachanic,
+				Protoss_FullMechanic,
 				Basic,
 				MAX
 			};
@@ -222,6 +230,15 @@ namespace BWAPI
 	namespace MyBuildTypes
 	{
 		extern const MyBuildType Terran_VultureTankWraith;
+		extern const MyBuildType Protoss_MineKiller;
+
+		extern const MyBuildType Protoss_ZealotKiller;
+		extern const MyBuildType Protoss_CannonKiller;
+		extern const MyBuildType Protoss_CarrierKiller;
+		extern const MyBuildType Protoss_DragoonKiller;
+		extern const MyBuildType Protoss_TemplarKiller;
+		extern const MyBuildType Zerg_MMtoMachanic;
+		extern const MyBuildType Protoss_FullMechanic;
 		extern const MyBuildType Terran_TankGoliath;
 		extern const MyBuildType Basic;
 	}

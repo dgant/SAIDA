@@ -628,11 +628,67 @@ void GameCommander::onFrame()
 		throw;
 #endif
 	}
-
+//==================================================================
 	Logger::debug("8");
 	time[++i] = clock();
 
 	if (time[i] - time[i - 1] > 55) Logger::info(Config::Files::TimeoutFilename, true, "DropshipManager Timeout (%dms)\n", time[i] - time[i - 1]);
+
+	try {
+		// 드랍쉽
+		ValkyrieManager::Instance().update();
+	}
+	catch (SAIDA_Exception e) {
+		Logger::error("ValkyrieManager Error. (ErrorCode : %x, Eip : %p)\n", e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
+#ifndef SERVERLOGDLL
+		throw e;
+#endif
+	}
+	catch (const exception &e) {
+		Logger::error("ValkyrieManager Error. (Error : %s)\n", e.what());
+#ifndef SERVERLOGDLL
+		throw e;
+#endif
+	}
+	catch (...) {
+		Logger::error("ValkyrieManager Unknown Error.\n");
+#ifndef SERVERLOGDLL
+		throw;
+#endif
+	}
+//===================================================================
+	Logger::debug("9");
+	time[++i] = clock();
+
+	if (time[i] - time[i - 1] > 55) Logger::info(Config::Files::TimeoutFilename, true, "ValkyrieManager Timeout (%dms)\n", time[i] - time[i - 1]);
+
+	try {
+		// 드랍쉽
+		MedicManager::Instance().update();
+	}
+	catch (SAIDA_Exception e) {
+		Logger::error("MedicManager Error. (ErrorCode : %x, Eip : %p)\n", e.getSeNumber(), e.getExceptionPointers()->ContextRecord->Eip);
+#ifndef SERVERLOGDLL
+		throw e;
+#endif
+	}
+	catch (const exception &e) {
+		Logger::error("MedicManager Error. (Error : %s)\n", e.what());
+#ifndef SERVERLOGDLL
+		throw e;
+#endif
+	}
+	catch (...) {
+		Logger::error("MedicManager Unknown Error.\n");
+#ifndef SERVERLOGDLL
+		throw;
+#endif
+	}
+//===================================================================
+	Logger::debug("10");
+	time[++i] = clock();
+
+	if (time[i] - time[i - 1] > 55) Logger::info(Config::Files::TimeoutFilename, true, "MedicManager Timeout (%dms)\n", time[i] - time[i - 1]);
 }
 
 // BasicBot 1.1 Patch Start ////////////////////////////////////////////////

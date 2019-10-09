@@ -160,13 +160,13 @@ void ScvManager::update()
 
 void	ScvManager::setMineralScv(UnitInfo *scv, Unit center)
 {
-	///// scv 에서 가장 유효한 Command Center를 찾는다.
+	///// 在scv中查找最有效的基地。 
 	if (center == nullptr)
 		center = getNearestDepot(scv);
 
 	if (center == nullptr)
 	{
-		// 가장 가까운 안전한 Center의 Mineral에 찍어놓는다.
+		//采在最近的安全中心的mineral上。 
 		if (!scv->unit()->isGatheringMinerals())
 		{
 			Unit tempMineral = getTemporaryMineral(scv->pos());
@@ -179,7 +179,7 @@ void	ScvManager::setMineralScv(UnitInfo *scv, Unit center)
 	}
 	else
 	{
-		// 해당 Center에서 가장 필요한 Mineral을 찾는다.
+		//在该中心寻找最需要的mineral。 
 		Unit mineral = getBestMineral(center);
 
 		if (mineral != nullptr)
@@ -864,6 +864,7 @@ void ScvManager::CheckBunkerDefence()
 
 		bunkerDefenceNeedCnt = DragoonCnt + (ZealotCnt / 2);
 		needRightNowCnt = dangerousDragoonCnt + (dangerousZealotCnt * 2 / 3);
+		
 	}
 	else if (INFO.enemyRace == Races::Zerg) {
 		int ZerglingCnt = 0;
@@ -959,6 +960,9 @@ void ScvManager::CheckBunkerDefence()
 
 	// 필요한 scv 수.
 	word baseCount = max(bunkerDefenceNeedCnt, needRightNowCnt);
+	if (SM.getMyBuild() == MyBuildTypes::Protoss_MineKiller)
+		baseCount = 2;
+
 
 	// 디팬스가 적으면 늘인다.
 	while (bunkerDefenceSet.size() < baseCount) {

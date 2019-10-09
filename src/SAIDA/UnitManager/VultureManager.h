@@ -78,8 +78,7 @@ namespace MyBot
 		bool scoutDone = false;
 		int lastScoutTime = 0;
 
-		// 전진 Pylon의 위치를 찾기 위함.
-		// Unknown 은 초기화 상태 , 발견되서 파괴되었으면 Positions::None으로 변경된다.
+
 		Position forwardBuildingPosition = Positions::Unknown;
 		bool checkedForwardPylon = false;
 

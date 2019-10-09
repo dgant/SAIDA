@@ -274,7 +274,8 @@ namespace MyBot
 			return pos;
 		}
 
-		TilePosition			getSecondChokePointBunkerPosition() {
+		TilePosition			getSecondChokePointBunkerPosition() 
+		{
 			if (INFO.getSecondChokePoint(S) == nullptr)
 				return TilePositions::None;
 
@@ -336,6 +337,71 @@ namespace MyBot
 
 			return (TilePosition)pos;
 		}
+
+		TilePosition			getEnemySecondChokePointBunkerPosition()
+		{
+			if (INFO.getSecondChokePoint(E) == nullptr)
+				return TilePositions::None;
+
+			const pair<const Area *, const Area *> &areas = INFO.getSecondChokePoint(E)->GetAreas();
+			const vector<ChokePoint> &secondCP = areas.first->ChokePoints(areas.second);
+			Position pos = Positions::Origin;
+
+			for (auto &cp : secondCP) {
+				pos += (Position)cp.Center();
+			}
+
+			Position commandPos = INFO.getFirstExpansionLocation(E)->getPosition() + Position(32, 0);
+
+			int dist = commandPos.getApproxDistance((Position)INFO.getSecondChokePoint(E)->Center());
+
+			bw->drawDotMap(pos / secondCP.size(), Colors::Red);
+			bw->drawDotMap(commandPos, Colors::Red);
+
+			Position p1 = commandPos;
+			Position p2 = pos / secondCP.size();
+
+			bool up = p1.y - 2 * 32 >= p2.y;
+			bool down = p1.y + 2 * 32 <= p2.y;
+			bool left = p1.x - 6 * 32 >= p2.x;
+			bool right = p1.x + 6 * 32 <= p2.x;
+
+			if (TIME == 1) {
+
+				cout << " 거리 = " << dist << endl;
+				cout << " 초크포인트 위치 " << (right ? "우" : left ? "좌" : "") + (string)(down ? "하" : up ? "상" : "") << endl;
+			}
+
+			// 초크포인트 : 확장기지 거리의 m:n 의 지점을 리턴한다. (거리가 먼 경우만)
+			int m = 0;
+			int n = 0;
+
+			// 좌 하 방향인 경우. (데스티네이션 12시, 포트리스 12시)
+			if (left && down) {
+				m = 3;
+				n = 7;
+			}
+			// 하 방향 거리 먼 경우 (엠파이어 1시, 11시)
+			else if (down && dist > 300) {
+				m = 3;
+				n = 7;
+			}
+			else if (dist <= 260) {
+				m = 1;
+				n = 1;
+			}
+			else {
+				m = 3;
+				n = 5;
+			}
+
+			pos = (pos * n + commandPos * m * secondCP.size()) / (secondCP.size() * (m + n));
+
+			bw->drawDotMap(pos, Colors::Blue);
+
+			return (TilePosition)pos;
+		}
+
 
 		// 두 지점이 같으면 0, p1 이 높으면 1, p2 가 높으면 -1, 유효하지 않은 인풋이면 -1.
 		int					getAltitudeDifference(TilePosition p1 = INFO.getMainBaseLocation(S)->getTilePosition(), TilePosition p2 = TilePositions::None);

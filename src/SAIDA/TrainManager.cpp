@@ -23,7 +23,7 @@ void TrainManager::update()
 	if (TIME % 4 != 0)
 		return;
 
-	// ÃÊ¹Ý Upgrade ¿ì¼± ¼øÀ§·Î µÎ±â À§ÇØ ¼öÁ¤
+	
 	if (SM.getNeedUpgrade())
 	{
 		return;
@@ -168,12 +168,12 @@ void TrainManager::commandCenterTraining()
 	if (commandCenterList.empty())
 		return;
 
-	// 9 Drone ÀÌÇÏ ³» º»Áø¿¡¼­
-	//	if (INFO.enemyRace == Races::Zerg && EIB <= Zerg_9_Drone &&
-	//			INFO.getTypeUnitsInRadius(Zerg_Zergling, E, INFO.getMainBaseLocation(S)->getPosition(), 10 * TILE_SIZE).size())
-	//	{
-	//		return;
-	//	}
+	// 9 Drone Ó¦¶Ô¼¼ÇÉ
+	if (INFO.enemyRace == Races::Zerg && EIB <= Zerg_9_Drone &&
+				INFO.getTypeUnitsInRadius(Zerg_Zergling, E, INFO.getMainBaseLocation(S)->getPosition(), 10 * TILE_SIZE).size())
+		{
+			return;
+	}
 
 	// ÃÊ¹Ý ÀÏ²Û·¯½¬ »ó´ë·Î ¸¶¸° 1±â »ý»êÇÏ±â À§ÇØ ÀÏ²Û »ý»ê Áß´Ü
 	if (needStopTrainToBarracks())
@@ -183,15 +183,11 @@ void TrainManager::commandCenterTraining()
 	{
 		if (needStopTrainToFactory())
 		{
-			// cout << "@@@ ÆÑÅä¸® º´·ÂÁ» »ý»êÇØ¾ßÇØ¼­ ÀÏ²Û »ý»ê ½¯°Ô ¤Ð" << endl;
 			return;
 		}
 	}
 
-	// SCV´Â ÃÖ´ë 60À» ³Ñ±âÁö ¾Ê´Â´Ù. º´·Â»ý»êÇØ¾ßµÊ.
 	int curScvCnt = INFO.getAllCount(Terran_SCV, S);
-
-	// ÇÊ¿äÇÑ SCV Count °è»ê.
 	int maxScvNeedCount = getMaxScvNeedCount();
 
 	// °øÁß¿¡ ¶°ÀÖ´Â Ä¿¸Çµå°¡ ÀÖ´Â°¡
@@ -215,7 +211,8 @@ void TrainManager::commandCenterTraining()
 		string state = c->getState();
 
 		// ¿ì¸® º»Áø Ä¿¸Çµå¼¾ÅÍ°¡ ¾Æ´Ï¶ó¸é À§±â»óÈ² ÆÇ´ÜÇÏ¿© ¶ç¿î´Ù
-		if (state != "LiftAndMove") {
+		if (state != "LiftAndMove") 
+		{
 			// ÇöÀç º£ÀÌ½º¸¦ À¯ÁöÇÒ »óÈ²ÀÌ ¾ÈµÈ´Ù¸é
 			if (c->isComplete() && isTimeToMoveCommandCenter(c))
 			{
@@ -323,16 +320,12 @@ void TrainManager::commandCenterTraining()
 		c->action();
 	}
 }
-
+//===============================================================================
 void TrainManager::barracksTraining()
 {
-	// 9 Drone ÀÌÇÏ ³» º»Áø¿¡¼­
-	//if (INFO.enemyRace == Races::Zerg && EIB <= Zerg_9_Drone &&
-	//		INFO.getCompletedCount(Terran_Factory, S) > 0 && INFO.getAllCount(Terran_Vulture, S) == 0)
-	//	return;
 
-	if (waitToProduce && INFO.enemyInMyArea().size())
-		return;
+	//if (waitToProduce)
+	//	return;
 
 	uList barracksList = INFO.getBuildings(Terran_Barracks, S);
 
@@ -340,186 +333,361 @@ void TrainManager::barracksTraining()
 		return;
 
 	int marineCount = INFO.getAllCount(Terran_Marine, S);
+	int medicCount = INFO.getAllCount(Terran_Medic, S);
 	int liftThreshold = 0;
-
-	// Marine »ý»ê Threshold
-	if (INFO.enemyRace == Races::Terran) {
-		if ((EIB == Terran_bunker_rush || EIB == Terran_1b_forward || EIB == Terran_2b_forward) && EMB == UnknownMainBuild)
-			liftThreshold = max(INFO.getCompletedCount(Terran_Marine, E) + 1, 3);
-		else if (INFO.getCompletedCount(Terran_Marine, E) >= 3)
-			liftThreshold = min(INFO.getCompletedCount(Terran_Marine, E) - 1, 3);
-		else if (EIB == Terran_4scv && EMB == UnknownMainBuild)
-			liftThreshold = 2;
-		else
-			liftThreshold = 1;
-	}
-	else if (INFO.enemyRace == Races::Zerg) {
-		if (EIB <= Zerg_9_Drone || EMB == Zerg_main_hydra || EMB == Zerg_main_lurker)
-			liftThreshold = 4;
-		else if (EIB == Zerg_9_Hat)
-			liftThreshold = 3;
-		else if (EIB == Zerg_12_Pool)
-			liftThreshold = 2;
-		else if (EIB == Zerg_4_Drone_Real && EMB == UnknownMainBuild)
-			liftThreshold = 2;
-		else
-			liftThreshold = 1;
-	}
-	else {
-
-		if (EIB == Toss_forge)
-			liftThreshold = 0;
-		else if (EMB == Toss_1base_fast_zealot) {
-			if ((INFO.getUnits(Terran_Vulture, S).size() + INFO.getUnits(Terran_Siege_Tank_Tank_Mode, S).size()
-					+ INFO.getUnits(Terran_Goliath, S).size() < 8))
-				liftThreshold = 4;
-			else
-				liftThreshold = 2;
-
-		}
-		else if (EIB == Toss_2g_forward || EIB == Toss_1g_forward
-				 || EMB == Toss_Scout || ESM.getEnemyGasRushRefinery() != nullptr) {
-
-			if (INFO.getUnits(Terran_Vulture, S).size() + INFO.getUnits(Terran_Siege_Tank_Tank_Mode, S).size()
-					+ INFO.getUnits(Terran_Goliath, S).size() < 5)
-				liftThreshold = 4;
-			else
-				liftThreshold = 2;
-		}
-		else if (EMB == Toss_dark || (EIB != Toss_cannon_rush && EMB == UnknownMainBuild))
+	int basemarineCount = 2 ;
+	int maxmarineCount = 0;
+	int basemedicCount = 1;
+	int maxmedicCount = 0;
+	//================================
+	if (INFO.enemyRace == Races::Terran)
+	{
+		if (INFO.getCompletedCount(Terran_Factory, S) == 0)
 		{
-			if (INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) > 0 && INFO.getAllCount(Terran_Engineering_Bay, S) > 0)
-				liftThreshold = 4;
-			else
-				liftThreshold = 2;
+			basemarineCount = 3;
 		}
-		else if (EIB <= Toss_2g_dragoon) {
-			if ((INFO.getUnits(Terran_Vulture, S).size() + INFO.getUnits(Terran_Siege_Tank_Tank_Mode, S).size()
-					+ INFO.getUnits(Terran_Goliath, S).size() < 5)
-					&& (EMB == Toss_range_up_dra_push || EMB == Toss_2gate_dra_push)
-					&& (INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) > 0))
-				liftThreshold = 4;
+		if (INFO.getCompletedCount(Terran_Factory, S) != 0)
+		{
+			if (INFO.getCompletedCount(Terran_Machine_Shop, S) == 0)
+			{
+				basemarineCount = 4;
+			}
 			else
-				liftThreshold = 2;
+			{
+				if (SM.getMyBuild() == MyBuildTypes::Terran_VultureTankWraith)
+				{
+					if (INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) >= 1 &&
+						INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) <= 4)
+					{
+						basemarineCount = 10;
+					}
+					else if (INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) > 4)
+					{
+						basemarineCount = 40;
+					}
+				}
+				else
+				{
+					if (INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) >= 1 &&
+						INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) <= 4)
+					{
+						basemarineCount = 3;
+					}
+					else if (INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) > 4)
+					{
+						basemarineCount = 6;
+					}
+
+				}
+			}
+
+		}
+	}
+	else
+	{
+		if (INFO.enemyRace == Races::Protoss)
+		{
+			if (SM.getMyBuild() == MyBuildTypes::Protoss_DragoonKiller || SM.getMyBuild() == MyBuildTypes::Protoss_CannonKiller)
+			{
+				if (INFO.getCompletedCount(Terran_Factory, S) == 0)
+				{
+					basemarineCount = 2;
+				}
+				if (INFO.getCompletedCount(Terran_Factory, S) != 0)
+				{
+					if (INFO.getCompletedCount(Terran_Machine_Shop, S) == 0 || INFO.getAllCount(Terran_Command_Center, S) < 2)
+					{
+						basemarineCount = 3;
+					}
+					else
+					{
+						if (INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) >= 1 &&
+							INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) <= 4)
+						{
+							basemarineCount = 6;
+						}
+						else if (INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) > 4)
+						{
+							basemarineCount = 8;
+						}
+						if (S->minerals() >= 900)
+						{
+							basemarineCount = 20;
+						}
+					}
+				}
+			}
+			if (SM.getMyBuild() == MyBuildTypes::Protoss_TemplarKiller)
+			{
+				if (INFO.getAllCount(Terran_Factory, S) == 0)
+				{
+					basemarineCount = 2;
+				}
+				if (INFO.getCompletedCount(Terran_Factory, S) == 0)
+				{
+					basemarineCount = 3;
+				}
+				if (INFO.getCompletedCount(Terran_Factory, S) != 0)
+				{
+					if (INFO.getCompletedCount(Terran_Machine_Shop, S) == 0 || INFO.getAllCount(Terran_Command_Center, S) < 2)
+					{
+						basemarineCount = 4;
+					}
+					else
+					{
+						if (INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) >= 1 &&
+							INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) <4)
+						{
+							basemarineCount = 6;
+						}
+						else if (INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) >= 4)
+						{
+							basemarineCount = 9;
+						}
+						if (S->minerals() >= 900)
+						{
+							basemarineCount = 30;
+						}
+					}
+				}
+			}
+			if (SM.getMyBuild() == MyBuildTypes::Protoss_CarrierKiller)
+			{
+				if (INFO.getAllCount(Terran_Factory, S) == 0)
+				{
+					basemarineCount = 2;
+				}
+				if (INFO.getCompletedCount(Terran_Factory, S) == 0)
+				{
+					basemarineCount = 3;
+				}
+				if (INFO.getCompletedCount(Terran_Factory, S) != 0)
+				{
+					if (INFO.getCompletedCount(Terran_Machine_Shop, S) == 0 || INFO.getAllCount(Terran_Command_Center, S) < 2)
+					{
+						basemarineCount = 4;
+					}
+					else
+					{
+						if (INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) >= 1 &&
+							INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) <4)
+						{
+							basemarineCount = 6;
+						}
+						else if (INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) >= 4)
+						{
+							basemarineCount = 12;
+						}
+						if (S->minerals() >= 900)
+						{
+							basemarineCount = 30;
+						}
+					}
+				}
+			}
+
+			if (SM.getMyBuild() == MyBuildTypes::Protoss_ZealotKiller)
+			{
+				if (INFO.getAllCount(Terran_Factory,S)<1)
+					basemarineCount = 3;
+
+				else if (INFO.getCompletedCount(Terran_Factory, S)<1)
+					basemarineCount = 8;
+
+				else if (INFO.getCompletedCount(Terran_Command_Center, S)<2)
+					basemarineCount = 10;
+				else 
+					basemarineCount = 12;
+
+				if (S->minerals() >= 900 || SM.getMainStrategy() == AttackAll)
+				{
+					basemarineCount = 30;
+				}
+			
+
+			}
+			if (SM.getMyBuild() == MyBuildTypes::Protoss_MineKiller)
+			{
+				if ((INFO.getDestroyedCount(Protoss_Nexus,E)<1))
+				basemarineCount = 30;
+				else if (INFO.getAllCount(Terran_Siege_Tank_Tank_Mode,S)<2)
+					basemarineCount = 4;
+
+				else if (INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S)>=2)
+					basemarineCount = 15;
+
+				if (S->minerals() >=800)
+				basemarineCount = INT_MAX;
+			}
+
+
+			if (SM.getMyBuild() == MyBuildTypes::Protoss_DragoonKiller || SM.getMyBuild() == MyBuildTypes::Protoss_CannonKiller)
+			{
+				if (marineCount >= 7)
+					basemedicCount = 1;
+
+				if (marineCount >= 12)
+					basemedicCount = 2;
+
+				if (marineCount >= 20)
+					basemedicCount = 3;
+
+			}
+
+			else if (SM.getMyBuild() == MyBuildTypes::Protoss_ZealotKiller)
+			{
+				if (marineCount >= 7)
+					basemedicCount = 2;
+
+				if (marineCount >= 12)
+					basemedicCount = 3;
+
+				if (marineCount >= 20)
+					basemedicCount = 5;
+
+			}
+
+			else if (SM.getMyBuild() == MyBuildTypes::Protoss_MineKiller)
+			{
+				if (marineCount >= 8)
+					basemedicCount = 2;
+
+				if (marineCount >= 14)
+					basemedicCount = 3;
+
+				if (marineCount >= 20)
+					basemedicCount = 4;
+
+			}
+			else if (SM.getMyBuild() == MyBuildTypes::Protoss_TemplarKiller)
+			{
+				if (marineCount >= 6)
+					basemedicCount = 2;
+
+				if (marineCount >= 12)
+					basemedicCount = 3;
+
+
+			}
+		
 
 		}
 		else
-			liftThreshold = 2;
+		{
+			//========================¹¤³§»¹Ã»½¨Á¢ÆðÀ´µÄÇé¿ö========================
+			if (INFO.getCompletedCount(Terran_Factory, S) == 0)
+			{
+				basemarineCount = 3;
+			}
+			//============================¹¤³§½¨Á¢ÆðÀ´µÄÇé¿ö=========================
+			if (INFO.getCompletedCount(Terran_Factory, S) != 0)
+			{
+				//»úÐµÉÌµêÎ´½¨Á¢
+				if (INFO.getCompletedCount(Terran_Machine_Shop, S) == 0)
+				{
+					basemarineCount = 4;
+				}
+				//»úÐµÉÌµê½¨Á¢
+				else
+				{
+					if (INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) >= 1 &&
+						INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) <= 4)
+					{
+						basemarineCount = 6;
+					}
+					else if (INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) > 4)
+					{
+						basemarineCount = 30;
+					}
+				}
 
-		// ÃÊ¹Ý 1°ÔÀÌÆ® Ã¹ µå¶ó±º Å¸ÀÌ¹Ö Àü¿¡ Áú·µÀÌ 1±â ÀÌ»ó º¸ÀÌ¸é ÃÖ¼Ò 3¸¶¸° »ý»ê
-		if (TIME < (24 * 60 * 5) && (INFO.getAllCount(Protoss_Zealot, E) + INFO.getDestroyedCount(Protoss_Zealot, E) >= 1))
-			liftThreshold = max(liftThreshold, 3);
+
+			}
+		}
 	}
 
-	if (INFO.getUnits(Terran_Vulture, S).size() + INFO.getUnits(Terran_Goliath, S).size()
-			+ INFO.getUnits(Terran_Siege_Tank_Tank_Mode, S).size() > 8)
-		liftThreshold = 0;
-
+	if (SM.getMyBuild() == MyBuildTypes::Terran_TankGoliath)
+	{
+		liftThreshold = 6;
+		if ((INFO.getUnits(Terran_Vulture, S).size() + INFO.getUnits(Terran_Goliath, S).size()
+			+ INFO.getUnits(Terran_Siege_Tank_Tank_Mode, S).size() > 4) && INFO.enemyRace == Races::Terran)
+			liftThreshold = 0;
+	}
+	
 	for (auto b : barracksList)
 	{
 		string state = b->getState();
 
-		// »õ·Î ¸¸µé¾îÁø ¹è·°ÀÌ¶ó¸é Idle ·Î ¼³Á¤
-		if (state == "New" && b->isComplete()) {
+		
+		if (state == "New" && b->isComplete())
+		{
 			b->setState(new BarrackIdleState());
 		}
 
-		// Idle ÀÏ¶§ ¸¶¸°»ý»ê
+		
 		if (state == "Idle")
 		{
 			UnitType trainUnit = Terran_Marine;
 
-			// ÀÚ¿ø ºÎÁ·
+			
 			if (!hasEnoughResources(trainUnit))
 				continue;
 
-			// 2Áú·µ ~ 2°ÔÀÌÆ® »çÀÌ°¡ ¾Æ´Ñ °æ¿ì¿¡´Â 2¹øÂ° ¸¶¸°Àº ÆÑÅä¸® Áþ°í³ª¼­ »ÌÀÚ
-			if (INFO.enemyRace == Races::Protoss &&
-					(EIB != UnknownBuild && EIB >= Toss_pure_double))
-			{
-				if (marineCount && INFO.getAllCount(Terran_Command_Center, S) < 2)
-					continue;
-			}
+			
+		//	if (INFO.enemyRace == Races::Protoss &&
+		//			(EIB != UnknownBuild && EIB >= Toss_pure_double))
+		//	{
+		//		if (marineCount && INFO.getAllCount(Terran_Command_Center, S) < 2)
+		//			continue;
+		//	}
 
-			if (marineCount < liftThreshold)
+			if (marineCount < basemarineCount)
 			{
+				if (needStopTrainToFactory() && SM.getMyBuild() != MyBuildTypes::Protoss_MineKiller)
+				{
+					continue;
+				}
 				if (INFO.enemyRace == Races::Protoss)
 				{
-					uList bunkerList = INFO.getTypeBuildingsInRadius(Terran_Bunker, S, INFO.getFirstExpansionLocation(S)->getPosition(), 10 * TILE_SIZE, false);
-					uList barricadeBarrack;
-
-					if (!bunkerList.empty())
-						barricadeBarrack = INFO.getTypeBuildingsInRadius(Terran_Barracks, S, (*bunkerList.begin())->pos(), 6 * TILE_SIZE);
-
-					// ¿Ï¼ºµÈ º¡Ä¿ ÀÖ°í ¸¶¸° 2±â »ý»êµÆ°í ¹Ù¸®ÄÉÀÌÆ® ¹è·° ¾ø´Ù¸é
-					if ((EIB == Toss_1g_double || EIB == Toss_2g_dragoon || EMB == Toss_range_up_dra_push || EMB == Toss_2gate_dra_push)
-							&& !bunkerList.empty() && barricadeBarrack.empty()
-							&& marineCount >= 2 && liftThreshold != 3)
+					if (((marineCount >= 7 && medicCount < basemedicCount)|| (marineCount >= 12 && medicCount < basemedicCount )||( marineCount >= 20 && medicCount < basemedicCount ))&& INFO.getCompletedCount(Terran_Academy, S) >= 1)
 					{
-						setBarricadeBarrack(barracksList);
+						UnitType trainUnit = Terran_Medic;
+						b->setState(new BarrackTrainState());
+						b->action(trainUnit);
+						addReserveResources(trainUnit);
 						continue;
 					}
 				}
-
-				if (needStopTrainToFactory())
+				else
 				{
-					// cout << "@@@ º´·ÂÁ» »ý»êÇØ¾ßÇØ¼­ ¹è·° »ý»ê ½¯°Ô ¤Ð" << endl;
-					continue;
+					if (marineCount >= 5 && medicCount < 1)
+					{
+						UnitType trainUnit = Terran_Medic;
+						b->setState(new BarrackTrainState());
+						b->action(trainUnit);
+						addReserveResources(trainUnit);
+						continue;
+					}
 				}
-
 				b->setState(new BarrackTrainState());
 				b->action(trainUnit);
 				addReserveResources(trainUnit);
 				continue;
 			}
-			else
+			if (marineCount >= liftThreshold && INFO.enemyRace == Races::Terran&&SM.getMyBuild() == MyBuildTypes::Terran_TankGoliath)
 			{
-				if (INFO.enemyRace == Races::Protoss)
-				{
-					uList bunkerList = INFO.getTypeBuildingsInRadius(Terran_Bunker, S, INFO.getFirstExpansionLocation(S)->getPosition(), 10 * TILE_SIZE, false);
 
-					if ((EIB == Toss_1g_double || EIB == Toss_2g_dragoon || EMB == Toss_range_up_dra_push || EMB == Toss_2gate_dra_push)
-							&& !bunkerList.empty())
-					{
-						// µå¶ó±º Çª½Ã·ùÀÏ¶© ¿Ï¼ºµÈ º¡Ä¿ ÀÖÀ¸¸é ¹Ù¸®ÄÉÀÌÆ®
-						setBarricadeBarrack(barracksList);
-					}
-					else
-					{
-						// ´Ù¸¥ ºôµåÀÏ¶© ¾Õ¸¶´ç Ä¿¸Çµå ¿Ã¶ó°¡°í ³ª¼­ ¹Ù¸®ÄÉÀÌÆ®
-						if (!INFO.getTypeBuildingsInRadius(Terran_Command_Center, S, INFO.getFirstExpansionLocation(S)->getPosition(), 5 * TILE_SIZE).empty())
-							setBarricadeBarrack(barracksList);
-					}
+				//if (EIB == Terran_1fac_1star || EIB == Terran_1fac_2star || EIB == Terran_2fac_1star || EMB == Terran_1fac_1star || EMB == Terran_1fac_2star || EMB == Terran_2fac_1star || EMB == Terran_2fac)
 
-					if (SM.getMainStrategy() == AttackAll)
-					{
-						b->setState(new BarrackLiftAndMoveState());
-					}
-				}
-				else if (INFO.enemyRace == Races::Terran)
-				{
-					if (INFO.getCompletedCount(Terran_Marine, S) + INFO.getDestroyedCount(Terran_Marine, S) > 0
-							&& ((EIB >= Terran_1b_double && EIB <= Terran_pure_double)
-								|| INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S)))
-					{
-						b->setState(new BarrackLiftAndMoveState());
-					}
-				}
-				else //zergÀÏ °æ¿ì
-				{
-					if (SM.getMainStrategy() == AttackAll) {
-						if (INFO.getCompletedCount(Terran_Command_Center, S) > 1)
-						{
-							b->setState(new BarrackLiftAndMoveState());
-						}
-					}
-				}
+				b->setState(new BarrackLiftAndMoveState());
+
 			}
 		}
 
-		// ¹Ù¸®ÄÉÀÌµåÀÎµ¥, ¸¶¸°ÀÌ ÇÊ¿äÇÏ´Ù¸é Idle·Î ±³Ã¼
-		if (state == "Barricade") {
-			//			cout << "@@ ¹Ù¸®ÄÉÀÌÆ®¾ß. --- marineCount = " << marineCount << ", liftThreshold = " << liftThreshold << endl;
+		
+		if (state == "Barricade")
+		{
+			
 
 			if (!b->unit()->isLifted()/* && INFO.getUnitsInRadius(E, b->pos(), 10 * TILE_SIZE, true).size() <= 2*/) {
 				if (marineCount < liftThreshold) {
@@ -532,7 +700,8 @@ void TrainManager::barracksTraining()
 	}
 }
 
-int TrainManager::getBaseVultureCount(InitialBuildType eib, MainBuildType emb) {
+int TrainManager::getBaseVultureCount(InitialBuildType eib, MainBuildType emb)
+{
 	if (INFO.enemyRace == Races::Terran)
 	{
 		if (SM.getMyBuild() == MyBuildTypes::Terran_TankGoliath)
@@ -551,10 +720,10 @@ int TrainManager::getBaseVultureCount(InitialBuildType eib, MainBuildType emb) {
 	{
 		if (eib <= Zerg_9_Balup || emb == Zerg_main_zergling) {
 			if (E->getUpgradeLevel(UpgradeTypes::Metabolic_Boost) || E->isUpgrading(UpgradeTypes::Metabolic_Boost))
-				return 4;
+				return 3;
 			// ¹úÃÄ¸¦ ÃÖ¼Ò 2¸¶¸® ~ 4¸¶¸® ±îÁö Àû º´·Â¿¡ ¸ÂÃç¼­ »Ì´Â´Ù.
 			else if (INFO.getCompletedCount(Zerg_Zergling, E) > INFO.getAllCount(Terran_Vulture, S) * 4)
-				return 4;
+				return 3;
 		}
 
 
@@ -562,40 +731,24 @@ int TrainManager::getBaseVultureCount(InitialBuildType eib, MainBuildType emb) {
 	}
 	else
 	{
-		if (emb == Toss_fast_carrier || emb == Toss_arbiter_carrier)
-			return 2;
-		else
-		{
-			if (INFO.getCompletedCount(Terran_Factory, S) >= 2)
-				return 4;
-		}
-
-		if (eib == Toss_1g_forward)
-			return 2;
-		else if (eib == Toss_2g_zealot || eib == Toss_2g_forward)
+		if (SM.getMyBuild() == MyBuildTypes::Protoss_ZealotKiller)
 			return 4;
-
-		if (eib == Toss_1g_double || eib == Toss_pure_double)
-			return 1;
-
-		// 3ºÐ 15ÃÊ(1°ÔÀÌÆ® Ã¹ µå¶ó±º Å¸ÀÌ¹Ö) Àü¿¡ Áú·µÀÌ 2¸¶¸® ÀÌ»ó º¸ÀÌ¸é ¹úÃÄ 1¸¶¸® »ý»ê ÈÄ ¾Öµå¿Â Ãß°¡ÇÏµµ·Ï
-		if (TIME < (24 * 60 * 3 + 15) && (INFO.getAllCount(Protoss_Zealot, E) + INFO.getDestroyedCount(Protoss_Zealot, E) >= 2))
-			return 1;
+		else
+			return 0;
 	}
-
-	return 0;
 }
 
-int TrainManager::getMaxVultureCount() {
+int TrainManager::getMaxVultureCount() 
+{
 	if (INFO.enemyRace == Races::Terran)
 	{
 		if (SM.getMyBuild() == MyBuildTypes::Terran_TankGoliath)
 		{
-			return min((getAvailableMinerals() / 500) * 6 + 1, 24);
+			return min((getAvailableMinerals() / 500) * 5 + 1, 6);
 		}
 	}
 
-	return 35;
+	return 20;
 }
 
 void TrainManager::factoryTraining()
@@ -614,12 +767,12 @@ void TrainManager::factoryTraining()
 	int baseTankCount = 0;
 	int baseGoliathCount = 0;
 	int maxVultureCount = getMaxVultureCount();
-	int maxTankCount = 35;
+	int maxTankCount = 30;
 	int maxGoliathCount = INT_MAX;
 	int mashineShopCount = 0;
 	int currentFrameSetAddOnCount = 0;
 
-	// Tank »ý»ê Threshold
+	// Tank 
 	if (INFO.enemyRace == Races::Terran)
 	{
 		if (SM.getMyBuild() == MyBuildTypes::Terran_TankGoliath)
@@ -629,19 +782,19 @@ void TrainManager::factoryTraining()
 	{
 		if (EMB == Zerg_main_lurker)
 			baseTankCount = 0;
-		else if ( EMB == Zerg_main_hydra_mutal)
+		else if (EMB == Zerg_main_hydra_mutal)
 			baseTankCount = 3;
 		else if (EMB == Zerg_main_hydra)
 			baseTankCount = 5;
 	}
 	else
 	{
-		if (EMB == Toss_fast_carrier || EMB == Toss_arbiter_carrier) {
-			baseTankCount = max(4, INFO.getCompletedCount(Protoss_Dragoon, E) / 2);
-		}
+		
+			baseTankCount = 3;//4Ì¹¿ËÊÇ»ù´¡
+		
 	}
 
-	// Goliath »ý»ê Threshold
+	// Goliath 
 	if (INFO.enemyRace == Races::Terran)
 	{
 		if (SM.getMyBuild() == MyBuildTypes::Terran_TankGoliath)
@@ -680,26 +833,32 @@ void TrainManager::factoryTraining()
 	else
 	{
 		if (EMB == Toss_arbiter)
-			baseGoliathCount = 2 + INFO.getCompletedCount(Protoss_Arbiter, E);
-		else if (EMB == Toss_fast_carrier || EMB == Toss_arbiter_carrier) {
-			int maxGcnt = EMB == Toss_fast_carrier ? 12 : 4;
+			baseGoliathCount = INFO.getCompletedCount(Protoss_Arbiter, E);
+		else if (EMB == Toss_fast_carrier || EMB == Toss_arbiter_carrier)
+		{
+			int maxGcnt = EMB == Toss_fast_carrier ? 10 : 2;
 			int carrierCnt = INFO.getCompletedCount(Protoss_Carrier, E);
 			baseGoliathCount = max(maxGcnt, carrierCnt * (int)(S->getUpgradeLevel(UpgradeTypes::Terran_Vehicle_Weapons) >= 2 ? 3.5 : 5));
 
-			if (INFO.getCompletedCount(Protoss_Arbiter, E) > 0) {
+			if (INFO.getCompletedCount(Protoss_Arbiter, E) > 0)
+			{
 				baseGoliathCount = max(baseGoliathCount, 2 + INFO.getCompletedCount(Protoss_Arbiter, E));
 			}
 
 		}
-		else if (EMB == Toss_dark_drop || EMB == Toss_drop)
-			baseGoliathCount = baseGoliathCount > 2 ? baseGoliathCount : 2;
+		//else if (EMB == Toss_dark_drop || EMB == Toss_drop)
+		//	baseGoliathCount = baseGoliathCount > 2 ? baseGoliathCount : 2;
 
-		if (INFO.getAllCount(Protoss_Scout, E) != 0) {
+		else if (INFO.getAllCount(Protoss_Scout, E) != 0) {
 			baseGoliathCount = baseGoliathCount > INFO.getAllCount(Protoss_Scout, E) * 2 ? baseGoliathCount : INFO.getAllCount(Protoss_Scout, E) * 2;
+		}
+		else
+		{
+			baseGoliathCount =0;
 		}
 	}
 
-	// ¸Ó½Å¼¥ Ä«¿îÆ®
+	//mashineShopCount	
 	if (INFO.enemyRace == Races::Zerg)
 	{
 		mashineShopCount = 1;
@@ -716,7 +875,7 @@ void TrainManager::factoryTraining()
 			if (INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S) >= 2 && INFO.getAllCount(Terran_Goliath, S) >= 4)
 				mashineShopCount = 2;
 
-			// »ó´ë°¡ ºü¸¥ 3¾Öµå¿Â ÅÊÅ©ÀÎ °æ¿ì ¸ÂÃç¼­ 3¾Öµå¿Â
+
 			if (INFO.getAllCount(Terran_Command_Center, S) == 2 && INFO.getAllCount(Terran_Machine_Shop, E) >= 3)
 				mashineShopCount = 3;
 		}
@@ -736,14 +895,14 @@ void TrainManager::factoryTraining()
 		}
 		else
 		{
-			if (INFO.getCompletedCount(Terran_Factory, S) > 2 || vultureCount >= 4)
-				mashineShopCount = 2;
+			if (INFO.getCompletedCount(Terran_Factory, S) > 2 )
+				mashineShopCount = 3;
 			else
 				mashineShopCount = 1;
 		}
 	}
 
-	// Ãß°¡ ¸ÖÆ¼ »ý±â¸é ¸Ó½Å¼¥ ÇÏ³ª Ãß°¡
+
 	if (INFO.getActivationGasBaseCount() >= 3)
 	{
 		if (INFO.enemyRace == Races::Zerg)
@@ -761,7 +920,7 @@ void TrainManager::factoryTraining()
 			mashineShopCount += 1;
 	}
 
-	// Factory with Machinshop ¸ÕÀú Ã³¸®ÇØÁÖ±â À§ÇÔ.
+	// Factory with Machinshop 
 	int addonIndex = 0;
 
 	for (auto f : factoryList)
@@ -770,28 +929,28 @@ void TrainManager::factoryTraining()
 		{
 			string state = f->getState();
 
-			// »õ·Î ¸¸µé¾îÁø ÆÑÅä¸®¶ó¸é Idle ·Î ¼³Á¤
-			if (state == "New" && f->isComplete()) {
+
+			if (state == "New" && f->isComplete())
+			{
 				f->setState(new FactoryIdleState());
 			}
 
-			// ÃÖ¼Ò ¹úÃÄ »ý»ê ÈÄ ¸Ó½Å¼¥ Ãß°¡
+
 			if (state == "Idle")
 			{
 				UnitType trainUnit = Terran_Vulture;
 
-				// ÀÚ¿øºÎÁ·, ¸Ó½Å¼¥Àº 50/50 ÀÌ¶ó ³ªÁß¿¡ ¼öÁ¤ ÇÊ¿äÇØº¸ÀÓ
-				// ÀÚ¿ø ºÎÁ·ÇÏ¸é ÀÏ²Û »ý»ê ½¬ÀÚ. // º´·Â ¿ì¼±.
+
 				if (!hasEnoughResources(trainUnit))
 				{
 					waitToProduce = true;
 					return;
 				}
 
-				// ±âº» ¹úÃÄ ¼ö´Â ¸ÂÃá´Ù.
-				if (vultureAllCount >= baseVultureCount)
+
+				if (vultureAllCount >= baseVultureCount )
 				{
-					// º´·Â »ý»ê
+
 					if (INFO.enemyRace == Races::Zerg)
 					{
 						if (EMB == Zerg_main_lurker)
@@ -833,7 +992,7 @@ void TrainManager::factoryTraining()
 						if (baseTankCount > tankCount)
 						{
 							if (baseGoliathCount > goliathCount
-									&& (EMB == Zerg_main_mutal || EMB == Zerg_main_hydra_mutal))
+								&& (EMB == Zerg_main_mutal || EMB == Zerg_main_hydra_mutal))
 								trainUnit = Terran_Goliath;
 							else
 								trainUnit = Terran_Siege_Tank_Tank_Mode;
@@ -842,8 +1001,8 @@ void TrainManager::factoryTraining()
 						{
 							if (INFO.getCompletedCount(Terran_Armory, S) && baseGoliathCount > goliathCount)
 								trainUnit = hasEnoughResources(Terran_Goliath) ? Terran_Goliath :
-											(getAvailableGas() >= Terran_Goliath.gasPrice() ? None :
-											 hasEnoughResources(Terran_Vulture) ? Terran_Vulture : None);
+								(getAvailableGas() >= Terran_Goliath.gasPrice() ? None :
+								hasEnoughResources(Terran_Vulture) ? Terran_Vulture : None);
 						}
 
 						// °¡½º ¼¼ÀÌºêÇÏ±â À§ÇØ ¹úÃÄ »ý»ê
@@ -879,45 +1038,38 @@ void TrainManager::factoryTraining()
 							}
 						}
 					}
-					else // ÇÁ·ÎÅä½º
+					else if (INFO.enemyRace == Races::Protoss)
 					{
-						// TankÀÇ °æ¿ì Gas°¡ ºÎÁ·ÇÑ °æ¿ì¸¸ Vulture¸¦ »ý»êÇÑ´Ù.
-						//Ä³¸®¾îÀÇ °æ¿ì,
-						if (EMB == Toss_fast_carrier || EMB == Toss_arbiter_carrier
-								|| EMB == Toss_Scout || EMB == Toss_arbiter) {
-							// Ã¹¹øÂ° ¾Öµå¿Â¿¡¼­´Â Tank ¸ÕÀú »Ì´Â´Ù.
-							if (((addonIndex == 0 && tankCount >= baseTankCount) || addonIndex != 0) && goliathCount < baseGoliathCount && INFO.getCompletedCount(Terran_Armory, S) > 0) {
-								trainUnit = getAvailableGas() >= Terran_Goliath.gasPrice() ? Terran_Goliath : Terran_Vulture;
-							}
-							else {
-								trainUnit = getAvailableGas() >= Terran_Siege_Tank_Tank_Mode.gasPrice() ? Terran_Siege_Tank_Tank_Mode : Terran_Vulture;
+						if (baseTankCount > tankCount)
+						{
+							trainUnit = Terran_Siege_Tank_Tank_Mode;
+							if (SM.getMyBuild() == MyBuildTypes::Protoss_MineKiller)
+							{
+								if (INFO.getCompletedCount(Terran_Marine,S)<3)
+									trainUnit = None;
 							}
 						}
-						else if ((EIB == Toss_1g_dragoon || EIB == Toss_2g_dragoon ||
-								  EIB == Toss_1g_double || EIB == UnknownBuild) && tankCount < 2)
+						else
 						{
-							// Tank ¾ø´Â »óÅÂ¸é Tank »Ì´Â´Ù.
-							trainUnit = getAvailableGas() >= Terran_Siege_Tank_Tank_Mode.gasPrice() ? Terran_Siege_Tank_Tank_Mode : None;
-						}
-						else if ((EIB == Toss_2g_zealot || EIB == Toss_1g_forward || EIB == Toss_2g_forward) && (EMB == Toss_1base_fast_zealot || EMB == UnknownMainBuild))
-						{
-							if (INFO.getAllCount(Protoss_Zealot, E) > INFO.getAllCount(Terran_Vulture, S) * 2 && INFO.getAllCount(Protoss_Dragoon, E) == 0 )
+							if (getAvailableGas() >= Terran_Siege_Tank_Tank_Mode.gasPrice())
+							{
+								trainUnit = Terran_Siege_Tank_Tank_Mode;
+							}
+							else if (getAvailableMinerals() > 250 )
 								trainUnit = Terran_Vulture;
+				
 							else
-								trainUnit = getAvailableGas() >= Terran_Siege_Tank_Tank_Mode.gasPrice() ? Terran_Siege_Tank_Tank_Mode : Terran_Vulture;
-						}
-						else {
-							if (tankCount > 8 && tankCount * 0.7 > vultureCount) // ÅÊÅ©°¡ ¸¹À¸¸é ¹úÃÄ ÂïÀÚ
-								trainUnit = Terran_Vulture;
-							else
-								trainUnit = getAvailableGas() >= Terran_Siege_Tank_Tank_Mode.gasPrice() ? Terran_Siege_Tank_Tank_Mode : Terran_Vulture;
+							{
+								trainUnit = None;
+							}
+							
 						}
 					}
 				}
 
-				// ÈÄ¹Ý¿¡ ÅÊÅ©°¡ ³Ê¹« ¸¹¾ÆÁö´Â°Í ¹æÁöÇÏ±â À§ÇØ Ãß°¡
+
 				if (trainUnit == Terran_Siege_Tank_Tank_Mode && maxTankCount <= INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S))
-					trainUnit = Terran_Vulture;
+					trainUnit = Terran_Goliath;
 
 				f->setState(new FactoryTrainState());
 				f->action(trainUnit);
@@ -944,13 +1096,13 @@ void TrainManager::factoryTraining()
 
 	}
 
-	// AddOn ´Ù´Âµ¥ Delay°¡ ÀÖ¾î¼­ º°µµ Ã¼Å©ÇÔ.
+	// AddOn 
 	for (auto f : factoryList)
 	{
 		string state = f->getState();
 
-		// »õ·Î ¸¸µé¾îÁø ÆÑÅä¸®¶ó¸é Idle ·Î ¼³Á¤
-		if (state == "BuildAddon") {
+		if (state == "BuildAddon")
+		{
 			currentFrameSetAddOnCount++;
 		}
 	}
@@ -961,12 +1113,12 @@ void TrainManager::factoryTraining()
 		{
 			string state = f->getState();
 
-			// »õ·Î ¸¸µé¾îÁø ÆÑÅä¸®¶ó¸é Idle ·Î ¼³Á¤
-			if (state == "New" && f->isComplete()) {
+			if (state == "New" && f->isComplete())
+			{
 				f->setState(new FactoryIdleState());
 			}
 
-			// ¾Öµå¿Â ÀÚ¸®¿¡ Àû °Ç¹°ÀÌ ÀÖÀ» ¶§ LiftAndLand »óÅÂ·Î ÆÑÅä¸®¸¦ ¶ç¿ì°Ô µÈ´Ù.
+
 			if (state == "LiftAndLand")
 			{
 				if (f->unit()->isLifted() || !f->unit()->canLift())
@@ -981,27 +1133,24 @@ void TrainManager::factoryTraining()
 				}
 			}
 
-			// ÃÖ¼Ò ¹úÃÄ »ý»ê ÈÄ ¸Ó½Å¼¥ Ãß°¡
+
 			if (state == "Idle")
 			{
 				UnitType trainUnit = Terran_Vulture;
 
-				// ÀÚ¿øºÎÁ·, ¸Ó½Å¼¥Àº 50/50 ÀÌ¶ó ³ªÁß¿¡ ¼öÁ¤ ÇÊ¿äÇØº¸ÀÓ
-				// ÀÚ¿ø ºÎÁ·ÇÏ¸é ÀÏ²Û »ý»ê ½¬ÀÚ. // º´·Â ¿ì¼±.
 				if (!hasEnoughResources(trainUnit))
 				{
 					waitToProduce = true;
 					return;
 				}
 
-				// ±âº» ¹úÃÄ ¼ö´Â ¸ÂÃá´Ù.
-				if (vultureAllCount >= baseVultureCount)
+				if (vultureAllCount >= baseVultureCount )
 				{
 					if (machineShopCount + currentFrameSetAddOnCount < mashineShopCount)
 					{
 						bool needMachineShop = true;
 
-						// ¹ß¾÷ Àú±Û¸µ »ó´ë·Î ¾ÈÀüÇÏ°Ô ¸Ó½Å¼¥ Ãß°¡
+
 						if (INFO.enemyRace == Races::Zerg)
 						{
 							if (EIB <= Zerg_9_Balup || EMB == Zerg_main_zergling)
@@ -1013,19 +1162,18 @@ void TrainManager::factoryTraining()
 						else if (INFO.enemyRace == Races::Protoss)
 						{
 							if (EIB == Toss_1g_forward
-									|| EIB == Toss_2g_zealot
-									|| EIB == Toss_2g_forward)
+								|| EIB == Toss_2g_zealot
+								|| EIB == Toss_2g_forward)
 							{
 								if (INFO.getCompletedCount(Terran_Vulture, S) < baseVultureCount && INFO.getAllCount(Protoss_Cybernetics_Core, E) == 0)
 									needMachineShop = false;
 							}
 						}
 
-						// ¸Ó½Å¼¥ Ãß°¡
 						if (f->unit()->getAddon() == nullptr && hasEnoughResources(Terran_Machine_Shop) && needMachineShop)
 						{
 							if (!bw->canBuildHere(f->unit()->getTilePosition(), Terran_Machine_Shop, f->unit())
-									&& !bw->getUnitsInRectangle((Position)(f->unit()->getTilePosition() + TilePosition(4, 1)), (Position)(f->unit()->getTilePosition() + TilePosition(6, 3)), Filter::IsBuilding).empty())
+								&& !bw->getUnitsInRectangle((Position)(f->unit()->getTilePosition() + TilePosition(4, 1)), (Position)(f->unit()->getTilePosition() + TilePosition(6, 3)), Filter::IsBuilding).empty())
 							{
 								if (isFirstFactory())
 								{
@@ -1050,7 +1198,7 @@ void TrainManager::factoryTraining()
 						}
 					}
 
-					// º´·Â »ý»ê
+
 					if (INFO.enemyRace == Races::Zerg)
 					{
 						if (INFO.getCompletedCount(Terran_Armory, S) == 0)
@@ -1088,14 +1236,15 @@ void TrainManager::factoryTraining()
 						{
 							if (S->hasResearched(TechTypes::Spider_Mines))
 							{
-								// ÈÄ¹Ý±îÁö ÀÏÁ¤ ¼ö ¹úÃÄ »ç¿ëÇÏ±â À§ÇØ Ãß°¡
+
 								if (baseVultureCount > vultureCount)
 								{
 									trainUnit = hasEnoughResources(Terran_Vulture) ? Terran_Vulture : None;
 								}
 								else
 								{
-									if (getAvailableGas() < 200)
+									if (getAvailableGas() < 600)
+										//if (getAvailableGas() < 200)
 										trainUnit = hasEnoughResources(Terran_Vulture) ? Terran_Vulture : None;
 									else
 										trainUnit = hasEnoughResources(Terran_Goliath) ? Terran_Goliath : hasEnoughResources(Terran_Vulture) ? Terran_Vulture : None;
@@ -1106,7 +1255,6 @@ void TrainManager::factoryTraining()
 								trainUnit = hasEnoughResources(Terran_Goliath) ? Terran_Goliath : None;
 							}
 
-							// °¡½º ¼¼ÀÌºêÇÏ±â À§ÇØ ¹úÃÄ »ý»ê
 							if (saveGas)
 								trainUnit = hasEnoughResources(Terran_Vulture) ? Terran_Vulture : None;
 						}
@@ -1122,34 +1270,33 @@ void TrainManager::factoryTraining()
 							}
 						}
 					}
-					else // ÇÁ·ÎÅä½º
+					else
 					{
-						// TankÀÇ °æ¿ì Gas°¡ ºÎÁ·ÇÑ °æ¿ì¸¸ Vulture¸¦ »ý»êÇÑ´Ù.
+
 						if (goliathCount < baseGoliathCount && INFO.getCompletedCount(Terran_Armory, S) > 0)
 						{
 							trainUnit = hasEnoughResources(Terran_Goliath) ? Terran_Goliath : None;
 
-							// °¡½º ºÎÁ·À¸·Î °ñ¸®¾Ñ ¸ø»ÌÀ» °æ¿ì ¹Ì³×¶ö Ã¼Å©ÇÏ°í ¹úÃÄ »ý»ê
+
 							if (trainUnit == None)
 								trainUnit = getAvailableGas() >= Terran_Goliath.gasPrice() ? None : hasEnoughResources(Terran_Vulture) ? Terran_Vulture : None;
 						}
 						else
 						{
-							// °ñ¸®¾Ñ ÇÊ¿äÇÏÁö ¾ÊÀº °æ¿ì ¹úÃÄ¸¸
+
 							trainUnit = hasEnoughResources(Terran_Vulture) ? Terran_Vulture : None;
 						}
 					}
 				}
 
 				if (INFO.enemyRace == Races::Terran) {
-					// Å×Å×Àü ÈÄ¹Ý¿¡ ¾µµ¥¾øÀÌ ¹úÃÄ ³Ê¹« ¸¹ÀÌ ¾ÈÂïµµ·Ï
+
 					if (trainUnit == Terran_Vulture && maxVultureCount <= INFO.getAllCount(Terran_Vulture, S)
-							|| (S->hasResearched(TechTypes::Spider_Mines) && S->isUpgrading(UpgradeTypes::Ion_Thrusters) && maxVultureCount >= tankCount + goliathCount))
+						|| (S->hasResearched(TechTypes::Spider_Mines) && S->isUpgrading(UpgradeTypes::Ion_Thrusters) && maxVultureCount >= tankCount + goliathCount))
 						continue;
 
-					// ÈÄ¹Ý¿¡ ÅÊÅ©º¸´Ù °ñ¸®¾ÑÀÌ ´õ ¸¹¾ÆÁö´Â°Í ¹æÁöÇÏ±â À§ÇØ Ãß°¡
 					else if (trainUnit == Terran_Goliath && maxGoliathCount <= INFO.getAllCount(Terran_Goliath, S)
-							 && S->getUpgradeLevel(UpgradeTypes::Charon_Boosters))
+						&& S->getUpgradeLevel(UpgradeTypes::Charon_Boosters))
 						continue;
 				}
 
@@ -1160,7 +1307,7 @@ void TrainManager::factoryTraining()
 			}
 			else if (state == "Train")
 			{
-				// º´·Â »ý»ê Á¾·áµÇ¸é Idle·Î ¹Ù²ñ
+
 				f->action();
 			}
 			else if (state == "BuildAddon")
@@ -1182,31 +1329,51 @@ void TrainManager::starportTraining()
 	int wraithCount = INFO.getAllCount(Terran_Wraith, S);
 	int dropshipCount = INFO.getAllCount(Terran_Dropship, S);
 	int vesselCount = INFO.getAllCount(Terran_Science_Vessel, S);
+	int ValkyrieCount = INFO.getAllCount(Terran_Valkyrie, S);
 	int maxVesselCount = 0;
 	int baseWraithCount = 0;
-	int maxWraithCount = 0;
-	int maxDropshipCount = 0;
-	int needConrolTowerCount = 0;
-
+	if (SM.getMyBuild() == MyBuildTypes::Protoss_ZealotKiller)
+		baseWraithCount = 1;
+	int baseValkyrieCount = 0;
+	int en_CarrierCount = INFO.getAllCount(Protoss_Carrier, E);
 	int en_wraithCount = INFO.getAllCount(Terran_Wraith, E);
 
+	int maxWraithCount = 0;
+	int maxValkyrieCount = 0;
+	int maxDropshipCount = 0;
+	int needConrolTowerCount = 0;
+	
+
+
+
+	
+	int en_valkyrieCount = INFO.getAllCount(Terran_Valkyrie, E);
 	if (starportList.empty())
 		return;
-
+//¿ÆÑ§´¬ÊýÁ¿ÉèÖÃ=======================================================
 	if (INFO.enemyRace == Races::Zerg)
-	{
-		maxVesselCount = 5;
-	}
-	else if (INFO.enemyRace == Races::Protoss)
 	{
 		maxVesselCount = 3;
 	}
+	else if (INFO.enemyRace == Races::Protoss)
+	{
+		if (SM.getMyBuild() == MyBuildTypes::Protoss_TemplarKiller && TIME<8.4*24*60)
+				maxVesselCount = 1;
+
+		else if (SM.getMyBuild() == MyBuildTypes::Protoss_CarrierKiller && EMB==Toss_fast_carrier)
+			maxVesselCount = 0;
+
+
+		else maxVesselCount = 2;
+
+	}
 	else
 	{
-		maxVesselCount = 2;
+		maxVesselCount = 1;
 	}
-
-	if (INFO.enemyRace == Races::Terran) {
+//ÉèÖÃ=======================================================
+	if (INFO.enemyRace == Races::Terran)
+	{
 		if (SM.getMyBuild() == MyBuildTypes::Terran_TankGoliath)
 		{
 			needConrolTowerCount = 1;
@@ -1216,14 +1383,18 @@ void TrainManager::starportTraining()
 		{
 			if (INFO.getCompletedCount(Terran_Valkyrie, E) > 0 || INFO.getCompletedCount(Terran_Goliath, E) > 2)
 			{
-				baseWraithCount = 0;
-				maxWraithCount = 0;
-				needConrolTowerCount = 0;
+				baseWraithCount = 2;
+				baseValkyrieCount = 2;
+				maxValkyrieCount =2;
+				maxWraithCount =5;
+				needConrolTowerCount = 1;
 			}
 			else
 			{
 				// wraith »ý»ê Threshold
 				baseWraithCount = 1;
+				baseValkyrieCount = 0;
+				maxValkyrieCount = 2;
 				// wraith ÃÖ´ë »ý»ê
 				maxWraithCount = 3;
 				// ÇÊ¿äÇÑ ÄÁÆ®·ÑÅ¸¿ö
@@ -1231,8 +1402,30 @@ void TrainManager::starportTraining()
 			}
 		}
 	}
+	else if (INFO.enemyRace == Races::Protoss)
+	{
+		
+  maxWraithCount = 0;
+  needConrolTowerCount = 1;	
+  baseWraithCount = 0;
+		if (SM.getMyBuild() == MyBuildTypes::Protoss_ZealotKiller)
+			baseWraithCount = 1;
+		
+		   if (en_CarrierCount >= 2)
+			   baseValkyrieCount = 2;
+
+		   if (SM.getMyBuild() == MyBuildTypes::Protoss_CarrierKiller && (EMB == Toss_fast_carrier || EMB == Toss_arbiter_carrier))
+		   {
+			   if (en_CarrierCount<2)
+				   baseValkyrieCount = 2;
+			   else baseValkyrieCount = 3;
+		   }
+
+	}
+
 	else
 	{
+		baseWraithCount = 1;
 		needConrolTowerCount = 1;
 	}
 
@@ -1291,32 +1484,54 @@ void TrainManager::starportTraining()
 				}
 				else if (INFO.enemyRace == Races::Protoss)
 				{
-					if (vesselCount < maxVesselCount) {
+					if (SM.getMyBuild() == MyBuildTypes::Protoss_CannonKiller &&SM.getMainStrategy()!=AttackAll &&dropshipCount <2)
+					trainUnit = hasEnoughResources(Terran_Dropship) ? Terran_Dropship : None;
+                     
+					else if (vesselCount < maxVesselCount) 
+					{
 						if (INFO.getCompletedCount(Terran_Science_Facility, S) == 0
 								|| INFO.getCompletedCount(Terran_Starport, S) == 0
 								|| INFO.getCompletedCount(Terran_Control_Tower, S) == 0)
 						{
 							continue;
 						}
-
-						// Ä³¸®¾î »ó´ëÇÒ ¶© °¡½º ¿©À¯ µÉ ¶§ »ý»ê
-						if (EMB == Toss_fast_carrier && INFO.getActivationGasBaseCount() < 3)
-							continue;
 
 						trainUnit = Terran_Science_Vessel;
 					}
-				}
-				else
-				{
-					if (vesselCount < maxVesselCount) {
-						if (INFO.getCompletedCount(Terran_Science_Facility, S) == 0
+					else
+					{
+						if ((ValkyrieCount < baseValkyrieCount))
+						{
+							if (INFO.getCompletedCount(Terran_Science_Facility, S) == 0
 								|| INFO.getCompletedCount(Terran_Starport, S) == 0
-								|| INFO.getCompletedCount(Terran_Control_Tower, S) == 0)
+								|| INFO.getCompletedCount(Terran_Control_Tower, S) == 0
+								)
+							{
+								continue;
+							}
+							trainUnit = Terran_Valkyrie;
+						}
+					}
+				}
+				else if(INFO.enemyRace == Races::Zerg)
+				{
+
+					if (vesselCount < maxVesselCount) 
+					{
+						if (INFO.getCompletedCount(Terran_Science_Facility, S) == 0
+							|| INFO.getCompletedCount(Terran_Starport, S) == 0
+							|| INFO.getCompletedCount(Terran_Control_Tower, S) == 0)
 						{
 							continue;
 						}
 
 						trainUnit = Terran_Science_Vessel;
+					}
+
+
+					else if (wraithCount < 3 )
+					{
+						trainUnit = hasEnoughResources(Terran_Wraith) ? Terran_Wraith : None;
 					}
 				}
 			}
@@ -1371,7 +1586,7 @@ int TrainManager::getMaxScvNeedCount()
 
 	for (auto c : commandCenterList)
 	{
-		// CommandÀÇ Mineral * 2 ¸¸Å« Ãß°¡
+		
 		maxScvNeedCount += ScvManager::Instance().getDepotMineralSize(c->unit()) * 2;
 		maxScvNeedCount += 3; // for Refinery
 		maxScvNeedCount += 1; // for Spare(Build, Scout, Repair)
@@ -1592,6 +1807,14 @@ bool TrainManager::isFirstFactory()
 		return false;
 }
 
+bool TrainManager::isFirstBarrack()
+{
+	if (INFO.getTypeBuildingsInRadius(Terran_Factory, S, INFO.getMainBaseLocation(S)->getPosition(), 0, true, true).size()<= 1)
+		return true;
+	else
+		return false;
+}
+
 void TrainManager::findAndSaveFirstFactoryPos(Unit factory)
 {
 	moveFirstFactoryPos = ReserveBuilding::Instance().getReservedPosition(Terran_Factory, factory, Terran_Machine_Shop);
@@ -1617,7 +1840,8 @@ void TrainManager::setBarricadeBarrack(uList &bList)
 	if (SM.getMainStrategy() != AttackAll && INFO.getFirstExpansionLocation(S))
 	{
 		for (auto b : bList) {
-			if (b->getState() == "Idle") {
+			if (b->getState() == "Idle") 
+			{
 				b->setState(new BarrackBarricadeState());
 				b->action();
 				break;
@@ -1710,8 +1934,8 @@ bool TrainManager::needStopTrainToBarracks()
 {
 	bool stopTrain = false;
 
-	if (TIME < 24 * 60 * 5 && (EIB == Terran_4scv || EIB == Toss_4probes || EIB == Zerg_4_Drone_Real)
-			&& INFO.getCompletedCount(Terran_Barracks, S) && INFO.getAllCount(Terran_Marine, S) < 1 && INFO.getAllCount(Terran_SCV, S) >= 2)
+	if ((TIME < 24 * 60 * 5 && (EIB == Terran_4scv || EIB == Toss_4probes || EIB == Zerg_4_Drone_Real)
+		&& INFO.getCompletedCount(Terran_Barracks, S) && INFO.getAllCount(Terran_Marine, S) < 1 && INFO.getAllCount(Terran_SCV, S) >= 2) || ((SM.getMyBuild() == MyBuildTypes::Protoss_ZealotKiller) && INFO.getAllCount(Terran_SCV, S) >= 6) && !INFO.getAllCount(Terran_Barracks, S))
 	{
 		// cout << "@@@ ¹è·° º´·ÂÁ» »ý»êÇØ¾ßÇØ¼­ ÀÏ²Û »ý»ê ½¯°Ô ¤Ð" << endl;
 		stopTrain = true;

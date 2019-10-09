@@ -12,14 +12,14 @@ void EnemyStrategyManager::update()
 {
 	if (TIME < 24 * 30 || TIME % 12 != 0)	return;
 
-	if (TIME < 24 * 300)
+	if (TIME < 24 * 300)//在5分钟之前，检查敌人的初始建筑
 		checkEnemyInitialBuild();
 
-	// 적 본적 없으면 스캔 그냥 쓴다.
+	// 假如一直没看过敌人基地，且升级了雷达，就直接在其主基地使用雷达
 	if (INFO.isEnemyBaseFound == false && INFO.getAvailableScanCount() > 0)
 		ComsatStationManager::Instance().useScan(INFO.getMainBaseLocation(E)->Center());
 
-	//3분 30초에서 15분 사이
+	//3分钟之后检查敌人主要建筑
 	if (TIME > 24 * 180)
 		checkEnemyMainBuild();
 
@@ -99,13 +99,13 @@ void EnemyStrategyManager::setEnemyInitialBuild(InitialBuildType ib, bool force)
 	}
 }
 
-// 적의 전략이 바꼈기 때문에 큐를 비워준다.
+// 因为有了敌人的战略，将队列留为空白 
 void EnemyStrategyManager::clearBuildConstructQueue() {
 	CM.clearNotUnderConstruction();
 	BM.buildQueue.clearAll();
 	BasicBuildStrategy::Instance().executeBasicBuildStrategy();
 }
-
+//====开始！====================================================
 EnemyStrategyManager::EnemyStrategyManager()
 {
 	enemyInitialBuild = UnknownBuild;
@@ -113,26 +113,24 @@ EnemyStrategyManager::EnemyStrategyManager()
 	enemyGasRushRefinery = nullptr;
 
 	int distance = getGroundDistance(theMap.Center(), MYBASE);
-
-	// SCV가 맵의 중앙까지 가서 배럭을 짓는데 걸리는 시간
+	//SCV到地图中心建造兵营所需时间
 	centerToBaseOfSCV = distance / Terran_SCV.topSpeed();
 	timeToBuildBarrack = (int)centerToBaseOfSCV + Terran_Barracks.buildTime();
-
-	// 프로브가 맵의 중앙까지 가서 게이트 웨이를 짓는 시간
+	//SCV到地图中心建造兵营所需时间
+	// 探机到地图中间的时间
 	centerToBaseOfProbe = distance / Protoss_Probe.topSpeed();
 	timeToBuildGateWay = (int)centerToBaseOfProbe + Protoss_Gateway.buildTime() + Protoss_Pylon.buildTime();
 
-	// 마린이 맵의 중앙에서 내 본진까지 오는데 걸리는 시간
+	// 枪兵和z到地图中间的时间
 	centerToBaseOfMarine = distance / Terran_Marine.topSpeed(); // 센터 어딘가에서 출발한 마린이 우리 본진까지 도착하는데 걸리는 시간 예측
 	centerToBaseOfZ = distance / Protoss_Zealot.topSpeed(); // 센터 어딘가에서 출발한 질럿이 우리 본진까지 도착하는데 걸리는 시간 예측
 }
-
+//===检查敌人初始建筑====================================================
 void EnemyStrategyManager::checkEnemyInitialBuild()
 {
 	// 프로토스 전략은 병력이나 건물 수를 계속 확인하면서 빌드를 갱신해야 한다.
 	if (INFO.enemyRace == Races::Zerg && enemyInitialBuild != UnknownBuild) {
-		// 9드론 판별된 경우에는 추가되는 저글링 수에 따라 4드론으로 바뀔수 있다.
-		// 12앞마당 or 12해쳐리인 경우에 9해쳐리로 변경 가능하다.
+	
 		if (enemyInitialBuild == Zerg_9_Drone || enemyInitialBuild == Zerg_12_Ap || enemyInitialBuild == Zerg_12_Hat)
 			useFirstAttackUnit();
 
@@ -244,7 +242,8 @@ void EnemyStrategyManager::useFirstExpansion()
 				// 드라군 사정거리 업그레이드 중이거나, 파일런 2개의 위치가 다 파악이 되면
 				// 변칙 빌드라고 보기 어렵다.
 
-				if ((!cyCoreList.empty() && cyCoreList.at(0)->unit()->isUpgrading()) ||  pylonList.size() > 2) {
+				if ((!cyCoreList.empty() && cyCoreList.at(0)->unit()->isUpgrading()) ||  pylonList.size() > 2) 
+				{
 
 					if (!cyCoreList.empty() && cyCoreList.at(0)->unit()->isUpgrading())
 					{
@@ -273,7 +272,7 @@ void EnemyStrategyManager::useFirstExpansion()
 			}
 			// 만드는 중이면 HP를 보고 언제 지었는지 알 수 있다.
 			else {
-				// 현재 HP / 속도 = 걸린 시간
+				// //当前hp/速度=建造nexus所用时间
 				// 현재 카운트 - 걸린시간 = 시작시간 유추 가능
 				int elapsedFrameCount = (int)(secondNexus->hp() / nexusBuildSpd_per_frmCnt);
 				int expectedFrameCount = currentFrameCnt - elapsedFrameCount;
@@ -565,8 +564,9 @@ void EnemyStrategyManager::useFirstAttackUnit()
 
 		int nearestDist = INT_MAX;
 		int farthestDist = INT_MIN;
-
-		for (auto b : INFO.getStartLocations()) {
+		//计算与本基地距离最远与最近的StartLocation
+		for (auto b : INFO.getStartLocations()) 
+		{
 			if (MYBASE == b->Center())
 				continue;
 
@@ -583,12 +583,13 @@ void EnemyStrategyManager::useFirstAttackUnit()
 			}
 		}
 
-		// 바로 오는데 걸리는 시간
+		// 直接来的时间
 		int fastestTime = 24 * 110 + int(getGroundDistance(MYBASE, nearestBase->Center()) / Zerg_Zergling.topSpeed());
 		// 돌아오는데 걸리는 시간
 		int slowestTime = fastestTime + int(getGroundDistance(nearestBase->Center(), farthestBase->Center()) / Zerg_Zergling.topSpeed()) + 24 * 10;
 
-		for (auto z : zerglingList) {
+		for (auto z : zerglingList) 
+		{
 			if (z->pos() == Positions::Unknown)
 				continue;
 
@@ -627,7 +628,8 @@ void EnemyStrategyManager::useFirstAttackUnit()
 			setEnemyInitialBuild(Zerg_4_Drone, true);
 		else if (canChange && reachTime < slowestTime && (reachCount > 6 || reachCount >= 5 && INFO.getCompletedCount(Zerg_Zergling, E) > 6))
 			setEnemyInitialBuild(Zerg_4_Drone, true);
-		else if (INFO.getCompletedCount(Terran_Vulture, S) <= 1 && INFO.getDestroyedCount(Terran_Vulture, S) == 0 && INFO.getCompletedCount(Terran_Machine_Shop, S) == 0 && zerglingList.size() >= 8 && HasEnemyFirstExpansion()) {
+		else if (INFO.getCompletedCount(Terran_Vulture, S) <= 1 && INFO.getDestroyedCount(Terran_Vulture, S) == 0 && INFO.getCompletedCount(Terran_Machine_Shop, S) == 0 && zerglingList.size() >= 8 && HasEnemyFirstExpansion()) 
+		{
 			int completedHatcheryCnt = 0;
 
 			for (auto h : INFO.getBuildings(Zerg_Hatchery, E)) {
@@ -738,9 +740,11 @@ void EnemyStrategyManager::useFirstAttackUnit()
 
 		// [2게이트 질럿 판단]
 		// 질럿의 숫자를 보고 전략판단.
-		if (INFO.getCompletedCount(Protoss_Zealot, E) + INFO.getDestroyedCount(Protoss_Zealot, E) >= 2) {
+		if (INFO.getCompletedCount(Protoss_Zealot, E) + INFO.getDestroyedCount(Protoss_Zealot, E) >= 2)
+		{
 
-			if (enemyFirstExpansionLocation != nullptr && enemyMainBase != nullptr) {
+			if (enemyFirstExpansionLocation != nullptr && enemyMainBase != nullptr) 
+			{
 
 				const Area *enemyFirstExpansionArea = theMap.GetArea(enemyFirstExpansionLocation->Location());
 				const Area *enemyMainBaseArea = theMap.GetArea(enemyMainBase->Location());
@@ -900,9 +904,11 @@ void EnemyStrategyManager::useBuildingCount()
 	{
 		// # 전진게이트 체크
 		uList gatewayList = INFO.getBuildings(Protoss_Gateway, E);
+		uList mainbasegateway = INFO.getTypeBuildingsInRadius(Protoss_Gateway, E, INFO.getMainBaseLocation(E)->Center(), 15 * TILE_SIZE);
+		uList scv = INFO.getTypeUnitsInRadius(Terran_SCV, S, INFO.getMainBaseLocation(E)->Center(), 10 * TILE_SIZE);
 
-		if (gatewayList.empty())
-			return;
+		if (scv.size() && mainbasegateway.empty() && EIB != Toss_pure_double)
+				setEnemyInitialBuild(Toss_1g_forward);
 
 		int forwardGate = 0;
 
@@ -939,18 +945,20 @@ void EnemyStrategyManager::useBuildingCount()
 		uList assimilatorList = INFO.getBuildings(Protoss_Assimilator, E);
 		uList cyCore = INFO.getBuildings(Protoss_Cybernetics_Core, E);
 
-		if (gatewayList.size() >= 2) {
+		if (gatewayList.size() >= 2)
+		{
 
 			TilePosition topLeft = TilePositions::None;
 			TilePosition bottomRight = TilePositions::None;
 			bool gasCheckFlag = false;
 
-			for (auto geysers : INFO.getMainBaseLocation(E)->Geysers()) {
+			for (auto geysers : INFO.getMainBaseLocation(E)->Geysers())
+			{
 				topLeft = geysers->TopLeft();
 				bottomRight = geysers->BottomRight();
 
 				if ((topLeft != TilePositions::None && bw->isExplored(topLeft)) ||
-						(bottomRight != TilePositions::None && bw->isExplored(bottomRight))) {
+					(bottomRight != TilePositions::None && bw->isExplored(bottomRight))) {
 					gasCheckFlag = true;
 				}
 
@@ -976,46 +984,129 @@ void EnemyStrategyManager::useBuildingCount()
 	}
 	else if (INFO.enemyRace == BWAPI::Races::Terran)
 	{
-		// # 전진배럭 체크
-		uList barracks = INFO.getBuildings(Terran_Barracks, E);
 
-		if (barracks.empty())
+		uList BarrackList = INFO.getBuildings(Terran_Barracks, E);
+
+		if (BarrackList.empty())
 			return;
 
-		int forwardBarrackCnt = 0;
-		bool isForwardBuilding = true;
+		int forwardBarrack = 0;
 
-		for (auto barrack : barracks) {
 
-			for (auto startPosition : theMap.StartingLocations()) {
-				// 어떤 스타트 포지션에 있다면 전진 전략이 아님(단 내 본진에 지었다면 전진 전략)
-				if (theMap.GetArea(startPosition) == theMap.GetArea((TilePosition)barrack->pos())
-						&& theMap.GetArea(startPosition) != theMap.GetArea(INFO.getMainBaseLocation(S)->getTilePosition())) {
-					isForwardBuilding = false;
+		int forwardThresholdGroundDistance = getGroundDistance(INFO.getSecondChokePosition(S), MYBASE)+5 * TILE_SIZE;
+
+		for (auto barrack : BarrackList) 
+		{
+			bool outSide = false;
+
+			for (auto startBase : INFO.getStartLocations()) 
+			{
+
+				if (startBase->GetOccupiedInfo() != myBase)
+					continue;
+
+				
+				if (getGroundDistance(INFO.getSecondChokePosition(S), barrack->pos()) < forwardThresholdGroundDistance)
+				{
+					outSide = true;
 					break;
 				}
 			}
 
-			if (isForwardBuilding)
-				forwardBarrackCnt++;
+			if (outSide)
+				forwardBarrack++;
+		}
 
-			isForwardBuilding = true;
+		if (forwardBarrack == 1)
+			setEnemyInitialBuild(Terran_1b_forward);
+		else if (forwardBarrack > 1)
+			setEnemyInitialBuild(Terran_2b_forward);
+		if ((forwardBarrack == 0) && (INFO.getBuildings(Terran_Barracks, E).size()>=2))
+			setEnemyInitialBuild(Terran_2b);
+
+		/*// # 2 게이트 빌드 체크
+		// 초반 정찰 타이밍에 게이트웨이가 두개, 가스가 늦으면 2게이트 질럿 푸쉬 올 확률이 높다.
+		uList assimilatorList = INFO.getBuildings(Protoss_Assimilator, E);
+		uList cyCore = INFO.getBuildings(Protoss_Cybernetics_Core, E);
+
+		if (gatewayList.size() >= 2)
+		{
+
+		TilePosition topLeft = TilePositions::None;
+		TilePosition bottomRight = TilePositions::None;
+		bool gasCheckFlag = false;
+
+		for (auto geysers : INFO.getMainBaseLocation(E)->Geysers())
+		{
+		topLeft = geysers->TopLeft();
+		bottomRight = geysers->BottomRight();
+
+		if ((topLeft != TilePositions::None && bw->isExplored(topLeft)) ||
+		(bottomRight != TilePositions::None && bw->isExplored(bottomRight))) {
+		gasCheckFlag = true;
+		}
+
+		break;
+		}
+
+		if (gasCheckFlag)
+		{
+		if (assimilatorList.size() == 0 && cyCore.size() == 0) {
+		setEnemyInitialBuild(Toss_2g_zealot);
+		}
+		else
+		setEnemyInitialBuild(Toss_2g_dragoon);
+		}
+
+		return;
+		}
+		else if (gatewayList.size() == 1) {
+		if (assimilatorList.size() != 0 || cyCore.size() != 0)
+		setEnemyInitialBuild(Toss_1g_dragoon);
+		}
+		// # 전진배럭 체크
+		uList barracks = INFO.getBuildings(Terran_Barracks, E);
+
+		if (barracks.empty())
+		return;
+
+		int forwardBarrackCnt = 0;
+		bool isForwardBuilding = true;
+
+		for (auto barrack : barracks) 
+		{
+
+		for (auto startPosition : theMap.StartingLocations()) {
+		// 어떤 스타트 포지션에 있다면 전진 전략이 아님(단 내 본진에 지었다면 전진 전략)
+		if (theMap.GetArea(startPosition) == theMap.GetArea((TilePosition)barrack->pos())
+		&& theMap.GetArea(startPosition) != theMap.GetArea(INFO.getMainBaseLocation(S)->getTilePosition())) 
+		{
+		isForwardBuilding = false;
+		break;
+		}
+		}
+
+		if (isForwardBuilding)
+		forwardBarrackCnt++;
+
+		isForwardBuilding = true;
 		}
 
 		if (forwardBarrackCnt == 1)
-			setEnemyInitialBuild(Terran_1b_forward);
+		setEnemyInitialBuild(Terran_1b_forward);
 		else if (forwardBarrackCnt > 1)
-			setEnemyInitialBuild(Terran_2b_forward);
+		setEnemyInitialBuild(Terran_2b_forward);
 
 		// # 본진 2배럭 빌드 체크
 		// 앞에서 전진으로 체크되면, 빌드 Inum 변수 순서 때문에 배럭 사이즈가 2개 이상이어도 세팅 되지 않는다.
 		if (barracks.size() >= 2)
-			setEnemyInitialBuild(Terran_2b);
+		setEnemyInitialBuild(Terran_2b);
 
-	}
-	else
-	{
+		}
+		else
+		{
 
+		}*/
 	}
 }
 

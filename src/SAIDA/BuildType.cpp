@@ -178,13 +178,31 @@ namespace BWAPI
 	{
 		"Terran_VultureTankWraith",
 		"Terran_TankGoliath",
+		"Protoss_MineKiller",
+		"Protoss_ZealotKiller",
+		"Protoss_CannonKiller",
+		"Protoss_CarrierKiller",
+		"Protoss_DragoonKiller",
+		"Protoss_TemplarKiller",
+		
+		"Protoss_FullMachanic",
+		"Zerg_MMtoMachanic",
 		"Basic"
+
 	};
 
 	namespace MyBuildTypes
 	{
 		MyBot_TYPEDEF(MyBuildType, Terran_VultureTankWraith);
 		MyBot_TYPEDEF(MyBuildType, Terran_TankGoliath);
+		MyBot_TYPEDEF(MyBuildType, Protoss_MineKiller);
+		MyBot_TYPEDEF(MyBuildType, Protoss_ZealotKiller);
+		MyBot_TYPEDEF(MyBuildType, Protoss_CannonKiller);
+		MyBot_TYPEDEF(MyBuildType, Protoss_CarrierKiller);
+		MyBot_TYPEDEF(MyBuildType, Protoss_DragoonKiller);
+		MyBot_TYPEDEF(MyBuildType, Protoss_TemplarKiller);
+		MyBot_TYPEDEF(MyBuildType, Protoss_FullMechanic);
+		MyBot_TYPEDEF(MyBuildType, Zerg_MMtoMachanic);
 		MyBot_TYPEDEF(MyBuildType, Basic);
 	};
 

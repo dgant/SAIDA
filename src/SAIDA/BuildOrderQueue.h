@@ -24,6 +24,7 @@ namespace MyBot
 			SeedPositionSpecified,		///< 별도 지정 위치
 			SecondExpansionLocation,	///< 아군 두번째 멀티
 			ThirdExpansionLocation,		///< 아군 세번째 멀티
+			EnemySecondChokePoint,
 			IslandExpansionLocation     ///< 아군 섬 멀티
 		};
 		SeedPositionStrategy		seedLocationStrategy;	///< 건설위치 초안 결정 정책

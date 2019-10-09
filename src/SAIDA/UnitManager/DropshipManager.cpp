@@ -43,17 +43,28 @@ void DropshipManager::update()
 			waitToBoardCnt++;
 	}
 
-	if (waitToBoardCnt == 3)
+	if (waitToBoardCnt >= 1)
 		waitToBoarding = true;
-
-	if (boardingSuccessCnt == 3) // 이번 Frame에 Boarding으로 간다.
+	if (INFO.enemyRace == Races::Protoss)
 	{
-		TM.initDropshipSet();
-		GM.initDropshipSet();
-		waitToBoarding = false;
-		reverse = !reverse;
+		if (boardingSuccessCnt == 2) // 이번 Frame에 Boarding으로 간다.
+		{
+			TM.initDropshipSet();
+			GM.initDropshipSet();
+			waitToBoarding = false;
+			reverse = !reverse;
+		}
 	}
-
+	else 
+	{
+		if (boardingSuccessCnt == 3) // 이번 Frame에 Boarding으로 간다.
+		{
+			TM.initDropshipSet();
+			GM.initDropshipSet();
+			waitToBoarding = false;
+			reverse = !reverse;
+		}
+	}
 	for (auto d : dropshipList)
 	{
 		string state = d->getState();
@@ -75,11 +86,24 @@ void DropshipManager::update()
 			// 예외처리
 			if (TIME % (24 * 5) == 0)
 				d->initspaceRemaining();
-
-			if (boardingSuccessCnt >= 3)
+          if(INFO.enemyRace == Races::Protoss)
+		  { 
+			if (boardingSuccessCnt >= 2 && SM.getMainStrategy() == AttackAll)
 			{
 				d->setState(new DropshipGoState(INFO.getMainBaseLocation(E)->Center(), reverse));
+				d->action();
 			}
+		  }
+		  else 
+		  
+		  
+		  {
+			  if (boardingSuccessCnt >= 3)
+			  {
+				  d->setState(new DropshipGoState(INFO.getMainBaseLocation(E)->Center(), reverse));
+				  d->action();
+			  }
+		  }
 		}
 
 		d->action();

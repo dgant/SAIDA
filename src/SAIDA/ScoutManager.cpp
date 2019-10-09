@@ -161,7 +161,7 @@ bool ScoutManager::assignScoutIfNeeded() {
 	}
 
 	// 정찰 출발 조건 정의
-	int checkSupplyUsed = 10 * 2;
+	int checkSupplyUsed =10 * 2;
 	bool checkSupplyDepotConstructionStarted = false;
 	bool checkSupplyDepotConstructionFinished = false;
 	bool checkBarrackConstructionStarted = false;
@@ -171,34 +171,35 @@ bool ScoutManager::assignScoutIfNeeded() {
 	if (INFO.getMapPlayerLimit() == 2) {
 		// vs 프로토스 : (일반적) 서플, 배럭, 가스 건설 시작 후 인구수 14 에 정찰 출발
 		if (INFO.enemyRace == Races::Protoss) {
-			checkSupplyUsed = 12 * 2;
+			checkSupplyUsed = 11 * 2;
 			checkSupplyDepotConstructionStarted = false;
-			checkSupplyDepotConstructionFinished = true;
-			checkBarrackConstructionStarted = true;
-			checkRefineryConstructionStarted = true;
+			checkSupplyDepotConstructionFinished = false;
+			checkBarrackConstructionStarted = false;
+			checkRefineryConstructionStarted = false;
 		}
 		// vs 테란 : (일반적) 서플, 배럭, 가스 건설 시작 후 인구수 14 에 정찰 출발
 		else if (INFO.enemyRace == Races::Terran) {
-			checkSupplyUsed = 14 * 2;
+			checkSupplyUsed = 10 * 2;
 			checkSupplyDepotConstructionStarted = false;
-			checkSupplyDepotConstructionFinished = true;
-			checkBarrackConstructionStarted = true;
-			checkRefineryConstructionStarted = true;
+			checkSupplyDepotConstructionFinished = false;
+			checkBarrackConstructionStarted = false;
+			checkRefineryConstructionStarted = false;
 		}
 		// vs 저그 : 서플, 배럭, 가스 건설 시작 후 인구수 13 에 정찰 출발 (4드론 저글링을 중간에 만나기때문에 괜찮다)
-		else if (INFO.enemyRace == Races::Zerg) {
-			checkSupplyUsed = 14 * 2;
+		else if (INFO.enemyRace == Races::Zerg) 
+		{
+			checkSupplyUsed = 10 * 2;
 			checkSupplyDepotConstructionStarted = false;
-			checkSupplyDepotConstructionFinished = true;
-			checkBarrackConstructionStarted = true;
-			checkRefineryConstructionStarted = true;
+			checkSupplyDepotConstructionFinished = false;
+			checkBarrackConstructionStarted = false;
+			checkRefineryConstructionStarted = false;
 		}
 		// vs 랜덤 : 서플, 배럭 건설 시작 후 인구수 12 에 정찰 출발
 		else {
-			checkSupplyUsed = 12 * 2;
+			checkSupplyUsed = 9 * 2;
 			checkSupplyDepotConstructionStarted = false;
-			checkSupplyDepotConstructionFinished = true;
-			checkBarrackConstructionStarted = true;
+			checkSupplyDepotConstructionFinished = false;
+			checkBarrackConstructionStarted = false;
 			checkRefineryConstructionStarted = false;
 		}
 	}
@@ -206,7 +207,7 @@ bool ScoutManager::assignScoutIfNeeded() {
 	else {
 		// vs 프로토스 : 서플, 배럭, 가스 건설 시작 후 인구수 13 에 정찰 출발
 		if (INFO.enemyRace == Races::Protoss) {
-			checkSupplyUsed = 12 * 2;
+			checkSupplyUsed = 9 * 2;
 			checkSupplyDepotConstructionStarted = false;
 			checkSupplyDepotConstructionFinished = true;
 			checkBarrackConstructionStarted = true;
@@ -214,7 +215,7 @@ bool ScoutManager::assignScoutIfNeeded() {
 		}
 		// vs 테란 : 서플, 배럭, 가스 건설 시작 후 인구수 13 에 정찰 출발
 		else if (INFO.enemyRace == Races::Terran) {
-			checkSupplyUsed = 13 * 2;
+			checkSupplyUsed = 10 * 2;
 			checkSupplyDepotConstructionStarted = false;
 			checkSupplyDepotConstructionFinished = true;
 			checkBarrackConstructionStarted = true;
@@ -238,21 +239,29 @@ bool ScoutManager::assignScoutIfNeeded() {
 		}
 	}
 
-	// 정찰 출발 조건 체크
-	if (S->supplyUsed() < checkSupplyUsed)
-		return false;
+	if (INFO.enemyRace == Races::Terran)
+	{
+		if (S->supplyUsed() < checkSupplyUsed)
+			return false;
+	}
+	else
+	{
+		// 정찰 출발 조건 체크
+		if (S->supplyUsed() < checkSupplyUsed)
+			return false;
 
-	if (checkSupplyDepotConstructionStarted && S->allUnitCount(Terran_Supply_Depot) < 1)
-		return false;
+		if (checkSupplyDepotConstructionStarted && S->allUnitCount(Terran_Supply_Depot) < 1)
+			return false;
 
-	if (checkSupplyDepotConstructionFinished && S->completedUnitCount(Terran_Supply_Depot) < 1)
-		return false;
+		if (checkSupplyDepotConstructionFinished && S->completedUnitCount(Terran_Supply_Depot) < 1)
+			return false;
 
-	if (checkBarrackConstructionStarted && S->allUnitCount(Terran_Barracks) < 1)
-		return false;
+		if (checkBarrackConstructionStarted && S->allUnitCount(Terran_Barracks) < 1)
+			return false;
 
-	if (checkRefineryConstructionStarted && S->allUnitCount(Terran_Refinery) < 1)
-		return false;
+		if (checkRefineryConstructionStarted && S->allUnitCount(Terran_Refinery) < 1)
+			return false;
+	}
 
 	// 적 베이스와 가장 가까이에 있는 Worker 를 정찰유닛으로 지정한다
 	UnitInfo *scouter = ScvManager::Instance().chooseScouterScvClosestTo(INFO.getMainBaseLocation(E)->Center());

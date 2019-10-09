@@ -270,6 +270,10 @@ void MyBotModule::ParseTextCommand(const string &commandString)
 		Config::BWAPIOptions::SetLocalSpeed = 42;
 		speedChange = true;
 	}
+	else if (commandString == "check" || commandString == "c") {
+		Config::BWAPIOptions::SetLocalSpeed = 1;
+		speedChange = true;
+	}
 	else if (commandString == "asap" || commandString == "vs") {
 		Config::BWAPIOptions::SetLocalSpeed = 300;
 		speedChange = true;

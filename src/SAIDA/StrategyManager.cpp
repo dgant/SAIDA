@@ -5,8 +5,8 @@
 #include "DeepLearning\Supervised.h"
 #include "DeepLearning\SharedMemoryManager.h"
 
-#define PERIOD 24 * 5                // 주기
-#define BASE_WINNING_RATE 65.00      // 베이스 승률						
+#define PERIOD 24 * 5                // 周期
+#define BASE_WINNING_RATE 65.00      // （基准胜率）
 
 using namespace MyBot;
 
@@ -26,7 +26,7 @@ StrategyManager::StrategyManager()
 	}
 
 	scanForcheckMulti = false;
-	mainStrategy = WaitToBase;
+	mainStrategy = WaitToBase;//基本策略首先设为WaitToBase
 	myBuild = MyBuildTypes::Basic;
 
 	searchPoint = 0;
@@ -62,7 +62,7 @@ void StrategyManager::onStart()
 void StrategyManager::onEnd(bool isWinner)
 {
 }
-
+//============================================================================
 void StrategyManager::update()
 {
 	try {
@@ -288,12 +288,13 @@ void StrategyManager::update()
 	bw->drawLineMap(pos1, pos2, Colors::Blue);
 	*/
 }
-
+//检查敌人的分基地==============================================================
 void StrategyManager::checkEnemyMultiBase()
 {
 	int scanThreshold = 4;
 
-	if (INFO.enemyRace == Races::Protoss) {
+	if (INFO.enemyRace == Races::Protoss) 
+	{
 		scanThreshold = 2;
 
 		if (EMB == Toss_arbiter || EMB == Toss_arbiter_carrier || EMB == Toss_fast_carrier
@@ -307,13 +308,13 @@ void StrategyManager::checkEnemyMultiBase()
 		int rank = 6;
 		Base *bestBase = nullptr;
 
-		//2. Base
+		//for每一个可能的基地位置
 		for (auto base : INFO.getBaseLocations())
-		{
+		{//如果基地被占据，跳出
 			if (base->GetOccupiedInfo() != emptyBase)
 				continue;
 
-			// 마지막으로 본 시간이 2분이 지난 경우
+			// 两分钟之后再次查看
 			if (base->GetLastVisitedTime() + (24 * 60 * 2) > TIME) continue;
 
 			if (base->GetExpectedEnemyMultiRank() <= 6 && base->GetExpectedEnemyMultiRank() < rank)
@@ -323,11 +324,11 @@ void StrategyManager::checkEnemyMultiBase()
 			}
 		}
 
-		if (bestBase != nullptr)
+		if (bestBase != nullptr)//如果bestbase能找到，就用雷达去扫
 			ComsatStationManager::Instance().useScan(bestBase->Center());
 	}
 }
-
+//检查敌人的分基地是否需要进攻==============================================================
 void StrategyManager::checkNeedAttackMulti()
 {
 	if (multiBreakDeathPosition != Positions::Unknown)
@@ -354,11 +355,11 @@ void StrategyManager::checkNeedAttackMulti()
 
 			multiBreakDeathPosition = Positions::Unknown;
 		}
-		else if (INFO.enemyRace == Races::Protoss) // 프로토스
+		else if (INFO.enemyRace == Races::Protoss)
 		{
 
 		}
-		else // 저그
+		else
 		{
 
 		}
@@ -367,12 +368,13 @@ void StrategyManager::checkNeedAttackMulti()
 	if (INFO.enemyRace == Races::Terran)
 		return;
 
-	// 1초에 한번만 실행
+	// 每秒一次运行一次 
 	if (TIME % 24 != 0) {
 		return;
 	}
 
-	if (INFO.enemyRace == Races::Zerg) {
+	if (INFO.enemyRace == Races::Zerg) 
+	{
 		// MainAttack Position에 도달했을 때
 		if (secondAttackPosition == Positions::Unknown || !secondAttackPosition.isValid())
 		{
@@ -401,7 +403,8 @@ void StrategyManager::checkNeedAttackMulti()
 
 		needAttackMulti = false;
 	}
-	else if (INFO.enemyRace == Races::Protoss) {
+	else if (INFO.enemyRace == Races::Protoss) 
+	{
 		// 상대 멀티가 없을 때
 		if (secondAttackPosition == Positions::Unknown || !secondAttackPosition.isValid())
 		{
@@ -410,7 +413,8 @@ void StrategyManager::checkNeedAttackMulti()
 		}
 
 		// 적 앞마당의 넥서스를 파괴
-		if (!INFO.getFirstExpansionLocation(E)) {
+		if (!INFO.getFirstExpansionLocation(E)) 
+		{
 			needAttackMulti = false;
 			return;
 		}
@@ -432,11 +436,12 @@ void StrategyManager::checkNeedAttackMulti()
 
 	return;
 }
-
+//制定主要策略==============================================================
 void StrategyManager::makeMainStrategy()
 {
 	// 1초에 한번만 실행
-	if (TIME % 24 != 0) {
+	if (TIME % 24 != 0)
+	{
 		return;
 	}
 
@@ -445,7 +450,7 @@ void StrategyManager::makeMainStrategy()
 	{
 		return;
 	}
-
+	int MarineCount = INFO.getCompletedCount(Terran_Marine, S);
 	int vultureCount = INFO.getCompletedCount(Terran_Vulture, S);
 	int tankCount = INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S);
 	int goliathCount = INFO.getCompletedCount(Terran_Goliath, S);
@@ -453,6 +458,9 @@ void StrategyManager::makeMainStrategy()
 	int enemyTankCount = INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, E);
 	int enemyGoliathCount = INFO.getCompletedCount(Terran_Goliath, E);
 
+	//==========================
+	mainStrategy = WaitToBase;
+	//==========================
 	// vsT, 벌쳐 사용하다가 나도 탱크를 빠르게 준비해야 하는지 판단
 	if (needTank == false)
 	{
@@ -462,12 +470,12 @@ void StrategyManager::makeMainStrategy()
 		}
 
 		if (TIME < 24 * 60 * 6
-				&& (enemyTankCount > 0 || enemyGoliathCount > 1))
+			&& (enemyTankCount > 0 || enemyGoliathCount > 1))
 		{
 			needTank = true;
 		}
 		else if (TIME >= 24 * 60 * 6 && TIME < 24 * 60 * 8
-				 && ((enemyTankCount > 3 && INFO.hasRearched(TechTypes::Tank_Siege_Mode)) || enemyGoliathCount > 4))
+			&& ((enemyTankCount > 3 && INFO.hasRearched(TechTypes::Tank_Siege_Mode)) || enemyGoliathCount > 4))
 		{
 			needTank = true;
 		}
@@ -477,7 +485,7 @@ void StrategyManager::makeMainStrategy()
 		}
 	}
 
-	// 내 공격 유닛 수 카운트 (인구 기준, 마린은 제외)
+	// 내 공격 유닛 수 카운트 (인구 기준, 마린은 제외)//计算我方攻击单位的人口
 	uMap myUnits = INFO.getUnits(S);
 	int myAttackUnitSupply = 0;
 
@@ -495,7 +503,7 @@ void StrategyManager::makeMainStrategy()
 		myAttackUnitSupply += myUnit.second->type().supplyRequired();
 	}
 
-	// 적 공격 유닛 수 카운트 (인구 기준)
+	// 적 공격 유닛 수 카운트 (인구 기준)//计算敌方攻击单位的人口
 	uMap enemyUnits = INFO.getUnits(E);
 	int enemyAttackUnitSupply = 0;
 
@@ -518,11 +526,12 @@ void StrategyManager::makeMainStrategy()
 		enemyAttackUnitSupply += enemyUnit.second->type().supplyRequired();
 	}
 
-	if (mainStrategy == AttackAll)
+	if (mainStrategy == AttackAll)     //Attack all 到 Back all 的情况
 	{
 		if (INFO.enemyRace == Races::Zerg)
 		{
-			if (myAttackUnitSupply < enemyAttackUnitSupply * 1.0 + 4)
+			//if (myAttackUnitSupply < enemyAttackUnitSupply * 1.0 + 4)
+			if (myAttackUnitSupply < enemyAttackUnitSupply * 0.8)
 			{
 				mainStrategy = BackAll;
 				scanForAttackAll = false;
@@ -538,6 +547,7 @@ void StrategyManager::makeMainStrategy()
 				drawLinePosition = Positions::Unknown;
 
 				if (S->supplyUsed() < 320 || (tankCount < enemyTankCount * 1.2 && S->supplyUsed() < 380))
+					//if (S->supplyUsed() < 150 || (tankCount < enemyTankCount * 1.0 && S->supplyUsed() < 160))
 				{
 					mainStrategy = WaitLine;
 					scanForAttackAll = false;
@@ -569,32 +579,37 @@ void StrategyManager::makeMainStrategy()
 		}
 		else
 		{
-
-			if (ESM.getEnemyMainBuild() == Toss_fast_carrier || ESM.getEnemyMainBuild() == Toss_arbiter_carrier) {
-
-				if (finalAttack) {
+			if (ESM.getEnemyMainBuild() == Toss_fast_carrier || ESM.getEnemyMainBuild() == Toss_arbiter_carrier)
+			{
+				if (finalAttack)
+				{
 					if (INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) < 2)
 						finalAttack = false;
 					else
 						return;
 				}
 
-				if (SM.getMainAttackPosition() != Positions::Unknown) {
+				if (SM.getMainAttackPosition() != Positions::Unknown)
+				{
 					UnitInfo *frontTank = TM.getFrontTankFromPos(SM.getMainAttackPosition());
 
-					if (frontTank && frontTank->pos().getApproxDistance(SM.getMainAttackPosition()) < 30 * TILE_SIZE) {
+					if (frontTank && frontTank->pos().getApproxDistance(SM.getMainAttackPosition()) < 30 * TILE_SIZE)
+					{
 						uList interceptor = INFO.getUnits(Protoss_Interceptor, E);
 						word interceptorCntInAttackArea = 0;
 
-						for (auto i : interceptor) {
-							if (i->getLastSeenPosition().getApproxDistance(SM.getMainAttackPosition()) <= 50 * TILE_SIZE) {
+						for (auto i : interceptor)
+						{
+							if (i->getLastSeenPosition().getApproxDistance(SM.getMainAttackPosition()) <= 50 * TILE_SIZE)
+							{
 								interceptorCntInAttackArea++;
 							}
 						}
 
 						uList goliath = INFO.getTypeUnitsInRadius(Terran_Goliath, S, frontTank->pos(), 20 * TILE_SIZE);
 
-						if (interceptorCntInAttackArea > goliath.size() * 4) {
+						if (interceptorCntInAttackArea > goliath.size() * 4)
+						{
 							mainStrategy = BackAll;
 							scanForAttackAll = false;
 							printf("[BackAll] near Protoss_Interceptor.size() = %d, near goliath.size()  = %d\n", interceptorCntInAttackArea, goliath.size());
@@ -603,7 +618,7 @@ void StrategyManager::makeMainStrategy()
 					}
 				}
 
-				if (myAttackUnitSupply < enemyAttackUnitSupply && myAttackUnitSupply < 45 && tankCount < 4)
+				if (myAttackUnitSupply < enemyAttackUnitSupply*0.9 && myAttackUnitSupply < 30 && tankCount < 4)
 				{
 					mainStrategy = BackAll;
 					scanForAttackAll = false;
@@ -612,7 +627,7 @@ void StrategyManager::makeMainStrategy()
 				}
 
 			}
-			else {
+		else {
 				// 상대 아비터가 보유되어있으면 베슬이 있거나, 없어도 스캔 여유가 되면 나간다.
 				if (!INFO.getUnits(Protoss_Arbiter, E).empty()) {
 					if (INFO.getCompletedCount(Terran_Science_Vessel, S) == 0 && INFO.getAvailableScanCount() < 1) {
@@ -623,7 +638,7 @@ void StrategyManager::makeMainStrategy()
 					}
 				}
 
-				if (myAttackUnitSupply < enemyAttackUnitSupply && myAttackUnitSupply < 45 && tankCount < 4)
+				if (myAttackUnitSupply < enemyAttackUnitSupply && myAttackUnitSupply < 45 && tankCount < 1)
 				{
 					mainStrategy = BackAll;
 					scanForAttackAll = false;
@@ -635,190 +650,99 @@ void StrategyManager::makeMainStrategy()
 
 		}
 	}
-	else if (mainStrategy == DrawLine)
+	else if (mainStrategy == DrawLine)//Draw line 到Attack all、WaitLine的情况
+	{
+	if (INFO.enemyRace != Races::Terran)
 	{
 		if (S->supplyUsed() >= 380 && (INFO.getOccupiedBaseLocations(E).size() < 2 || INFO.getAllCount(Terran_Command_Center, E) < 2))
+			//if (S->supplyUsed() >= 240 && (INFO.getOccupiedBaseLocations(E).size() <= 3 || INFO.getAllCount(Terran_Command_Center, E) < 2))
 		{
 			mainStrategy = AttackAll;
-			return;
-		}
-
-		if (INFO.enemyRace == Races::Terran)
-		{
-			UnitInfo *firstTank = TM.getFrontTankFromPos(mainAttackPosition);
-
-			if (firstTank == nullptr)
-			{
-				// 탱크 다 죽었으면 Wait 는 SecondChokePoint 로 지정
-				// 다시 나갈때 Draw 가 FirstWaitLine 으로 설정되게 초기화
-				waitLinePosition = INFO.getSecondChokePosition(S);
-
-				cout << "[" << TIME << "]" << "=== 내 탱크 다 죽어서 Wait - " << endl;
-				drawLinePosition = Positions::Unknown;
-				mainStrategy = WaitLine;
-
-				return;
-			}
-
-			// 멀티 3개 이하일 때 공 2업 전까지 firstWaitLine 에서 계속 대기할 것
-			// 상대 마인이 없으면 볼때까지는 진출
-			//if (!isExistEnemyMine
-			//		&& INFO.getOccupiedBaseLocations(S).size() <= 3 && S->getUpgradeLevel(UpgradeTypes::Terran_Vehicle_Weapons) < 2
-			//		&& (INFO.getSecondChokePosition(S).getApproxDistance(INFO.getFirstWaitLinePosition())
-			//			< INFO.getSecondChokePosition(S).getApproxDistance(firstTank->pos()) + 3 * TILE_SIZE))
-			//{
-			//	drawLinePosition == Positions::Unknown;
-			//	mainStrategy = WaitLine;
-
-			//	return;
-			//}
-
-			if (needWait(firstTank))
-			{
-				cout << "@@ Draw에서 WaitLine 으로 대기해야겠어 ***" << endl;
-				mainStrategy = WaitLine;
-				drawLinePosition = Positions::Unknown;
-				return;
-			}
-
-			// 스캔 너무 적으면 Wait (스캔 체크는 적 마인이나 레이스 있을 경우에만)
-			if (INFO.getAvailableScanCount() < 1 && INFO.getUnits(Spell_Scanner_Sweep, S).empty()
-					&& (isExistEnemyMine || (INFO.getAllCount(Terran_Wraith, E) + INFO.getDestroyedCount(Terran_Wraith, E))))
-			{
-				cout << "[" << TIME << "]" << "=== 스캔 적어서 Wait - " << INFO.getAvailableScanCount() << endl;
-				drawLinePosition = Positions::Unknown;
-				mainStrategy = WaitLine;
-
-				return;
-			}
-
-			// 다음 타겟 위치 설정
-			if (TIME > nextScanTime || drawLinePosition.getApproxDistance(firstTank->pos()) <= 3 * TILE_SIZE)
-			{
-				setDrawLinePosition();
-
-				// 다음 가야할 위치 모르면 대기상태로
-				if (drawLinePosition == Positions::Unknown || !drawLinePosition.isValid())
-				{
-					cout << "[" << TIME << "]" << "=== 어디로 가야할 지 몰라 Wait" << endl;
-					drawLinePosition = Positions::Unknown;
-					mainStrategy = WaitLine;
-
-					return;
-				}
-
-				// 스캔 사용
-				if (drawLinePosition.getApproxDistance(firstTank->pos()) > 9 * TILE_SIZE || !bw->isVisible((TilePosition)drawLinePosition))
-				{
-					int myUnitCountInDrawLine = INFO.getUnitsInRadius(S, drawLinePosition, 10 * TILE_SIZE, true).size();
-					int enemyUnitCountInDrawLine = INFO.getUnitsInRadius(E, drawLinePosition, 10 * TILE_SIZE, true).size();
-
-					if (myUnitCountInDrawLine <= enemyUnitCountInDrawLine)
-					{
-						cout << "[DrawLine] [" << TIME << "]" << "--- 스캔 사용" << (TilePosition)drawLinePosition << endl;
-						ComsatStationManager::Instance().useScan(drawLinePosition);
-						nextScanTime = TIME + 25 * 24;
-					}
-				}
-			}
-
-			// DrawLine 에서 첫번째 탱크 근처로 hide 중인 마인이 있을 경우 스캔 사용
-			uList enemyMine = INFO.getTypeUnitsInRadius(Terran_Vulture_Spider_Mine, E, firstTank->pos(), Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange(), true);
-
-			if (!enemyMine.empty())
-			{
-				Position scanPosition = getAvgPosition(enemyMine);
-
-				if (scanPosition.isValid())
-				{
-					ComsatStationManager::Instance().useScan(drawLinePosition);
-					cout << "@@@@ 첫번째 탱크 주변에 마인 있어!! 스캔 뿌릴게" << getAvgPosition(enemyMine) / TILE_SIZE << endl;
-				}
-			}
-
-			if (!moreUnits(firstTank))
-			{
-				drawLinePosition = Positions::Unknown;
-				mainStrategy = WaitLine;
-			}
-
 			return;
 		}
 	}
-	else if (mainStrategy == WaitLine)
+	else
 	{
-		if (S->supplyUsed() >= 380 && (INFO.getOccupiedBaseLocations(E).size() < 2 || INFO.getAllCount(Terran_Command_Center, E) < 2))
+		if (myBuild == MyBuildTypes::Terran_TankGoliath)
 		{
-			mainStrategy = AttackAll;
+			if ((S->supplyUsed() >= 380 && (INFO.getOccupiedBaseLocations(E).size() <= 2 || INFO.getAllCount(Terran_Command_Center, E) <= 2)) ||
+				(myAttackUnitSupply >= (int)(enemyAttackUnitSupply * 1.4) && S->supplyUsed() >= 120))
+			{
+				mainStrategy = AttackAll;
+				return;
+			}
+		}
+		else if (myBuild == MyBuildTypes::Terran_VultureTankWraith)
+		{
+			if (S->supplyUsed() >= 240 && (INFO.getOccupiedBaseLocations(E).size() <= 2 || INFO.getAllCount(Terran_Command_Center, E) <= 3))
+				//if (TIME >= 24 * 60 * 5 && myAttackUnitSupply >= (int)(enemyAttackUnitSupply * 1.5) && tankCount >= 4)
+			{
+				mainStrategy = AttackAll;
+				return;
+			}
+		}
+	}
+
+	if (INFO.enemyRace == Races::Terran)
+	{
+		UnitInfo *firstTank = TM.getFrontTankFromPos(mainAttackPosition);
+
+		if (firstTank == nullptr)
+		{
+			// 탱크 다 죽었으면 Wait 는 SecondChokePoint 로 지정
+			// 다시 나갈때 Draw 가 FirstWaitLine 으로 설정되게 초기화
+			waitLinePosition = INFO.getSecondChokePosition(S);
+
+			cout << "[" << TIME << "]" << "=== 내 탱크 다 죽어서 Wait - " << endl;
+			drawLinePosition = Positions::Unknown;
+			mainStrategy = WaitLine;
+
 			return;
 		}
 
-		if (INFO.enemyRace == Races::Terran)
+		// 멀티 3개 이하일 때 공 2업 전까지 firstWaitLine 에서 계속 대기할 것
+		// 상대 마인이 없으면 볼때까지는 진출
+		//if (!isExistEnemyMine
+		//		&& INFO.getOccupiedBaseLocations(S).size() <= 3 && S->getUpgradeLevel(UpgradeTypes::Terran_Vehicle_Weapons) < 2
+		//		&& (INFO.getSecondChokePosition(S).getApproxDistance(INFO.getFirstWaitLinePosition())
+		//			< INFO.getSecondChokePosition(S).getApproxDistance(firstTank->pos()) + 3 * TILE_SIZE))
+		//{
+		//	drawLinePosition == Positions::Unknown;
+		//	mainStrategy = WaitLine;
+
+		//	return;
+		//}
+
+		if (needWait(firstTank))
 		{
-			UnitInfo *firstTank = TM.getFrontTankFromPos(mainAttackPosition);
-
-			if (firstTank != nullptr)
-			{
-				int distanceToFirstTank = 0;
-				int distanceToSecondChokePoint = 0;
-
-				theMap.GetPath(MYBASE, firstTank->pos(), &distanceToFirstTank);
-				theMap.GetPath(MYBASE, INFO.getSecondChokePosition(S), &distanceToSecondChokePoint);
-
-				if (distanceToFirstTank < distanceToSecondChokePoint)
-					waitLinePosition = INFO.getSecondChokePosition(S);
-				else
-					waitLinePosition = firstTank->pos();
-			}
-			else
-			{
-				// 탱크 다 죽었으면 Wait 는 SecondChokePoint 로 지정
-				// 다시 나갈때 Draw 가 FirstWaitLine 으로 설정되게 초기화
-				waitLinePosition = INFO.getSecondChokePosition(S);
-
-				return;
-			}
-
-			// 다시 DrawLine 으로 변경하기까지 20초 후에 판단
-			if (nextDrawTime == 0)
-			{
-				nextDrawTime = TIME + 20 * 24;
-				return;
-			}
-
-			if (nextDrawTime > 0 && nextDrawTime > TIME)
-			{
-				return;
-			}
-
-			// 20초 지난 후 Draw 로 변경되지 않았을 경우 다시 20초 후 확인되도록 리셋
-			nextDrawTime = 0;
+			cout << "@@ Draw에서 WaitLine 으로 대기해야겠어 ***" << endl;
+			mainStrategy = WaitLine;
 			drawLinePosition = Positions::Unknown;
+			return;
+		}
 
-			if (needWait(firstTank))
-			{
-				cout << "@@ Wait 계속 유지하자아" << endl;
-				waitLinePosition = firstTank->pos();
-				return;
-			}
+		// 스캔 너무 적으면 Wait (스캔 체크는 적 마인이나 레이스 있을 경우에만)
+		if (INFO.getAvailableScanCount() < 1 && INFO.getUnits(Spell_Scanner_Sweep, S).empty()
+			&& (isExistEnemyMine || (INFO.getAllCount(Terran_Wraith, E) + INFO.getDestroyedCount(Terran_Wraith, E))))
+		{
+			cout << "[" << TIME << "]" << "=== 스캔 적어서 Wait - " << INFO.getAvailableScanCount() << endl;
+			drawLinePosition = Positions::Unknown;
+			mainStrategy = WaitLine;
 
-			// 탱크나 골리앗 수가 적거나 스캔 체크(적 마인이 있거나 레이스가 있을 경우)
-			if (tankCount < 3 || goliathCount < 2
-					|| (INFO.getAvailableScanCount() < 2
-						&& (isExistEnemyMine || (INFO.getAllCount(Terran_Wraith, E) + INFO.getDestroyedCount(Terran_Wraith, E))))
-			   )
-			{
-				return;
-			}
+			return;
+		}
 
-			// 다음 타겟 위치 설정
+		// 다음 타겟 위치 설정设置下一个目标位置
+		if (TIME > nextScanTime || drawLinePosition.getApproxDistance(firstTank->pos()) <= 3 * TILE_SIZE)
+		{
 			setDrawLinePosition();
 
-			// 다음 가야할 위치 모르면 대기상태로
+			// 다음 가야할 위치 모르면 대기상태로位置未知
 			if (drawLinePosition == Positions::Unknown || !drawLinePosition.isValid())
 			{
 				cout << "[" << TIME << "]" << "=== 어디로 가야할 지 몰라 Wait" << endl;
 				drawLinePosition = Positions::Unknown;
+				mainStrategy = WaitLine;
 
 				return;
 			}
@@ -831,40 +755,208 @@ void StrategyManager::makeMainStrategy()
 
 				if (myUnitCountInDrawLine <= enemyUnitCountInDrawLine)
 				{
-					cout << "[WaitLine] [" << TIME << "]" << "--- 스캔 사용" << (TilePosition)drawLinePosition << endl;
+					cout << "[DrawLine] [" << TIME << "]" << "--- 스캔 사용" << (TilePosition)drawLinePosition << endl;
 					ComsatStationManager::Instance().useScan(drawLinePosition);
+					nextScanTime = TIME + 25 * 24;
 				}
 			}
+		}
 
-			if (moreUnits(firstTank))
+		// DrawLine 에서 첫번째 탱크 근처로 hide 중인 마인이 있을 경우 스캔 사용
+		uList enemyMine = INFO.getTypeUnitsInRadius(Terran_Vulture_Spider_Mine, E, firstTank->pos(), Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange(), true);
+
+		if (!enemyMine.empty())
+		{
+			Position scanPosition = getAvgPosition(enemyMine);
+
+			if (scanPosition.isValid())
 			{
-				mainStrategy = DrawLine;
-				return;
+				ComsatStationManager::Instance().useScan(drawLinePosition);
+				cout << "@@@@ 첫번째 탱크 주변에 마인 있어!! 스캔 뿌릴게" << getAvgPosition(enemyMine) / TILE_SIZE << endl;
 			}
+		}
 
-			// 여기까지 왔다면 계속 wait
+		if (!moreUnits(firstTank))
+		{
 			drawLinePosition = Positions::Unknown;
+			mainStrategy = WaitLine;
 		}
 
 		return;
 	}
-	else
+	}
+	else if (mainStrategy == WaitLine)  //WaitLine到AttackAll、
 	{
-		if (S->supplyUsed() >= 380 && (INFO.getOccupiedBaseLocations(E).size() < 2 || INFO.getAllCount(Terran_Command_Center, E) < 2))
+	if (INFO.enemyRace != Races::Terran)
+	{
+		if (S->supplyUsed() >= 320 && (INFO.getOccupiedBaseLocations(E).size() < 2 || INFO.getAllCount(Terran_Command_Center, E) < 2))
+			//if (S->supplyUsed() >= 240 && (INFO.getOccupiedBaseLocations(E).size() <= 3 || INFO.getAllCount(Terran_Command_Center, E) < 2))
 		{
 			mainStrategy = AttackAll;
 			return;
 		}
+	}
+	else
+	{
+		if (myBuild == MyBuildTypes::Terran_TankGoliath)
+		{
+			if ((S->supplyUsed() >= 380 && (INFO.getOccupiedBaseLocations(E).size() <= 2 || INFO.getAllCount(Terran_Command_Center, E) <= 2)) ||
+				(myAttackUnitSupply >= (int)(enemyAttackUnitSupply * 1.4) && S->supplyUsed() >= 120))
+			{
+				mainStrategy = AttackAll;
+				return;
+			}
+		}
+		else if (myBuild == MyBuildTypes::Terran_VultureTankWraith)
+		{
+			if (S->supplyUsed() >= 240 && (INFO.getOccupiedBaseLocations(E).size() <= 2 || INFO.getAllCount(Terran_Command_Center, E) <= 2))
+				//if (TIME>=24*60*5&&myAttackUnitSupply >= (int)(enemyAttackUnitSupply * 1.5) && tankCount >= 4)
+			{
+				mainStrategy = AttackAll;
+				return;
+			}
+		}
+	}
 
+	if (INFO.enemyRace == Races::Terran)
+	{
+		UnitInfo *firstTank = TM.getFrontTankFromPos(mainAttackPosition);
+
+		if (firstTank != nullptr)
+		{
+			int distanceToFirstTank = 0;
+			int distanceToSecondChokePoint = 0;
+
+			theMap.GetPath(MYBASE, firstTank->pos(), &distanceToFirstTank);
+			theMap.GetPath(MYBASE, INFO.getSecondChokePosition(S), &distanceToSecondChokePoint);
+
+			if (distanceToFirstTank < distanceToSecondChokePoint)
+				waitLinePosition = INFO.getSecondChokePosition(S);
+			else
+				waitLinePosition = firstTank->pos();
+		}
+		else
+		{
+			// 탱크 다 죽었으면 Wait 는 SecondChokePoint 로 지정
+			// 다시 나갈때 Draw 가 FirstWaitLine 으로 설정되게 초기화
+			waitLinePosition = INFO.getSecondChokePosition(S);
+
+			return;
+		}
+
+		// 다시 DrawLine 으로 변경하기까지 20초 후에 판단
+		if (nextDrawTime == 0)
+		{
+			nextDrawTime = TIME + 20 * 24;
+			return;
+		}
+
+		if (nextDrawTime > 0 && nextDrawTime > TIME)
+		{
+			return;
+		}
+
+		// 20초 지난 후 Draw 로 변경되지 않았을 경우 다시 20초 후 확인되도록 리셋
+		nextDrawTime = 0;
+		drawLinePosition = Positions::Unknown;
+
+		if (needWait(firstTank))
+		{
+			cout << "@@ Wait 계속 유지하자아" << endl;
+			waitLinePosition = firstTank->pos();
+			return;
+		}
+
+		// 탱크나 골리앗 수가 적거나 스캔 체크(적 마인이 있거나 레이스가 있을 경우)
+		if (tankCount < 3 || goliathCount < 2
+			|| (INFO.getAvailableScanCount() < 2
+				&& (isExistEnemyMine || (INFO.getAllCount(Terran_Wraith, E) + INFO.getDestroyedCount(Terran_Wraith, E)))))
+		{
+			return;
+		}
+
+		// 다음 타겟 위치 설정
+		setDrawLinePosition();
+
+		// 다음 가야할 위치 모르면 대기상태로
+		if (drawLinePosition == Positions::Unknown || !drawLinePosition.isValid())
+		{
+			cout << "[" << TIME << "]" << "=== 어디로 가야할 지 몰라 Wait" << endl;
+			drawLinePosition = Positions::Unknown;
+
+			return;
+		}
+
+		// 스캔 사용
+		if (drawLinePosition.getApproxDistance(firstTank->pos()) > 9 * TILE_SIZE || !bw->isVisible((TilePosition)drawLinePosition))
+		{
+			int myUnitCountInDrawLine = INFO.getUnitsInRadius(S, drawLinePosition, 10 * TILE_SIZE, true).size();
+			int enemyUnitCountInDrawLine = INFO.getUnitsInRadius(E, drawLinePosition, 10 * TILE_SIZE, true).size();
+
+			if (myUnitCountInDrawLine <= enemyUnitCountInDrawLine)
+			{
+				cout << "[WaitLine] [" << TIME << "]" << "--- 스캔 사용" << (TilePosition)drawLinePosition << endl;
+				ComsatStationManager::Instance().useScan(drawLinePosition);
+			}
+		}
+
+		if (moreUnits(firstTank))
+		{
+			mainStrategy = DrawLine;
+			return;
+		}
+
+		// 여기까지 왔다면 계속 wait
+		drawLinePosition = Positions::Unknown;
+	}
+		return;
+	}
+	else      //主要策略等于其他
+	{
+		//if (S->supplyUsed() >= 380 && (INFO.getOccupiedBaseLocations(E).size() < 2 || INFO.getAllCount(Terran_Command_Center, E) < 2))
+		if (SM.getMyBuild() != MyBuildTypes::Protoss_DragoonKiller&&SM.getMyBuild() != MyBuildTypes::Protoss_CannonKiller
+			&&SM.getMyBuild() != MyBuildTypes::Protoss_CarrierKiller&&SM.getMyBuild() != MyBuildTypes::Protoss_ZealotKiller)
+		{
+			if (INFO.enemyRace != Races::Terran)
+			{
+				if (S->supplyUsed() >= 320 && (INFO.getOccupiedBaseLocations(E).size() < 2 || INFO.getAllCount(Terran_Command_Center, E) < 2))
+					//if (S->supplyUsed() >= 240 && (INFO.getOccupiedBaseLocations(E).size() <= 3 || INFO.getAllCount(Terran_Command_Center, E) < 2))
+				{
+					mainStrategy = AttackAll;
+					return;
+				}
+			}
+			else
+			{
+				if (myBuild == MyBuildTypes::Terran_TankGoliath)
+				{
+					if ((S->supplyUsed() >= 380 && (INFO.getOccupiedBaseLocations(E).size() <= 2 || INFO.getAllCount(Terran_Command_Center, E) <= 2)) ||
+						(myAttackUnitSupply >= (int)(enemyAttackUnitSupply * 1.4) && S->supplyUsed() >= 120))
+					{
+						mainStrategy = AttackAll;
+						return;
+					}
+				}
+				else if (myBuild == MyBuildTypes::Terran_VultureTankWraith)
+				{
+					if (S->supplyUsed() >= 240 && (INFO.getOccupiedBaseLocations(E).size() <= 2 || INFO.getAllCount(Terran_Command_Center, E) <= 3))
+						//if (TIME >= 24 * 60 * 5 && myAttackUnitSupply >= (int)(enemyAttackUnitSupply * 1.5)&& tankCount >= 4)
+					{
+						mainStrategy = AttackAll;
+						return;
+					}
+				}
+			}
+        }
 		if (INFO.enemyRace == Races::Zerg)
 		{
 			if (myAttackUnitSupply >= 12 * 2 && S->hasResearched(TechTypes::Tank_Siege_Mode) && tankCount > 2 &&
-					myAttackUnitSupply >= enemyAttackUnitSupply * 1.5 + 8)
+				myAttackUnitSupply >= enemyAttackUnitSupply * 1.5 + 8)
 			{
 				UnitInfo *armory = INFO.getClosestTypeUnit(S, MYBASE, Terran_Armory);
 
 				if (S->getUpgradeLevel(UpgradeTypes::Terran_Vehicle_Plating) || S->getUpgradeLevel(UpgradeTypes::Terran_Vehicle_Weapons)
-						|| (armory != nullptr && armory->unit()->getRemainingUpgradeTime() > 0 && armory->unit()->getRemainingUpgradeTime() < 24 * 30))
+					|| (armory != nullptr && armory->unit()->getRemainingUpgradeTime() > 0 && armory->unit()->getRemainingUpgradeTime() < 24 * 30))
 				{
 					mainStrategy = AttackAll;
 
@@ -882,17 +974,9 @@ void StrategyManager::makeMainStrategy()
 		{
 			if (myBuild == MyBuildTypes::Terran_TankGoliath)
 			{
+
 				if (S->hasResearched(TechTypes::Tank_Siege_Mode))
 				{
-					//if (INFO.getFirstWaitLinePosition() != Positions::Unknown)
-					//{
-					//	waitLinePosition = INFO.getFirstWaitLinePosition();
-					//	mainStrategy = WaitLine;
-
-					//	return;
-					//}
-					//else
-					//{
 					UnitInfo *closestTank = TM.getFrontTankFromPos(SM.getMainAttackPosition());
 
 					if (closestTank != nullptr)
@@ -904,8 +988,8 @@ void StrategyManager::makeMainStrategy()
 						return;
 					}
 
-					//}
 				}
+
 			}
 			else if (myBuild == MyBuildTypes::Terran_VultureTankWraith)
 			{
@@ -920,7 +1004,7 @@ void StrategyManager::makeMainStrategy()
 					}
 				}
 
-				if (myAttackUnitSupply >= (int)(enemyAttackUnitSupply * 1.3) + 2)
+				if (myAttackUnitSupply >= (int)(enemyAttackUnitSupply * 1.4) && tankCount >= 3)
 				{
 					mainStrategy = AttackAll;
 
@@ -934,13 +1018,10 @@ void StrategyManager::makeMainStrategy()
 				}
 			}
 		}
-		else // Protoss
+		else if (INFO.enemyRace == Races::Protoss)
 		{
-			if (ML_ON_OFF)
-				if (useML())
-					return;
-
-			if (ESM.getEnemyMainBuild() == Toss_fast_carrier || ESM.getEnemyMainBuild() == Toss_arbiter_carrier)
+		
+		/*	if (ESM.getEnemyMainBuild() == Toss_fast_carrier || ESM.getEnemyMainBuild() == Toss_arbiter_carrier)
 			{
 				//3기 이하일때
 				int threshold = 3;
@@ -950,8 +1031,7 @@ void StrategyManager::makeMainStrategy()
 
 				int sizeDiff = INFO.getCompletedCount(Terran_Goliath, S) - INFO.getCompletedCount(Protoss_Carrier, E) * threshold;
 
-				if (S->hasResearched(TechTypes::Tank_Siege_Mode) && tankCount >= 4
-						&& sizeDiff > 0 && S->getUpgradeLevel(UpgradeTypes::Charon_Boosters))
+				if (S->hasResearched(TechTypes::Tank_Siege_Mode) && tankCount >= 3)
 				{
 					bool canAttack = false;
 
@@ -1000,9 +1080,10 @@ void StrategyManager::makeMainStrategy()
 					}
 				}
 
-			}
-			else
+			}*/
+			
 			{
+
 				double rushThreshhold = 1.3;
 
 				// 적이 세번째 멀티를 안먹었으면 병력을 모았을 것이므로 좀더 안전하게 한다.
@@ -1021,30 +1102,38 @@ void StrategyManager::makeMainStrategy()
 					rushThreshhold = 1.2;
 				}
 
-				// SiegeMode가 연구된 다음에 러쉬
-				if (tankCount >= 6 && vultureCount >= 3 && S->hasResearched(TechTypes::Tank_Siege_Mode) && myAttackUnitSupply >= (int)(enemyAttackUnitSupply * rushThreshhold))
+				int Tankcnt = INFO.getAllCount(Terran_Siege_Tank_Siege_Mode, S)
+					+ INFO.getAllCount(Terran_Siege_Tank_Tank_Mode, S);
+				int Marinecnt = INFO.getCompletedCount(Terran_Marine, S);
+				if (SM.getMyBuild() == MyBuildTypes::Protoss_TemplarKiller &&TIME >= 24 * 60 * 6.2)
 				{
-					// 상대 아비터가 보유되어있으면 베슬이 있거나, 없어도 스캔 여유가 되면 나간다.
+					
+					mainStrategy = AttackAll;
+					return;
+				}
+				else if ((SM.getMyBuild() == MyBuildTypes::Protoss_CarrierKiller || SM.getMyBuild() == MyBuildTypes::Protoss_CannonKiller || SM.getMyBuild() == MyBuildTypes::Protoss_ZealotKiller || SM.getMyBuild() == MyBuildTypes::Protoss_DragoonKiller) && S->getUpgradeLevel(UpgradeTypes::Terran_Vehicle_Weapons) == 2 || S->getUpgradeLevel(UpgradeTypes::Terran_Vehicle_Weapons) == 3)
+				{
+
 					if (!INFO.getUnits(Protoss_Arbiter, E).empty()) {
 						if (INFO.getAllCount(Terran_Science_Vessel, S) == 0 && INFO.getAvailableScanCount() < 5) {
 							return;
 						}
 					}
-
+					
 					// 다크가 보이면 스캔이 있거나 베슬이 있어야 나간다.
-					if (!INFO.getUnits(Protoss_Dark_Templar, E).empty()) {
-						if (INFO.getAllCount(Terran_Science_Vessel, S) == 0 && INFO.getAvailableScanCount() < 2) {
-							return;
-						}
-					}
-
+					//	if (!INFO.getUnits(Protoss_Dark_Templar, E).empty()) {
+						//	if (INFO.getAllCount(Terran_Science_Vessel, S) == 0 && INFO.getAvailableScanCount() < 2) {
+					//			return;
+						//	}
+					//	}
+					
 					UnitInfo *armory = INFO.getClosestTypeUnit(S, MYBASE, Terran_Armory);
-
+					mainStrategy = AttackAll;
 					/*myAttackUnitSupply >= (int)(enemyAttackUnitSupply * 1.6) || */
 					if (S->getUpgradeLevel(UpgradeTypes::Terran_Vehicle_Weapons) ||
-							(armory != nullptr && armory->unit()->getRemainingUpgradeTime() > 0 && armory->unit()->getRemainingUpgradeTime() < 24 * 30))
+						(armory != nullptr && armory->unit()->getRemainingUpgradeTime() > 0 && armory->unit()->getRemainingUpgradeTime() < 24 * 30))
 					{
-						mainStrategy = AttackAll;
+						
 
 						if (scanForAttackAll == false && INFO.getAvailableScanCount() > 0)
 						{
@@ -1055,27 +1144,34 @@ void StrategyManager::makeMainStrategy()
 						return;
 					}
 				}
+				else if ((SM.getMyBuild() == MyBuildTypes::Protoss_MineKiller) &&INFO.getAllCount(Terran_Siege_Tank_Tank_Mode,S)>=1)
+				{
+
+					mainStrategy = AttackAll;
+					return;
+				}
 			}
 		}
 
 		uList commandCenterList = INFO.getBuildings(Terran_Command_Center, S);
-
-		for (auto c : commandCenterList)
-		{
-			if (INFO.getFirstExpansionLocation(S) != nullptr && c->pos().getApproxDistance(INFO.getFirstExpansionLocation(S)->getPosition()) < 6 * TILE_SIZE)
+		
+			for (auto c : commandCenterList)
 			{
-				mainStrategy = WaitToFirstExpansion;
-				return;
+				if (INFO.getFirstExpansionLocation(S) != nullptr && c->pos().getApproxDistance(INFO.getFirstExpansionLocation(S)->getPosition()) < 6 * TILE_SIZE)
+				{
+					mainStrategy = WaitToFirstExpansion;
+					return;
+				}
 			}
-		}
-
-		mainStrategy = WaitToBase;
+		
+		
 	}
 }
 
+
 bool StrategyManager::useML()
 {
-	if (!isCircuitBreakers || SHM.getWinningRate() == -1)
+	
 		return false;
 
 	bool upgradeCheck = false;
@@ -1140,7 +1236,7 @@ bool StrategyManager::useML()
 
 }
 
-// Supply DeadLock 예방 및 SupplyProvider 가 부족해질 상황 에 대한 선제적 대응으로서 SupplyProvider를 추가 건설/생산한다
+//人口管理======================================================================
 void StrategyManager::executeSupplyManagement()
 {
 	// 1초에 한번만 실행
@@ -1164,7 +1260,7 @@ void StrategyManager::executeSupplyManagement()
 		}
 	}
 
-	// 현재 supply + 건설중인 supply 가 400 이 넘을경우 추가 건설하지 않아도 됨
+
 	if (S->supplyUsed() + onBuildingSupplyCount >= 400)
 	{
 		return;
@@ -1234,7 +1330,8 @@ void StrategyManager::executeSupplyManagement()
 		if (currentSupplyShortage > 0) {
 			//cout << "currentSupplyShortage : " << currentSupplyShortage << ", onBuildingSupplyCount : " << onBuildingSupplyCount << endl;
 
-			if (currentSupplyShortage > onBuildingSupplyCount) {
+			if (currentSupplyShortage > onBuildingSupplyCount) 
+			{
 				bool needBarricade = false;
 
 				for (auto b : INFO.getBuildings(Terran_Barracks, S))
@@ -1277,7 +1374,8 @@ void StrategyManager::executeSupplyManagement()
 				else*/
 				{
 					// 적군에 의해서 SD의 부족이 많이 발생하면 현재 Mineral을 감안하여 다수의 SCV들이 SD를 빨리 짓는 로직
-					if (currentSupplyShortage > 2 * Terran_Supply_Depot.supplyProvided()) {
+					if (currentSupplyShortage > 2 * Terran_Supply_Depot.supplyProvided()) 
+					{
 						int neededTobuildByForce = currentSupplyShortage / Terran_Supply_Depot.supplyProvided();
 
 						for (int i = 0; i < min(neededTobuildByForce, remaingMineral / 100); i++) {
@@ -1308,10 +1406,11 @@ void StrategyManager::executeSupplyManagement()
 						}
 						else
 						{
-							// BuildQueue 최상단에 SupplyProvider 가 있지 않으면 enqueue 한다
+							// 将SP放到建造队列中
 							bool isToEnqueue = true;
 
-							if (!BM.buildQueue.isEmpty()) {
+							if (!BM.buildQueue.isEmpty()) 
+							{
 								BuildOrderItem currentItem = BM.buildQueue.getHighestPriorityItem();
 
 								if (currentItem.metaType.isUnit() && currentItem.metaType.getUnitType() == Terran_Supply_Depot) {
@@ -1320,8 +1419,7 @@ void StrategyManager::executeSupplyManagement()
 							}
 
 							if (isToEnqueue) {
-								// 주석처리
-								//						cout << "enqueue supply provider " << Terran_Supply_Depot.getName().c_str() << endl;
+						
 								BM.buildQueue.queueAsHighestPriority(Terran_Supply_Depot, true);
 							}
 						}
@@ -1461,16 +1559,69 @@ bool StrategyManager::getNeedAdvanceWait()
 {
 	return advanceWait;
 }
-
+//设置我的建造类型=============================
 void StrategyManager::setMyBuild()
 {
+	string enemyName = BWAPI::Broodwar->enemy()->getName();
+
+
 	if (INFO.enemyRace == Races::Terran)
 	{
-		myBuild = MyBuildTypes::Terran_TankGoliath;
+		if (EIB == Terran_1fac_1star ||
+			EIB == Terran_1fac_2star ||
+			EIB == Terran_2fac_1star ||
+			EMB == Terran_1fac_1star ||
+			EMB == Terran_1fac_2star ||
+			EMB == Terran_2fac_1star ||
+			EMB == Terran_2fac
+			)
+			myBuild = MyBuildTypes::Terran_TankGoliath;
+		else
+			myBuild = MyBuildTypes::Terran_VultureTankWraith;
 	}
 	else if (INFO.enemyRace == Races::Protoss)
 	{
+	
 
+		if (EIB == UnknownBuild)
+			myBuild = MyBuildTypes::Protoss_DragoonKiller;
+		else
+		{
+			
+			if (EMB == Toss_dark &&TIME < 3.1 * 60 * 24)
+				myBuild = MyBuildTypes::Protoss_TemplarKiller;
+
+
+			else if ((EIB == Toss_1g_forward || EIB == Toss_2g_forward || EIB == Toss_2g_zealot)&& myBuild != MyBuildTypes::Protoss_TemplarKiller)
+				myBuild = MyBuildTypes::Protoss_ZealotKiller;
+
+			else if (EIB == Toss_pure_double || EMB == Toss_fast_carrier || EMB == Toss_arbiter_carrier)
+			{
+				if(INFO.getMapPlayerLimit() == 2)
+					myBuild = MyBuildTypes::Protoss_MineKiller;
+
+				else 
+				{
+					if (EMB == Toss_fast_carrier || EMB == Toss_arbiter_carrier)
+					 myBuild = MyBuildTypes::Protoss_CarrierKiller;
+					
+					else
+						myBuild = MyBuildTypes::Protoss_CannonKiller;
+				}
+			}
+
+
+			else if (EIB == Toss_forge || Toss_cannon_rush)
+				myBuild = MyBuildTypes::Protoss_CannonKiller;
+
+			else 
+			{
+				if (myBuild = MyBuildTypes::Protoss_DragoonKiller)
+					myBuild = MyBuildTypes::Protoss_DragoonKiller;
+
+			}
+
+		}
 	}
 	else if (INFO.enemyRace == Races::Zerg)
 	{
@@ -1552,7 +1703,7 @@ void StrategyManager::blockFirstChokePoint(UnitType type)
 			}
 	}
 }
-
+//建造完成以及建造血量大于60％的建筑=============================
 int StrategyManager::getTrainBuildingCount(UnitType type)
 {
 	uList buildings = INFO.getBuildings(type, S);
@@ -1569,7 +1720,7 @@ int StrategyManager::getTrainBuildingCount(UnitType type)
 
 	return count;
 }
-
+//检查升级==========================================================
 void StrategyManager::checkUpgrade()
 {
 	if (TIME % 24 != 0)
@@ -1581,7 +1732,8 @@ void StrategyManager::checkUpgrade()
 	{
 		// 탱크가 없으면 탱크 1개 먼저 찍는다
 		// 탱크 1개 이상인데 시즈업이 안되어 있는 상태면 시즈업 먼저 찍는다.
-		if (BasicBuildStrategy::Instance().isResearchingOrResearched(TechTypes::Tank_Siege_Mode)) {
+		if (BasicBuildStrategy::Instance().isResearchingOrResearched(TechTypes::Tank_Siege_Mode)) 
+		{
 			needUpgrade = false;
 			return;
 		}
@@ -1598,7 +1750,7 @@ void StrategyManager::checkUpgrade()
 
 	return;
 }
-
+//检查是否用雷达==========================================================
 void StrategyManager::checkUsingScan()
 {
 	if (TIME % 24 != 0)
@@ -1640,7 +1792,7 @@ void StrategyManager::checkUsingScan()
 
 	checkEnemyMultiBase();
 }
-
+//设置进攻地址==================================================
 void StrategyManager::setAttackPosition()
 {
 	if (TIME % 24 != 0)
@@ -1694,7 +1846,7 @@ void StrategyManager::setAttackPosition()
 		{
 			mainAttackPosition = currentBasePos;
 		}
-		else // 현재 메인 공격지점 커맨드를 날려버렸다면..
+		else // 如果把目前的主要攻击点轰出去，
 		{
 			if (INFO.getBuildingsInRadius(E, mainAttackPosition, 2 * TILE_SIZE, true, false, true).size() == 0)
 			{
@@ -1741,14 +1893,14 @@ void StrategyManager::setAttackPosition()
 			}
 		}
 
-		// 상대 Main Attack Position에서 가장 먼곳부터 부순다. 18.09.15
+		// 相对 Main Attack Position从离这儿最远的地方开始打碎。. 18.09.15
 		standardPos = mainAttackPosition;
 		int farDistance = 0;
 		Position farPosition = Positions::Unknown;
 
 		for (auto eBase : INFO.getOccupiedBaseLocations(E))
 		{
-			// 일단 섬은 제외
+			// 已经排除岛屿了
 			if (eBase->isIsland())
 				continue;
 
@@ -1814,7 +1966,8 @@ void StrategyManager::setAttackPosition()
 	}
 	else // 현재 메인공격지점이 없는 경우.
 	{
-		if (mainAttackPosition != Positions::Unknown && theMap.Center().getApproxDistance(mainAttackPosition) < 10 * TILE_SIZE) {
+		if (mainAttackPosition != Positions::Unknown && theMap.Center().getApproxDistance(mainAttackPosition) < 10 * TILE_SIZE) 
+		{
 			mainAttackPosition = INFO.getMainBaseLocation(E)->Center();
 			return;
 		}
@@ -2696,9 +2849,22 @@ void StrategyManager::decideDropship()
 {
 	if (INFO.enemyRace == Races::Terran)
 	{
-		//bw->drawTextScreen(Position(300, 100), " DropShip Mode : %s", dropshipMode ? "true" : "false");
+		
 
 		if (INFO.getCompletedCount(Terran_Dropship, S) >= 3 && TM.enoughTankForDrop() && GM.enoughGoliathForDrop()) //DrawLine tank > 8, gol > 6  && INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) > 12 && INFO.getCompletedCount(Terran_Goliath, S) > 8)
+		{
+			dropshipMode = true;
+		}
+		else
+		{
+			dropshipMode = false;
+		}
+	}
+	else if (INFO.enemyRace == Races::Protoss)
+	{
+
+
+		if (INFO.getCompletedCount(Terran_Dropship, S) >= 1 && TM.enoughTankForDrop()) //DrawLine tank > 8, gol > 6  && INFO.getCompletedCount(Terran_Siege_Tank_Tank_Mode, S) > 12 && INFO.getCompletedCount(Terran_Goliath, S) > 8)
 		{
 			dropshipMode = true;
 		}

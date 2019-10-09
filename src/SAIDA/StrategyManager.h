@@ -85,14 +85,17 @@ namespace MyBot
 				return needKeepMultiSecond || needKeepMultiSecondAir;
 			else if (uType == Terran_Vulture)
 				return needKeepMultiSecond || needMineSecond;
-			else
-				return needKeepMultiSecond;
+			else if (uType == Terran_Marine)
+				return needKeepMultiSecond || needKeepMultiSecondAir;
+			else return needKeepMultiSecond;
 		}
 		bool getNeedKeepThirdExpansion(UnitType uType) {
 			if (uType == Terran_Goliath)
 				return needKeepMultiThird || needKeepMultiThirdAir;
 			else if (uType == Terran_Vulture)
 				return needKeepMultiThird || needMineThird;
+			else if (uType == Terran_Marine)
+				return needKeepMultiThird || needKeepMultiThirdAir;
 			else
 				return needKeepMultiThird;
 		}
@@ -107,19 +110,19 @@ namespace MyBot
 		}
 
 		void checkNeedDefenceWithScv();
-		bool getNeedDefenceWithScv() {
+		bool getNeedDefenceWithScv() 
+		{
 			return needDefenceWithScv;
 		}
 
 		// 추가 멀티 먹어야 하나
 		bool needAdditionalExpansion();
 	private:
-		// 내 빌드 설정
+		
 		void setMyBuild();
-
+		void setMyBasicBuildStrategy();
 		void blockFirstChokePoint(UnitType type);
 
-		// 서플 증설 시 사용할 건물 count
 		int getTrainBuildingCount(UnitType type);
 
 		// 초반에 유닛뽑기보다 업그레이드를 먼저 해줘야 하는 상황을 설정해 주기 위함.
