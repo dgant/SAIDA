@@ -1,0 +1,567 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Stormbreaker\CommandUtil.cpp">
+      <Filter>Stormbreaker</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\GameCommander.cpp">
+      <Filter>Stormbreaker</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\StrategyManager.cpp">
+      <Filter>Stormbreaker</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BWEM\src\area.cpp">
+      <Filter>BWEM\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BWEM\src\base.cpp">
+      <Filter>BWEM\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BWEM\src\bwapiExt.cpp">
+      <Filter>BWEM\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BWEM\src\bwem.cpp">
+      <Filter>BWEM\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BWEM\src\cp.cpp">
+      <Filter>BWEM\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BWEM\src\examples.cpp">
+      <Filter>BWEM\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BWEM\src\exampleWall.cpp">
+      <Filter>BWEM\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BWEM\src\graph.cpp">
+      <Filter>BWEM\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BWEM\src\gridMap.cpp">
+      <Filter>BWEM\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BWEM\src\map.cpp">
+      <Filter>BWEM\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BWEM\src\mapDrawer.cpp">
+      <Filter>BWEM\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BWEM\src\mapImpl.cpp">
+      <Filter>BWEM\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BWEM\src\mapPrinter.cpp">
+      <Filter>BWEM\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BWEM\src\neutral.cpp">
+      <Filter>BWEM\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BWEM\src\tiles.cpp">
+      <Filter>BWEM\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BWEM\src\utils.cpp">
+      <Filter>BWEM\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BWEM\src\winutils.cpp">
+      <Filter>BWEM\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BWEM\EasyBMP_1.06\EasyBMP.cpp">
+      <Filter>BWEM\EasyBMP</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\GridArea.cpp">
+      <Filter>Stormbreaker</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\ReserveBuilding.cpp">
+      <Filter>Stormbreaker</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\dllmain.cpp">
+      <Filter>Stormbreaker</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\Stormbreaker.cpp">
+      <Filter>Stormbreaker</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\StormbreakerUtil.cpp">
+      <Filter>Stormbreaker</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\DeepLearningTools\LinearRegression.cpp">
+      <Filter>Stormbreaker\DeepLearningTools</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\DeepLearningTools\network.cpp">
+      <Filter>Stormbreaker\DeepLearningTools</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\DeepLearningTools\neuron.cpp">
+      <Filter>Stormbreaker\DeepLearningTools</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\DeepLearningTools\SumTree.cpp">
+      <Filter>Stormbreaker\DeepLearningTools</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\ActorCriticForProductionStrategy.cpp">
+      <Filter>Stormbreaker</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\Common.cpp">
+      <Filter>Stormbreaker</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\InformationManager.cpp">
+      <Filter>Stormbreaker\InFoManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\MetaType.cpp">
+      <Filter>Stormbreaker\InFoManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitInfo.cpp">
+      <Filter>Stormbreaker\InFoManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitData.cpp">
+      <Filter>Stormbreaker\InFoManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\ComsatStationManager.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\DropshipManager.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\EngineeringBayManager.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\GoliathManager.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\MarineManager.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\TankManager.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\VessleManager.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\VultureManager.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\WraithManager.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\BarrackState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\CommandCenterState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\ComsatStationState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\DropshipState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\EngineeringBayState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\FactoryState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\GoliathState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\MarineState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\ScvState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\StarportState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\TankState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\VessleState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\VultureState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\WraithState.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\HostileManager.cpp">
+      <Filter>Stormbreaker</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\MetaStrategy.cpp">
+      <Filter>Stormbreaker</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BuildingStrategy\BuildingPlaceFinder.cpp">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BuildingStrategy\BuildManager.cpp">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BuildingStrategy\BuildOrderManager.cpp">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BuildingStrategy\BuildStrategy.cpp">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BuildingStrategy\BuildType.cpp">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BuildingStrategy\ConstructionManager.cpp">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BuildingStrategy\ConstructionTask.cpp">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\TrainManager.cpp">
+      <Filter>Stormbreaker</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\TimeOut\TimerManager.cpp">
+      <Filter>Stormbreaker\TimeOut</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\BuildingStrategy\SelfBuildingPlaceFinder.cpp">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\ExploreManager.cpp">
+      <Filter>Stormbreaker</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\SoldierManager.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\CombatCommander.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Stormbreaker\UnitManager\MicroManager.cpp">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Stormbreaker\CommandUtil.h">
+      <Filter>Stormbreaker</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\GameCommander.h">
+      <Filter>Stormbreaker</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\StrategyManager.h">
+      <Filter>Stormbreaker</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BWEM\src\area.h">
+      <Filter>BWEM\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BWEM\src\base.h">
+      <Filter>BWEM\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BWEM\src\bwapiExt.h">
+      <Filter>BWEM\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BWEM\src\bwem.h">
+      <Filter>BWEM\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BWEM\src\cp.h">
+      <Filter>BWEM\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BWEM\src\defs.h">
+      <Filter>BWEM\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BWEM\src\examples.h">
+      <Filter>BWEM\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BWEM\src\exampleWall.h">
+      <Filter>BWEM\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BWEM\src\graph.h">
+      <Filter>BWEM\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BWEM\src\gridMap.h">
+      <Filter>BWEM\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BWEM\src\map.h">
+      <Filter>BWEM\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BWEM\src\mapDrawer.h">
+      <Filter>BWEM\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BWEM\src\mapImpl.h">
+      <Filter>BWEM\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BWEM\src\mapPrinter.h">
+      <Filter>BWEM\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BWEM\src\neutral.h">
+      <Filter>BWEM\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BWEM\src\tiles.h">
+      <Filter>BWEM\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BWEM\src\utils.h">
+      <Filter>BWEM\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BWEM\src\winutils.h">
+      <Filter>BWEM\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BWEM\EasyBMP_1.06\EasyBMP.h">
+      <Filter>BWEM\EasyBMP</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\GridArea.h">
+      <Filter>Stormbreaker</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\ReserveBuilding.h">
+      <Filter>Stormbreaker</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\Stormbreaker.h">
+      <Filter>Stormbreaker</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\StormbreakerUtil.h">
+      <Filter>Stormbreaker</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\DeepLearningTools\LinearRegression.h">
+      <Filter>Stormbreaker\DeepLearningTools</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\DeepLearningTools\network.h">
+      <Filter>Stormbreaker\DeepLearningTools</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\DeepLearningTools\neuron.h">
+      <Filter>Stormbreaker\DeepLearningTools</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\DeepLearningTools\SumTree.h">
+      <Filter>Stormbreaker\DeepLearningTools</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\ActorCriticForProductionStrategy.h">
+      <Filter>Stormbreaker</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\ACUnitType.h">
+      <Filter>Stormbreaker</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\Common.h">
+      <Filter>Stormbreaker</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\InformationManager.h">
+      <Filter>Stormbreaker\InFoManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\MetaType.h">
+      <Filter>Stormbreaker\InFoManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitInfo.h">
+      <Filter>Stormbreaker\InFoManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitData.h">
+      <Filter>Stormbreaker\InFoManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\ComsatStationManager.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\DropshipManager.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\EngineeringBayManager.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\GoliathManager.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\MarineManager.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\TankManager.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\VessleManager.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\VultureManager.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\WraithManager.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\BarrackState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\CommandCenterState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\ComsatStationState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\DropshipState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\EngineeringBayState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\FactoryState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\GoliathState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\MarineState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\ScvState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\StarportState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\State.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\TankState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\VessleState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\VultureState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\WraithState.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\HostileManager.h">
+      <Filter>Stormbreaker</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\MetaStrategy.h">
+      <Filter>Stormbreaker</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BuildingStrategy\BuildingPlaceFinder.h">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BuildingStrategy\BuildManager.h">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BuildingStrategy\BuildOrderManager.h">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BuildingStrategy\BuildStrategy.h">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BuildingStrategy\BuildType.h">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BuildingStrategy\ConstructionManager.h">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BuildingStrategy\ConstructionTask.h">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\TrainManager.h">
+      <Filter>Stormbreaker</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\TimeOut\Timer.hpp">
+      <Filter>Stormbreaker\TimeOut</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\TimeOut\TimerManager.h">
+      <Filter>Stormbreaker\TimeOut</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\BuildingStrategy\SelfBuildingPlaceFinder.h">
+      <Filter>Stormbreaker\BuildingStrategy</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\ExploreManager.h">
+      <Filter>Stormbreaker</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\SoldierManager.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\CombatCommander.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Stormbreaker\UnitManager\MicroManager.h">
+      <Filter>Stormbreaker\UnitManager</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="BWEM">
+      <UniqueIdentifier>{dde37e20-e1a9-47d5-a545-7c468f8272ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BWEM\doc">
+      <UniqueIdentifier>{d6953c2a-7779-4dd5-bfdc-b685a45f1e61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BWEM\doc\html">
+      <UniqueIdentifier>{16acb652-6a36-4b29-aa19-706b386068d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BWEM\src">
+      <UniqueIdentifier>{309ed729-bdf3-4e97-9397-39a5a9990462}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BWEM\EasyBMP">
+      <UniqueIdentifier>{16556d8f-be1e-4934-ba24-153ec0755465}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Stormbreaker">
+      <UniqueIdentifier>{295ff9ca-e7f5-4de0-ba47-19bbf0421850}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Stormbreaker\DeepLearningTools">
+      <UniqueIdentifier>{d7b34015-1278-456d-b84f-ae5588fe7ecb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Stormbreaker\UnitManager">
+      <UniqueIdentifier>{3a59ae9f-ffa5-496a-9d91-d0ba470d4bec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Stormbreaker\BuildingStrategy">
+      <UniqueIdentifier>{48f4ff54-9ca3-4735-a377-bc821f10e9a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Stormbreaker\TimeOut">
+      <UniqueIdentifier>{a0e357c8-039f-4f66-b316-4fb7f4baacad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Stormbreaker\InFoManager">
+      <UniqueIdentifier>{33bd948b-551d-445c-bc41-0d4800f16080}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Stormbreaker\BWEM\LICENSE.txt">
+      <Filter>BWEM</Filter>
+    </Text>
+    <Text Include="Stormbreaker\BWEM\README.txt">
+      <Filter>BWEM</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Stormbreaker\BWEM\doc\html\about.html">
+      <Filter>BWEM\doc\html</Filter>
+    </None>
+    <None Include="Stormbreaker\BWEM\doc\html\download.html">
+      <Filter>BWEM\doc\html</Filter>
+    </None>
+    <None Include="Stormbreaker\BWEM\doc\html\faq.html">
+      <Filter>BWEM\doc\html</Filter>
+    </None>
+    <None Include="Stormbreaker\BWEM\doc\html\features.html">
+      <Filter>BWEM\doc\html</Filter>
+    </None>
+    <None Include="Stormbreaker\BWEM\doc\html\help.html">
+      <Filter>BWEM\doc\html</Filter>
+    </None>
+    <None Include="Stormbreaker\BWEM\doc\html\index.html">
+      <Filter>BWEM\doc\html</Filter>
+    </None>
+    <None Include="Stormbreaker\BWEM\doc\html\interactiveIron.html">
+      <Filter>BWEM\doc\html</Filter>
+    </None>
+    <None Include="Stormbreaker\BWEM\doc\html\Iron.html">
+      <Filter>BWEM\doc\html</Filter>
+    </None>
+    <None Include="Stormbreaker\BWEM\doc\html\start.html">
+      <Filter>BWEM\doc\html</Filter>
+    </None>
+    <None Include="Stormbreaker\BWEM\doc\html\Stone.html">
+      <Filter>BWEM\doc\html</Filter>
+    </None>
+    <None Include="Stormbreaker\BWEM\doc\html\style.css">
+      <Filter>BWEM\doc\html</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Stormbreaker\BWEM\doc\html\Andromeda.png">
+      <Filter>BWEM\doc\html</Filter>
+    </Image>
+    <Image Include="Stormbreaker\BWEM\doc\html\Baby Steps.png">
+      <Filter>BWEM\doc\html</Filter>
+    </Image>
+    <Image Include="Stormbreaker\BWEM\doc\html\Great Barrier Reef.png">
+      <Filter>BWEM\doc\html</Filter>
+    </Image>
+    <Image Include="Stormbreaker\BWEM\doc\html\Heartbreak Ridge.png">
+      <Filter>BWEM\doc\html</Filter>
+    </Image>
+    <Image Include="Stormbreaker\BWEM\doc\html\Iron.jpg">
+      <Filter>BWEM\doc\html</Filter>
+    </Image>
+    <Image Include="Stormbreaker\BWEM\doc\html\Ride of Valkyries.png">
+      <Filter>BWEM\doc\html</Filter>
+    </Image>
+    <Image Include="Stormbreaker\BWEM\doc\html\Stone.jpg">
+      <Filter>BWEM\doc\html</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

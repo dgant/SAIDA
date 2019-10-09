@@ -1,0 +1,378 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug_DLL|Win32">
+      <Configuration>Debug_DLL</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_DLL|Win32">
+      <Configuration>Release_DLL</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{AE3B9DC4-5FBB-4B57-8AB4-0D84D8649D78}</ProjectGuid>
+    <RootNamespace>Stormbreaker</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>Stormbreaker</ProjectName>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_DLL|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DLL|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_DLL|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DLL|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release_DLL|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug_DLL|Win32'">false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(BWAPI_DIR)/include</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(BWAPI_DIR)/lib</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_DLL|Win32'">
+    <OutDir>$(Configuration)\dll\</OutDir>
+    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(BWAPI_DIR)/include</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(BWAPI_DIR)/lib</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DLL|Win32'">
+    <OutDir>$(Configuration)\dll\</OutDir>
+    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(BWAPI_DIR)/include</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(BWAPI_DIR)/lib</LibraryPath>
+    <TargetName>$(ProjectName)_d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(BWAPI_DIR)/include</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(BWAPI_DIR)/lib</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/D_ITERATOR_DEBUG_LEVEL=2 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <PreLinkEvent />
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalDependencies>Advapi32.lib;ws2_32.lib;BWAPId.lib;BWAPIClientd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ExceptionHandling>Async</ExceptionHandling>
+    </ClCompile>
+    <PreLinkEvent />
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalDependencies>Advapi32.lib;ws2_32.lib;BWAPI.lib;BWAPIClient.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_DLL|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(BWTA_DIR)/include;$(BWAPI_DIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ExceptionHandling>Async</ExceptionHandling>
+    </ClCompile>
+    <PreLinkEvent />
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalDependencies>Advapi32.lib;ws2_32.lib;BWAPI.lib;BWAPIClient.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DLL|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(BWTA_DIR)/include;$(BWAPI_DIR)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NOMINMAX;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ExceptionHandling>Async</ExceptionHandling>
+    </ClCompile>
+    <PreLinkEvent />
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalDependencies>Advapi32.lib;ws2_32.lib;BWAPId.lib;BWAPIClientd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Stormbreaker\ActorCriticForProductionStrategy.cpp" />
+    <ClCompile Include="Stormbreaker\BuildingStrategy\BuildingPlaceFinder.cpp" />
+    <ClCompile Include="Stormbreaker\BuildingStrategy\BuildManager.cpp" />
+    <ClCompile Include="Stormbreaker\BuildingStrategy\BuildOrderManager.cpp" />
+    <ClCompile Include="Stormbreaker\BuildingStrategy\BuildStrategy.cpp" />
+    <ClCompile Include="Stormbreaker\BuildingStrategy\BuildType.cpp" />
+    <ClCompile Include="Stormbreaker\BuildingStrategy\ConstructionManager.cpp" />
+    <ClCompile Include="Stormbreaker\BuildingStrategy\ConstructionTask.cpp" />
+    <ClCompile Include="Stormbreaker\BuildingStrategy\SelfBuildingPlaceFinder.cpp" />
+    <ClCompile Include="Stormbreaker\DeepLearningTools\LinearRegression.cpp" />
+    <ClCompile Include="Stormbreaker\DeepLearningTools\network.cpp" />
+    <ClCompile Include="Stormbreaker\DeepLearningTools\neuron.cpp" />
+    <ClCompile Include="Stormbreaker\DeepLearningTools\SumTree.cpp" />
+    <ClCompile Include="Stormbreaker\ExploreManager.cpp" />
+    <ClCompile Include="Stormbreaker\MetaStrategy.cpp" />
+    <ClCompile Include="Stormbreaker\ReserveBuilding.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\EasyBMP_1.06\EasyBMP.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\area.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\base.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\bwapiExt.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\bwem.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\cp.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\examples.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\exampleWall.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\graph.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\gridMap.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\map.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\mapDrawer.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\mapImpl.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\mapPrinter.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\neutral.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\tiles.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\utils.cpp" />
+    <ClCompile Include="Stormbreaker\BWEM\src\winutils.cpp" />
+    <ClCompile Include="Stormbreaker\Common.cpp" />
+    <ClCompile Include="Stormbreaker\HostileManager.cpp" />
+    <ClCompile Include="Stormbreaker\GameCommander.cpp" />
+    <ClCompile Include="Stormbreaker\InformationManager.cpp" />
+    <ClCompile Include="Stormbreaker\GridArea.cpp" />
+    <ClCompile Include="Stormbreaker\MetaType.cpp" />
+    <ClCompile Include="Stormbreaker\CommandUtil.cpp" />
+    <ClCompile Include="Stormbreaker\Stormbreaker.cpp" />
+    <ClCompile Include="Stormbreaker\dllmain.cpp" />
+    <ClCompile Include="Stormbreaker\StormbreakerUtil.cpp" />
+    <ClCompile Include="Stormbreaker\StrategyManager.cpp" />
+    <ClCompile Include="Stormbreaker\TimeOut\TimerManager.cpp" />
+    <ClCompile Include="Stormbreaker\TrainManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitData.cpp" />
+    <ClCompile Include="Stormbreaker\UnitInfo.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\BarrackState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\CombatCommander.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\CommandCenterState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\ComsatStationManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\ComsatStationState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\DropshipManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\DropshipState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\EngineeringBayManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\EngineeringBayState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\FactoryState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\GoliathManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\GoliathState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\MarineManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\MarineState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\MicroManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\ScvState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\SoldierManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\StarportState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\TankManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\TankState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\VessleManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\VessleState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\VultureManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\VultureState.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\WraithManager.cpp" />
+    <ClCompile Include="Stormbreaker\UnitManager\WraithState.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Stormbreaker\ActorCriticForProductionStrategy.h" />
+    <ClInclude Include="Stormbreaker\BuildingStrategy\BuildingPlaceFinder.h" />
+    <ClInclude Include="Stormbreaker\BuildingStrategy\BuildManager.h" />
+    <ClInclude Include="Stormbreaker\BuildingStrategy\BuildOrderManager.h" />
+    <ClInclude Include="Stormbreaker\BuildingStrategy\BuildStrategy.h" />
+    <ClInclude Include="Stormbreaker\BuildingStrategy\BuildType.h" />
+    <ClInclude Include="Stormbreaker\BuildingStrategy\ConstructionManager.h" />
+    <ClInclude Include="Stormbreaker\BuildingStrategy\ConstructionTask.h" />
+    <ClInclude Include="Stormbreaker\BuildingStrategy\SelfBuildingPlaceFinder.h" />
+    <ClInclude Include="Stormbreaker\DeepLearningTools\LinearRegression.h" />
+    <ClInclude Include="Stormbreaker\DeepLearningTools\network.h" />
+    <ClInclude Include="Stormbreaker\DeepLearningTools\neuron.h" />
+    <ClInclude Include="Stormbreaker\DeepLearningTools\SumTree.h" />
+    <ClInclude Include="Stormbreaker\ACUnitType.h" />
+    <ClInclude Include="Stormbreaker\ExploreManager.h" />
+    <ClInclude Include="Stormbreaker\MetaStrategy.h" />
+    <ClInclude Include="Stormbreaker\ReserveBuilding.h" />
+    <ClInclude Include="Stormbreaker\BWEM\EasyBMP_1.06\EasyBMP.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\area.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\base.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\bwapiExt.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\bwem.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\cp.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\defs.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\examples.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\exampleWall.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\graph.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\gridMap.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\map.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\mapDrawer.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\mapImpl.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\mapPrinter.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\neutral.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\tiles.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\utils.h" />
+    <ClInclude Include="Stormbreaker\BWEM\src\winutils.h" />
+    <ClInclude Include="Stormbreaker\Common.h" />
+    <ClInclude Include="Stormbreaker\HostileManager.h" />
+    <ClInclude Include="Stormbreaker\GameCommander.h" />
+    <ClInclude Include="Stormbreaker\InformationManager.h" />
+    <ClInclude Include="Stormbreaker\GridArea.h" />
+    <ClInclude Include="Stormbreaker\MetaType.h" />
+    <ClInclude Include="Stormbreaker\CommandUtil.h" />
+    <ClInclude Include="Stormbreaker\Stormbreaker.h" />
+    <ClInclude Include="Stormbreaker\StormbreakerUtil.h" />
+    <ClInclude Include="Stormbreaker\StrategyManager.h" />
+    <ClInclude Include="Stormbreaker\TimeOut\Timer.hpp" />
+    <ClInclude Include="Stormbreaker\TimeOut\TimerManager.h" />
+    <ClInclude Include="Stormbreaker\TrainManager.h" />
+    <ClInclude Include="Stormbreaker\UnitData.h" />
+    <ClInclude Include="Stormbreaker\UnitInfo.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\BarrackState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\CombatCommander.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\CommandCenterState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\ComsatStationManager.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\ComsatStationState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\DropshipManager.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\DropshipState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\EngineeringBayManager.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\EngineeringBayState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\FactoryState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\GoliathManager.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\GoliathState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\MarineManager.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\MarineState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\MicroManager.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\ScvState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\SoldierManager.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\StarportState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\State.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\TankManager.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\TankState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\VessleManager.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\VessleState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\VultureManager.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\VultureState.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\WraithManager.h" />
+    <ClInclude Include="Stormbreaker\UnitManager\WraithState.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Stormbreaker\BWEM\LICENSE.txt" />
+    <Text Include="Stormbreaker\BWEM\README.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Stormbreaker\BWEM\doc\html\about.html" />
+    <None Include="Stormbreaker\BWEM\doc\html\download.html" />
+    <None Include="Stormbreaker\BWEM\doc\html\faq.html" />
+    <None Include="Stormbreaker\BWEM\doc\html\features.html" />
+    <None Include="Stormbreaker\BWEM\doc\html\help.html" />
+    <None Include="Stormbreaker\BWEM\doc\html\index.html" />
+    <None Include="Stormbreaker\BWEM\doc\html\interactiveIron.html" />
+    <None Include="Stormbreaker\BWEM\doc\html\Iron.html" />
+    <None Include="Stormbreaker\BWEM\doc\html\start.html" />
+    <None Include="Stormbreaker\BWEM\doc\html\Stone.html" />
+    <None Include="Stormbreaker\BWEM\doc\html\style.css" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Stormbreaker\BWEM\doc\html\Andromeda.png" />
+    <Image Include="Stormbreaker\BWEM\doc\html\Baby Steps.png" />
+    <Image Include="Stormbreaker\BWEM\doc\html\Great Barrier Reef.png" />
+    <Image Include="Stormbreaker\BWEM\doc\html\Heartbreak Ridge.png" />
+    <Image Include="Stormbreaker\BWEM\doc\html\Iron.jpg" />
+    <Image Include="Stormbreaker\BWEM\doc\html\Ride of Valkyries.png" />
+    <Image Include="Stormbreaker\BWEM\doc\html\Stone.jpg" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
